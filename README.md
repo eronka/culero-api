@@ -1,5 +1,7 @@
 # culero
 
+![Banner](https://github.com/eronka/culero/assets/159177373/844a53e8-4ed1-45fb-8158-c5a9a02da521)
+
 Welcome to Culero, the revolutionary platform for bottom-up management!
 
 Introduction
