@@ -27,6 +27,12 @@ Employees can confidentially rate and review their managers on various aspects s
 Managers can receive feedback and use it to improve their management style.
 The platform provides anonymous data to organizations, helping them identify areas for improvement and promoting positive change from within.
 
+
+Wireframe
+
+https://www.figma.com/file/p4gfqRDn3ma4zPaPAj8vH4?node-id=0:1&locale=en&type=design
+
+
 Contributing
 
 Here are some ways you can contribute to Culero:
