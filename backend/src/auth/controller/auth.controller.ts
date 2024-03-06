@@ -13,7 +13,6 @@ import { AuthGuard } from '@nestjs/passport';
 import { Public } from '../../decorators/public.decorator';
 import { FacebookOAuthStrategyFactory } from '../../oauth/factory/facebook/facebook-strategy.factory';
 import { LinkedInOAuthStrategyFactory } from '../../oauth/factory/linkedin/linkedin-strategy.factory';
-import { AuthType } from '@prisma/client';
 
 @Controller('auth')
 export class AuthController {
@@ -41,15 +40,7 @@ export class AuthController {
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
   async googleOAuthCallback(@Req() req) {
-    const { emails, displayName: name, photos } = req.user;
-    const email = emails[0].value;
-    const profilePictureUrl = photos[0].value;
-    return await this.authService.handleOAuthLogin(
-      email,
-      name,
-      profilePictureUrl,
-      AuthType.GOOGLE,
-    );
+    return await this.authService.handleGoogleOAuthLogin(req);
   }
 
   @Public()
@@ -69,17 +60,7 @@ export class AuthController {
   @Get('facebook/callback')
   @UseGuards(AuthGuard('facebook'))
   async facebookOAuthCallback(@Req() req) {
-    const { emails, name, photos } = req.user;
-    const email = emails[0].value;
-    const displayName = name.givenName + ' ' + name.familyName;
-    const profilePictureUrl = photos[0].value;
-    console.log(req.user);
-    return await this.authService.handleOAuthLogin(
-      email,
-      displayName,
-      profilePictureUrl,
-      AuthType.FACEBOOK,
-    );
+    return await this.authService.handleFacebookOAuthLogin(req);
   }
 
   @Public()
@@ -99,15 +80,6 @@ export class AuthController {
   @Get('linkedin/callback')
   @UseGuards(AuthGuard('linkedin'))
   async linkedinOAuthCallback(@Req() req) {
-    console.log(req.user);
-    const { emails, displayName: name, photos } = req.user;
-    const email = emails[0].value;
-    const profilePictureUrl = photos[0].value;
-    return await this.authService.handleOAuthLogin(
-      email,
-      name,
-      profilePictureUrl,
-      AuthType.LINKEDIN,
-    );
+    return await this.authService.handleLinkedInOAuthLogin(req);
   }
 }

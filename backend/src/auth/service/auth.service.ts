@@ -10,18 +10,58 @@ export class AuthService {
     private jwt: JwtService,
   ) {}
 
-  async handleOAuthLogin(
-    email: string,
-    name: string,
-    profilePictureUrl: string,
-    authType: AuthType,
-  ) {
-    // We need to create the user if it doesn't exist yet
+  async handleGoogleOAuthLogin(req: any) {
+    const { emails, displayName: name, photos } = req.user;
+    const email = emails[0].value;
+    const profilePictureUrl = photos[0].value;
+
     const user = await this.createUserIfNotExists(
       email,
       name,
       profilePictureUrl,
-      authType,
+      AuthType.GOOGLE,
+    );
+
+    const token = await this.generateToken(user.id);
+
+    return {
+      ...user,
+      token,
+    };
+  }
+
+  async handleFacebookOAuthLogin(req: any) {
+    const { emails, name, photos } = req.user;
+    const email = emails[0].value;
+    const displayName = name.givenName + ' ' + name.familyName;
+    const profilePictureUrl = photos[0].value;
+
+    const user = await this.createUserIfNotExists(
+      email,
+      displayName,
+      profilePictureUrl,
+      AuthType.FACEBOOK,
+    );
+
+    const token = await this.generateToken(user.id);
+
+    return {
+      ...user,
+      token,
+    };
+  }
+
+  async handleLinkedInOAuthLogin(req: any) {
+    const { emails, name, photos } = req.user;
+    const email = emails[0].value;
+    const displayName = name.givenName + ' ' + name.familyName;
+    const profilePictureUrl = photos[0].value;
+
+    const user = await this.createUserIfNotExists(
+      email,
+      displayName,
+      profilePictureUrl,
+      AuthType.LINKEDIN,
     );
 
     const token = await this.generateToken(user.id);
