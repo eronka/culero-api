@@ -1,0 +1,6 @@
+{
+	"dependencies": {
+		"@types/passport-facebook": "^3.0.3",
+		"passport-facebook": "^3.0.0"
+	}
+}

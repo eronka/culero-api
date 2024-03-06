@@ -4,6 +4,7 @@ import { AuthService } from './service/auth.service';
 import { JwtModule } from '@nestjs/jwt';
 import { GoogleOAuthStrategyFactory } from '../oauth/factory/google/google-strategy.factory';
 import { GoogleStrategy } from '../oauth/strategy/google/google.strategy';
+import { FacebookOAuthStrategyFactory } from '../oauth/factory/facebook/facebook-strategy.factory';
 
 @Module({
   imports: [
@@ -27,6 +28,16 @@ import { GoogleStrategy } from '../oauth/strategy/google/google.strategy';
         googleOAuthStrategyFactory.createOAuthStrategy();
       },
       inject: [GoogleOAuthStrategyFactory],
+    },
+    FacebookOAuthStrategyFactory,
+    {
+      provide: GoogleStrategy,
+      useFactory: (
+        facebookOAuthStrategyFactory: FacebookOAuthStrategyFactory,
+      ) => {
+        facebookOAuthStrategyFactory.createOAuthStrategy();
+      },
+      inject: [FacebookOAuthStrategyFactory],
     },
   ],
 })
