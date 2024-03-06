@@ -8,6 +8,8 @@ import { FacebookOAuthStrategyFactory } from '../oauth/factory/facebook/facebook
 import { LinkedInOAuthStrategyFactory } from '../oauth/factory/linkedin/linkedin-strategy.factory';
 import { FacebookStrategy } from '../oauth/strategy/facebook/facebook.strategy';
 import { LinkedInStrategy } from '../oauth/strategy/linkedin/linkedin.strategy';
+import { AppleOAuthStrategyFactory } from '../oauth/factory/apple/apple-strategy.factory';
+import { AppleStrategy } from '../oauth/strategy/apple/apple.strategy';
 
 @Module({
   imports: [
@@ -51,6 +53,14 @@ import { LinkedInStrategy } from '../oauth/strategy/linkedin/linkedin.strategy';
         linkedinOAuthStrategyFactory.createOAuthStrategy();
       },
       inject: [LinkedInOAuthStrategyFactory],
+    },
+    AppleOAuthStrategyFactory,
+    {
+      provide: AppleStrategy,
+      useFactory: (appleOAuthStrategyFactory: AppleOAuthStrategyFactory) => {
+        appleOAuthStrategyFactory.createOAuthStrategy();
+      },
+      inject: [AppleOAuthStrategyFactory],
     },
   ],
 })
