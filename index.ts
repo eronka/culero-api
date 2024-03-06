@@ -75,12 +75,13 @@ async function createSampleData() {
     });
   
     console.dir(users, { depth: null });
-  }
-  
-  try {
-    await createSampleData();
-    await readSampleData();
-  } catch (error) {
-    console.log(error);
-  }
+  };
 
+  (async () => {
+    try {
+      await createSampleData();
+      await readSampleData();
+    } catch (error) {
+      console.log(error);
+    }
+  })();
