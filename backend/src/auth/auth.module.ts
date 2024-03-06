@@ -5,6 +5,9 @@ import { JwtModule } from '@nestjs/jwt';
 import { GoogleOAuthStrategyFactory } from '../oauth/factory/google/google-strategy.factory';
 import { GoogleStrategy } from '../oauth/strategy/google/google.strategy';
 import { FacebookOAuthStrategyFactory } from '../oauth/factory/facebook/facebook-strategy.factory';
+import { LinkedInOAuthStrategyFactory } from '../oauth/factory/linkedin/linkedin-strategy.factory';
+import { FacebookStrategy } from '../oauth/strategy/facebook/facebook.strategy';
+import { LinkedInStrategy } from '../oauth/strategy/linkedin/linkedin.strategy';
 
 @Module({
   imports: [
@@ -31,13 +34,23 @@ import { FacebookOAuthStrategyFactory } from '../oauth/factory/facebook/facebook
     },
     FacebookOAuthStrategyFactory,
     {
-      provide: GoogleStrategy,
+      provide: FacebookStrategy,
       useFactory: (
         facebookOAuthStrategyFactory: FacebookOAuthStrategyFactory,
       ) => {
         facebookOAuthStrategyFactory.createOAuthStrategy();
       },
       inject: [FacebookOAuthStrategyFactory],
+    },
+    LinkedInOAuthStrategyFactory,
+    {
+      provide: LinkedInStrategy,
+      useFactory: (
+        linkedinOAuthStrategyFactory: LinkedInOAuthStrategyFactory,
+      ) => {
+        linkedinOAuthStrategyFactory.createOAuthStrategy();
+      },
+      inject: [LinkedInOAuthStrategyFactory],
     },
   ],
 })

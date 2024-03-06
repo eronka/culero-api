@@ -33,9 +33,13 @@
     "@nestjs/passport": "^10.0.3",
     "@nestjs/platform-express": "^10.0.0",
     "@prisma/client": "^5.10.2",
+    "@types/passport-facebook": "^3.0.3",
+    "@types/passport-linkedin-oauth2": "^1.5.6",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
+    "passport-facebook": "^3.0.0",
     "passport-google-oauth20": "^2.0.0",
+    "passport-linkedin-oauth2": "^2.0.0",
     "prisma": "^5.10.2",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1"

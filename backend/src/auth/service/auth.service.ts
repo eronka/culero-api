@@ -14,12 +14,14 @@ export class AuthService {
     email: string,
     name: string,
     profilePictureUrl: string,
+    authType: AuthType,
   ) {
     // We need to create the user if it doesn't exist yet
     const user = await this.createUserIfNotExists(
       email,
       name,
       profilePictureUrl,
+      authType,
     );
 
     const token = await this.generateToken(user.id);
@@ -34,6 +36,7 @@ export class AuthService {
     email: string,
     name?: string,
     profilePictureUrl?: string,
+    authType?: AuthType,
   ) {
     let user = await this.findUserByEmail(email);
     // We need to create the user if it doesn't exist yet
@@ -43,7 +46,7 @@ export class AuthService {
           email: email,
           name: name,
           profilePictureUrl: profilePictureUrl,
-          authType: AuthType.GOOGLE,
+          authType,
         },
       });
     }

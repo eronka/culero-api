@@ -12,6 +12,8 @@ import { GoogleOAuthStrategyFactory } from '../../oauth/factory/google/google-st
 import { AuthGuard } from '@nestjs/passport';
 import { Public } from '../../decorators/public.decorator';
 import { FacebookOAuthStrategyFactory } from '../../oauth/factory/facebook/facebook-strategy.factory';
+import { LinkedInOAuthStrategyFactory } from '../../oauth/factory/linkedin/linkedin-strategy.factory';
+import { AuthType } from '@prisma/client';
 
 @Controller('auth')
 export class AuthController {
@@ -19,6 +21,7 @@ export class AuthController {
     private authService: AuthService,
     private googleOAuthStrategyFactory: GoogleOAuthStrategyFactory,
     private facebookOAuthStrategyFactory: FacebookOAuthStrategyFactory,
+    private linkedinOAuthStrategyFactory: LinkedInOAuthStrategyFactory,
   ) {}
 
   @Public()
@@ -45,6 +48,7 @@ export class AuthController {
       email,
       name,
       profilePictureUrl,
+      AuthType.GOOGLE,
     );
   }
 
@@ -74,6 +78,36 @@ export class AuthController {
       email,
       displayName,
       profilePictureUrl,
+      AuthType.FACEBOOK,
+    );
+  }
+
+  @Public()
+  @Get('linkedin')
+  async linkedinOAuthLogin(@Res() res) {
+    if (!this.linkedinOAuthStrategyFactory.isOAuthEnabled()) {
+      throw new HttpException(
+        'LinkedIn Auth is not enabled in this environment.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    res.status(302).redirect('/api/auth/linkedin/callback');
+  }
+
+  @Public()
+  @Get('linkedin/callback')
+  @UseGuards(AuthGuard('linkedin'))
+  async linkedinOAuthCallback(@Req() req) {
+    console.log(req.user);
+    const { emails, displayName: name, photos } = req.user;
+    const email = emails[0].value;
+    const profilePictureUrl = photos[0].value;
+    return await this.authService.handleOAuthLogin(
+      email,
+      name,
+      profilePictureUrl,
+      AuthType.LINKEDIN,
     );
   }
 }
