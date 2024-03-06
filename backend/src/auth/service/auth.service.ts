@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { AuthType } from '@prisma/client';
 
@@ -62,6 +62,24 @@ export class AuthService {
       displayName,
       profilePictureUrl,
       AuthType.LINKEDIN,
+    );
+
+    const token = await this.generateToken(user.id);
+
+    return {
+      ...user,
+      token,
+    };
+  }
+
+  async handleAppleOAuthLogin(req: any) {
+    const { email, name } = req.user;
+    const displayName = name.firstName + ' ' + name.lastName;
+    const user = await this.createUserIfNotExists(
+      email,
+      displayName,
+      null,
+      AuthType.APPLE,
     );
 
     const token = await this.generateToken(user.id);

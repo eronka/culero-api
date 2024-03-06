@@ -13,6 +13,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { Public } from '../../decorators/public.decorator';
 import { FacebookOAuthStrategyFactory } from '../../oauth/factory/facebook/facebook-strategy.factory';
 import { LinkedInOAuthStrategyFactory } from '../../oauth/factory/linkedin/linkedin-strategy.factory';
+import { AppleOAuthStrategyFactory } from '../../oauth/factory/apple/apple-strategy.factory';
 
 @Controller('auth')
 export class AuthController {
@@ -21,6 +22,7 @@ export class AuthController {
     private googleOAuthStrategyFactory: GoogleOAuthStrategyFactory,
     private facebookOAuthStrategyFactory: FacebookOAuthStrategyFactory,
     private linkedinOAuthStrategyFactory: LinkedInOAuthStrategyFactory,
+    private appleOAuthStrategyFactory: AppleOAuthStrategyFactory,
   ) {}
 
   @Public()
@@ -81,5 +83,25 @@ export class AuthController {
   @UseGuards(AuthGuard('linkedin'))
   async linkedinOAuthCallback(@Req() req) {
     return await this.authService.handleLinkedInOAuthLogin(req);
+  }
+
+  @Public()
+  @Get('apple')
+  async appleOAuthLogin(@Res() res) {
+    if (!this.appleOAuthStrategyFactory.isOAuthEnabled()) {
+      throw new HttpException(
+        'Apple Auth is not enabled in this environment.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    res.status(302).redirect('/api/auth/apple/callback');
+  }
+
+  @Public()
+  @Get('apple/callback')
+  @UseGuards(AuthGuard('apple'))
+  async appleOAuthCallback(@Req() req) {
+    return await this.authService.handleAppleOAuthLogin(req);
   }
 }
