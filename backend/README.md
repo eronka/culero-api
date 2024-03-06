@@ -1,73 +1,116 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# curelo backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+The backend is a NestJS based application. It uses PostgreSQL as a database and Prisma as an ORM.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Getting started
 
-## Description
+### Prerequisites
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- **Node.js** installed
+- **pnpm** installed
+- **PostgreSQL** up and running on your machine on port `5432`. If you change this, or you are using a different database, you will need to change the connection string in the `.env` file.
+- Port `4200` should be free. This will be used by the backend to run the server.
 
-## Installation
+### Installation
 
-```bash
-$ pnpm install
+1. Clone the repository
+
+   ```sh
+   git clone https://github.com/eronka/culero
+   ```
+
+2. Head into the `backend` folder
+
+   ```sh
+   cd backend
+   ```
+
+3. Install the dependencies
+
+   ```sh
+   pnpm install
+   ```
+
+4. Make sure your database is running
+
+5. For Prisma to work properly, generate the types
+
+   ```sh
+   pnpm db:generate-types
+   ```
+
+6. Deploy the migrations
+
+   ```sh
+   pnpm db:deploy-migrations
+   ```
+
+7. Start the server
+
+   ```sh
+   pnpm start:dev
+   ```
+
+This will get your prerequisites ready and the backend up and running.
+
+### Environment Variables
+
+All the environmental variables required by the backend are present in the `.env` file. You can copy the `.env.example` file and fill in the required values.
+
+```sh
+cp .env.example .env
 ```
 
-## Running the app
+### Developing
 
-```bash
-# development
-$ pnpm run start
+Any changes that you make to the code will automatically show up since live reload is enabled. If you make any changes to the database file (`schema.prisma`), you will need to re-generate the migration files and deploy them. A side note, generate and deploy the migrations only when you feel that the changes are ready to be deployed.
 
-# watch mode
-$ pnpm run start:dev
-
-# production mode
-$ pnpm run start:prod
+```sh
+pnpm db:generate-types
+pnpm db:generate-migrations
+pnpm db:deploy-migrations
 ```
 
-## Test
+### OAuth Configuration
 
-```bash
-# unit tests
-$ pnpm run test
+Currently, the backend supports 4 OAuth providers:
 
-# e2e tests
-$ pnpm run test:e2e
+- Google
+- Facebook
+- LinkedIn
+- Apple
 
-# test coverage
-$ pnpm run test:cov
+By default, all of them will be disabled. To enable them, all you need to do is fill in the required values in the `.env` file.
+
+## Organization of the code
+
+The code is organized in a modular way. Each module has its own folder and contains the following files:
+
+- `<module>.controller.ts`: The REST controller file for the module. Exposes the REST endpoints.
+- `<module>.service.ts`: The service file for the module. Contains the business logic.
+- `<module>.module.ts`: The module file for the module. Contains the module definition and the imports.
+
+## Authentication and Authorization
+
+### Authenticating to the application
+
+Currently, the only way to log into the application is via the 4 OAuth providers:
+
+- Google: `/api/auth/google`
+- Facebook: `/api/auth/facebook`
+- LinkedIn: `/api/auth/linkedin`
+- Apple: `/api/auth/apple`
+
+Once you log in, you will receive a JWT token which you can use to authenticate yourself to the application. You will need to pass this token in the `Authorization` header of the request.
+
+```yaml
+Authorization: Bearer <token>
 ```
 
-## Support
+### Authorization flow
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+All endpoints that require authorization are guarded by the [`AuthGuard`](./src/auth/guard/auth/auth.guard.ts) from NestJS. This means that you will need to pass the JWT token in the `Authorization` header of the request.
 
-## Stay in touch
+For endpoints that can be accessed publicly, annotate them with the [`@Public()`](./src/decorators/public.decorator.ts) decorator.
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+If any endpoint would be accessed only after authentication, you can access the user's information from the request object. The user's information is present in the `req.user` object. You can use the [`@CurrentUser()`](./src/decorators/current-user.decorator.ts) decorator to access the user's information. Usage of this decorator can be found in the user controller.
