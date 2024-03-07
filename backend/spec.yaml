@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: culero API
-  description: culero is an open-source platform aimed at creating a more transparent and democratic workplace by allowing employees to confidentially review their managers.
+  description: Culero is an open-source platform aimed at creating a more transparent and democratic workplace by allowing employees to confidentially review their managers.
   version: 1.0.0
 servers:
   - url: 'http://localhost:4200/api'
@@ -185,4 +185,132 @@ components:
         - professionalism
         - reliability
         - communication
-
+    LinkedSocialAccount:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the linked social account record.
+        userId:
+          type: string
+          description: Unique identifier of the user who owns the linked social account.
+        platform:
+          type: string
+          description: Name of the social media platform (e.g., 'facebook', 'twitter').
+        isConnected:
+          type: boolean
+          description: Flag indicating whether the social account is connected.
+        profileUrl:
+          type: string
+          format: uri
+          description: URL to the social media profile.
+          nullable: true
+        accessToken:
+          type: string
+          description: Access token for the social media platform's API.
+          nullable: true
+        refreshToken:
+          type: string
+          description: Refresh token for the social media platform's API.
+          nullable: true
+        accessTokenExpiry:
+          type: string
+          format: date-time
+          description: Expiry date and time of the access token.
+          nullable: true
+        refreshTokenExpiry:
+          type: string
+          format: date-time
+          description: Expiry date and time of the refresh token.
+          nullable: true
+      required:
+        - id
+        - userId
+        - platform
+        - isConnected
+    Connection:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the connection record.
+        followerId:
+          type: string
+          description: Unique identifier of the user who is following.
+        followingId:
+          type: string
+          description: Unique identifier of the user being followed.
+      required:
+        - id
+        - followerId
+        - followingId
+    AuthType:
+      type: string
+      enum:
+        - GOOGLE
+        - APPLE
+        - FACEBOOK
+        - LINKEDIN
+      description: The type of authentication used by the user.
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the user, typically a cuid.
+        email:
+          type: string
+          format: email
+          description: Unique email address of the user.
+        name:
+          type: string
+          description: Name of the user.
+          nullable: true
+        profilePictureUrl:
+          type: string
+          format: uri
+          description: URL to the user's profile picture.
+          nullable: true
+        authType:
+          $ref: '#/components/schemas/AuthType'
+        fullName:
+          type: string
+          description: Full name of the user.
+        headline:
+          type: string
+          description: Professional headline of the user.
+          nullable: true
+        jobTitle:
+          type: string
+          description: Current job title of the user.
+          nullable: true
+        reviews:
+          type: array
+          description: Reviews authored by the user.
+          items:
+            $ref: '#/components/schemas/Review'
+        receivedReviews:
+          type: array
+          description: Reviews received by the user.
+          items:
+            $ref: '#/components/schemas/Review'
+        connections:
+          type: array
+          description: Connections where the user is the follower.
+          items:
+            $ref: '#/components/schemas/Connection'
+        followedConnections:
+          type: array
+          description: Connections where the user is the following.
+          items:
+            $ref: '#/components/schemas/Connection'
+        LinkedSocialAccounts:
+          type: array
+          description: Social accounts linked to the user's profile.
+          items:
+            $ref: '#/components/schemas/LinkedSocialAccount'
+      required:
+        - id
+        - email
+        - authType
+        - fullName
