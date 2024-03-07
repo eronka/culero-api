@@ -1,0 +1,188 @@
+openapi: 3.0.3
+info:
+  title: culero API
+  description: culero is an open-source platform aimed at creating a more transparent and democratic workplace by allowing employees to confidentially review their managers.
+  version: 1.0.0
+servers:
+  - url: 'http://localhost:4200/api'
+
+security:
+  - bearerAuth: [ ]
+tags:
+  - name: user
+    description: User related endpoints
+  - name: reviews
+    description: API endpoints to interact with Reviews
+paths:
+  /reviews:
+    post:
+      tags:
+        - reviews
+      summary: Submit a review
+      description: Allows a user to submit a review for a manager.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Review'
+      responses:
+        '201':
+          description: Review successfully submitted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+        '400':
+          description: Invalid input.
+
+  /reviews/all:
+    get:
+      tags:
+        - reviews
+      summary: Get all reviews for the current user
+      description: Retrieves all reviews associated with the currently authenticated user.
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: A list of all reviews for the current user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewWithoutComment'
+        '401':
+          description: Unauthorized. User is not authenticated.
+        '500':
+          description: Internal Server Error.
+
+  /reviews/{authourId}:
+    get:
+      tags:
+        - reviews
+      summary: Get reviews by user
+      description: Retrieve all reviews submitted by a specific user.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: authourId
+          required: true
+          schema:
+            type: string
+            description: Unique identifier for the user whose reviews are being fetched.
+      responses:
+        '200':
+          description: An array of reviews submitted by the user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+
+        '404':
+          description: User not found.
+  /reviews/me:
+    get:
+      tags:
+        - reviews
+      summary: Get review summary for the current user
+      description: Retrieves a summary of the reviews submitted by the currently authenticated user, including average ratings.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: A summary of the user's review ratings.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewWithoutComment'
+        '401':
+          description: Unauthorized. User is not authenticated.
+        '500':
+          description: Internal Server Error.
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Review:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The unique identifier of the review.
+        authorId:
+          type: string
+          description: The unique identifier of the author of the review.
+        recipientId:
+          type: string
+          description: The unique identifier of the recipient of the review.
+        professionalism:
+          type: integer
+          description: Rating for professionalism on a scale of 0 to 5.
+          minimum: 0
+          maximum: 5
+        reliability:
+          type: integer
+          description: Rating for reliability on a scale of 0 to 5.
+          minimum: 0
+          maximum: 5
+        communication:
+          type: integer
+          description: Rating for communication on a scale of 0 to 5.
+          minimum: 0
+          maximum: 5
+        comment:
+          type: string
+          description: Additional comments about the recipient.
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+          description: The date and time when the review was created.
+      required:
+        - authorId
+        - professionalism
+        - reliability
+        - communication
+        - comment
+    ReviewWithoutComment:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The unique identifier of the review.
+        authorId:
+          type: string
+          description: The unique identifier of the author of the review.
+        recipientId:
+          type: string
+          description: The unique identifier of the recipient of the review.
+        professionalism:
+          type: integer
+          description: Rating for professionalism on a scale of 0 to 5.
+          minimum: 0
+          maximum: 5
+        reliability:
+          type: integer
+          description: Rating for reliability on a scale of 0 to 5.
+          minimum: 0
+          maximum: 5
+        communication:
+          type: integer
+          description: Rating for communication on a scale of 0 to 5.
+          minimum: 0
+          maximum: 5
+        createdAt:
+          type: string
+          format: date-time
+          description: The date and time when the review was created.
+      required:
+        - id
+        - authorId
+        - professionalism
+        - reliability
+        - communication
+
