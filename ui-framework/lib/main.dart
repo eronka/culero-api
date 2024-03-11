@@ -1,39 +1,21 @@
 import 'package:flutter/material.dart';
-import 'components/primary_button.dart';
-import 'components/secondary_button.dart';
+import 'package:ui_framwork/screens/buttons.dart';
+import 'package:ui_framwork/screens/home.dart';
+import 'package:ui_framwork/screens/input.dart';
+import 'package:ui_framwork/screens/typography.dart';
 
 void main() {
-  runApp(const MainApp());
+  runApp(
+    MaterialApp(
+      title: 'Named Routes Demo',
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const HomeScreen(), 
+        '/buttons': (context) => const ButtonShowcase(),
+        '/typography': (context) => const TypographyShowcase(),
+        '/input': (context) => const InputShowcase(),
+      },
+    ),
+  );
 }
 
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              PrimaryButton(
-                text: 'Get Started',
-                onPressed: () {
-
-                },
-              ),
-              const SizedBox(height: 20),
-              SecondaryButton(
-                text: 'See other options',
-                onPressed: () {
-
-                },
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
