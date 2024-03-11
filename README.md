@@ -50,3 +50,18 @@ Contact Us
 If you have any questions or suggestions, feel free to reach out to us on GitHub or via email at hello@culero.com.
 
 Join us today and let's build a better future for the modern workplace together!
+
+
+
+Dir Sturctures
+
+Req : Mobile & Web 
+Problem : lib
+            - main.dart 
+            - atoms 
+            - molecues 
+
+
+
+
+
