@@ -1,6 +1,17 @@
-FROM gitpod/workspace-full:latest
+FROM gitpod/workspace-full-vnc
 
-RUN curl https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
- && echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list \
- && apt-get update \
- && apt-get install -y google-chrome-stable
+ENV CYPRESS_CACHE_FOLDER=/workspace/.cypress-cache
+
+# Install Cypress dependencies
+RUN sudo apt-get update \
+    && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    libgtk2.0-0 \
+    libgtk-3-0 \
+    libnotify-dev \
+    libnss3 \
+    libxss1 \
+    libasound2 \
+    libxtst6 \
+    xauth \
+    xvfb \
+    && sudo rm -rf /var/lib/apt/lists/*
