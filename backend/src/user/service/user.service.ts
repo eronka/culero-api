@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -122,5 +123,48 @@ export class UserService {
       },
     });
     return users;
+  }
+
+  async linkSocialAccount(
+    userId: string,
+    provider: string,
+    accessToken: string,
+  ) {
+    const user = await this.findUserById(userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    let email: string | undefined;
+
+    const existingUser = await this.findUserByEmail(email);
+    if (existingUser && existingUser.id !== user.id) {
+      throw new ConflictException(
+        'Social account already linked to a different user',
+      );
+    }
+
+    // Add the social account to the user
+    await this.prisma.linkedSocialAccount.create({
+      data: {
+        platform: provider,
+        accessToken,
+        userId,
+      },
+    });
+
+    return user;
+  }
+
+  private async findUserById(id: string) {
+    return await this.prisma.user.findUnique({ where: { id } });
+  }
+
+  private async findUserByEmail(email: string) {
+    return await this.prisma.user.findUnique({
+      where: {
+        email,
+      },
+    });
   }
 }

@@ -7,7 +7,6 @@ import {
   Param,
   Post,
   Put,
-  Query,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -17,7 +16,6 @@ import { User } from '@prisma/client';
 import { RatingDto } from '../dto/rating.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Public } from '../../decorators/public.decorator';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
@@ -171,28 +169,5 @@ export class UserController {
     @Param('revieweeUserId') revieweeUserId: string,
   ) {
     return this.userService.getUserReviews(user, false, revieweeUserId);
-  }
-
-  @Public()
-  @Get('search')
-  @ApiOperation({
-    summary: 'Search users',
-    description: 'Search users by name or email',
-  })
-  @ApiBadRequestResponse({
-    description: 'Search term is required',
-  })
-  @ApiOkResponse({
-    description: 'Users found',
-    schema: {
-      type: 'array',
-      items: {
-        type: 'object',
-        properties: userProperties,
-      },
-    },
-  })
-  async searchUsers(@Query('searchTerm') searchTerm: string) {
-    return await this.userService.searchUsers(searchTerm);
   }
 }
