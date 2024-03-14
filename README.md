@@ -1,4 +1,4 @@
-# culero
+# Culero
 
 
 🌟 Introducing Culero: Empowering Transparency & Accountability in the Workplace 🌟
@@ -17,23 +17,23 @@ Join us in our mission to foster healthier, more transparent workplaces. Togethe
 
 #Culero #Transparency #Accountability #WorkplaceWellness #CommunityEmpowerment
 
-Introduction
+## Introduction
 
 Culero is an open-source project aimed at creating a more transparent and democratic workplace by allowing employees to review their managers. Our goal is to shift the power dynamic in traditional organizations and give employees a voice in the decision-making process.
 
-Features
+## Features
 
 Employees can confidentially rate and review their managers on various aspects such as communication, leadership, and fairness.
 Managers can receive feedback and use it to improve their management style.
 The platform provides anonymous data to organizations, helping them identify areas for improvement and promoting positive change from within.
 
 
-Wireframe
+## Wireframe
 
 https://www.figma.com/file/p4gfqRDn3ma4zPaPAj8vH4?node-id=0:1&locale=en&type=design
 
 
-Contributing
+## Contributing
 
 Here are some ways you can contribute to Culero:
 Write code or fix bugs.
@@ -42,11 +42,11 @@ Contribute to the documentation.
 Spread the word about Culero and its mission.
 Before contributing, please take a moment to review our contribution guidelines.
 
-License
+## License
 
 Culero is released under the MIT license. See LICENSE for details.
 
-Contact Us
+## Contact Us
 If you have any questions or suggestions, feel free to reach out to us on GitHub or https://discordapp.com/users/2733.
 
 Join us today and let's build a better future for the modern workplace together!
