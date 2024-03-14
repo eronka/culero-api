@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { RatingDto } from '../dto/rating.dto';
@@ -108,6 +108,14 @@ export class UserService {
     }));
   }
 
+  private async findUserByEmail(email: string) {
+    return await this.prisma.user.findUnique({
+      where: {
+        email,
+      },
+    });
+  }
+
   async getUserRatings(user: User, self: boolean, userId?: User['id']) {
     if (self) userId = user.id;
 
@@ -137,6 +145,6 @@ export class UserService {
         (result._avg.reliability ?? 0) +
         (result._avg.communication ?? 0)
       ) / 3,
-    };   
-  }
+    }; 
+  }  
 }
