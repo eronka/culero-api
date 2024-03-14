@@ -52,6 +52,11 @@ export class AuthGuard implements CanActivate {
       throw new ForbiddenException();
     }
 
+    // Check if the user's email is verified.
+    if (!user.isEmailVerified) {
+      throw new ForbiddenException('Email not verified');
+    }
+
     // We attach the user to the request object.
     request['user'] = user;
     return true;

@@ -1,8 +1,11 @@
 import {
+  Body,
   Controller,
   Get,
   HttpException,
   HttpStatus,
+  Param,
+  Post,
   Req,
   Res,
   UseGuards,
@@ -14,6 +17,9 @@ import { Public } from '../../decorators/public.decorator';
 import { FacebookOAuthStrategyFactory } from '../../oauth/factory/facebook/facebook-strategy.factory';
 import { LinkedInOAuthStrategyFactory } from '../../oauth/factory/linkedin/linkedin-strategy.factory';
 import { AppleOAuthStrategyFactory } from '../../oauth/factory/apple/apple-strategy.factory';
+import { SignupDto } from '../dto/signup.dto';
+import { SigninDto } from '../dto/signin.dto';
+import { EmailVerificationDto } from '../dto/email-verification.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -103,5 +109,29 @@ export class AuthController {
   @UseGuards(AuthGuard('apple'))
   async appleOAuthCallback(@Req() req) {
     return await this.authService.handleAppleOAuthLogin(req);
+  }
+
+  @Public()
+  @Post('sign-up')
+  async signUp(@Body() dto: SignupDto) {
+    return await this.authService.signUp(dto);
+  }
+
+  @Public()
+  @Post('sign-in')
+  async signIn(@Body() dto: SigninDto) {
+    return await this.authService.signIn(dto);
+  }
+
+  @Public()
+  @Get('regenerate-code/:email')
+  async resendEmailVerificationCode(@Param('email') email: string) {
+    return await this.authService.resendEmailVerificationCode(email);
+  }
+
+  @Public()
+  @Post('verify-email')
+  async verifyEmail(@Body() dto: EmailVerificationDto) {
+    return await this.authService.verifyEmail(dto.email, dto.code);
   }
 }
