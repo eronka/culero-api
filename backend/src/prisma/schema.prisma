@@ -21,6 +21,7 @@ model User {
   password             String?
   name                 String?
   profilePictureUrl    String?
+  socialAccounts       UserSocialAccount[]
   authType             AuthType
   isEmailVerified      Boolean               @default(false)
   headline             String?
@@ -84,6 +85,15 @@ model Rating {
   comment         String?
   createdAt       DateTime @default(now())
   anonymous       Boolean  @default(false)
+}
+
+model UserSocialAccount {
+  id              String   @id @default(cuid())  
+  provider        String   @unique                  
+  accessToken     String
+
+  user            User     @relation(fields: [userId], references: [id])
+  userId          String
 }
 
 model VerificationCode {
