@@ -39,4 +39,41 @@ export class UserService {
       },
     });
   }
+
+  async getUserReviews(user: User, self: boolean, revieweeUserId?: User['id']) {
+    if (self) revieweeUserId = user.id;
+    const revieweeUser = await this.prisma.user.findUnique({
+      where: { id: revieweeUserId },
+      include: {
+        receivedReviews: {
+          include: {
+            author: true,
+          },
+        },
+      },
+    });
+
+    if (!revieweeUser) {
+      throw new Error('User not found');
+    }
+
+    if (self)
+      return revieweeUser.receivedReviews.map((review) => ({
+        userName: review.author.name,
+        profilePictureUrl: review.author.profilePictureUrl ?? '',
+        professionalism: review.professionalism,
+        reliability: review.reliability,
+        communication: review.communication,
+        createdOn: review.createdAt.toISOString(),
+      }));
+    return revieweeUser.receivedReviews.map((review) => ({
+      userName: review.author.name,
+      profilePictureUrl: review.author.profilePictureUrl ?? '',
+      professionalism: review.professionalism,
+      reliability: review.reliability,
+      communication: review.communication,
+      createdOn: review.createdAt.toISOString(),
+      comment: review.comment,
+    }));
+  }
 }
