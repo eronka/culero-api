@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { CurrentUser } from '../../decorators/current-user.decorator';
 import { UserService } from '../service/user.service';
 import { User } from '@prisma/client';
@@ -10,5 +10,10 @@ export class UserController {
   @Get()
   async getCurrentUser(@CurrentUser() user: User) {
     return this.userService.getSelf(user);
+  }
+
+  @Get('search')
+  async searchUsers(@CurrentUser() user: User, @Query('query') query: string) {
+    return this.userService.findUsers(user, query);
   }
 }

@@ -9,4 +9,26 @@ export class UserService {
   async getSelf(user: User) {
     return user;
   }
+
+  async findUsers(user: User, search: string) {
+    return this.prisma.user.findMany({
+      where: {
+        NOT: {
+          id: user.id,
+        },
+        OR: [
+          {
+            email: {
+              contains: search,
+            },
+          },
+          {
+            name: {
+              contains: search,
+            },
+          },
+        ],
+      },
+    });
+  }
 }
