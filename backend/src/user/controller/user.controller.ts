@@ -62,4 +62,17 @@ export class UserController {
   ) {
     return this.userService.getUserReviews(user, false, revieweeUserId);
   }
+
+  @Get('ratings/self')
+  async getSelfRatings(@CurrentUser() user: User) {
+    return this.userService.getUserRatings(user, true);
+  }
+
+  @Get('ratings/:userId')
+  async getUserRatings(
+    @CurrentUser() user: User,
+    @Param('userId') userId: string,
+  ) {
+    return this.userService.getUserRatings(user, false, userId);
+  }
 }
