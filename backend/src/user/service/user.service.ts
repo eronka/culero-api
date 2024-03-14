@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { RatingDto } from '../dto/rating.dto';
+import { UpdateUserDto } from '../dto/update-user.dto';
 
 @Injectable()
 export class UserService {
@@ -9,6 +10,16 @@ export class UserService {
 
   async getSelf(user: User) {
     return user;
+  }
+
+  async updateSelf(user: User, dto: UpdateUserDto) {
+    return await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        name: dto.name,
+        headline: dto.headline,
+      },
+    });
   }
 
   async rateUser(user: User, ratedUserId: User['id'], rating: RatingDto) {
