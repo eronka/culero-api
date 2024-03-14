@@ -6,6 +6,7 @@ import {
   Req,
   Res,
   UseGuards,
+  Query
 } from '@nestjs/common';
 import { AuthService } from '../service/auth.service';
 import { GoogleOAuthStrategyFactory } from '../../oauth/factory/google/google-strategy.factory';
