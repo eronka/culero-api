@@ -286,7 +286,23 @@ export class AuthService {
 
   private async sendEmailVerificationCode(email: string) {
     // Generate the code
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    let code: string;
+
+    // Generate a random 6-digit code. It needs to be unique
+    while (true) {
+      code = Math.floor(100000 + Math.random() * 900000).toString();
+
+      // Check if the code is already in use
+      const existingCode = await this.prisma.verificationCode.findUnique({
+        where: {
+          code,
+        },
+      });
+
+      if (!existingCode) {
+        break;
+      }
+    }
 
     // Set the expiration date to 10 minutes from now
     const expiresAt = new Date(Date.now() + 1000 * 60 * 10); // 10 minutes
