@@ -1,10 +1,10 @@
 # Culero
 
-## How to join our community
+## Join our community
 
 On our Discord Channel : https://discord.gg/tyaRVrJsDW.
 
-## Introduction
+## What is Culero
 
 Culero is an open-source project aimed at creating a more transparent and democratic workplace by allowing employees to review their managers. Our goal is to shift the power dynamic in traditional organizations and give employees a voice in the decision-making process.
 
