@@ -6,6 +6,8 @@ import {
   Req,
   Res,
   UseGuards,
+  Post,
+  Body
 } from '@nestjs/common';
 import { AuthService } from '../service/auth.service';
 import { GoogleOAuthStrategyFactory } from '../../oauth/factory/google/google-strategy.factory';
@@ -105,14 +107,21 @@ export class AuthController {
     return await this.authService.handleAppleOAuthLogin(req);
   }
 
-  @Public()
-  @Get('search')
-  async searchUsers(@Query('searchTerm') searchTerm: string) {
-    if (!searchTerm) {
-      throw new HttpException('Search term is required.', HttpStatus.BAD_REQUEST);
+  // New API endpoint for social account linking
+  @Post('/link-social')
+  @UseGuards(AuthGuard('jwt')) // Assuming JWT authentication for authorization
+  async linkSocialAccount(
+    @Body() { userId, provider, accessToken }: { userId: string; provider: string; accessToken: string },
+  ) {
+    try {
+      const linkedUser = await this.authService.linkSocialAccount(userId, provider, accessToken);
+      return linkedUser; // Return success response or relevant data
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error; // Re-throw existing HttpExceptions for consistent error handling
+      } else {
+        throw new HttpException('Failed to link social account', HttpStatus.INTERNAL_SERVER_ERROR);
+      }
     }
-
-    const users = await this.authService.searchUsers(searchTerm);
-    return users;
   }
 }

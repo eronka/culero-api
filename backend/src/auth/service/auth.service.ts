@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable,HttpException,HttpStatus } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { AuthType } from '@prisma/client';
@@ -9,24 +9,6 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private jwt: JwtService,
   ) {}
-
-  async searchUsers(searchTerm: string) {
-    const users = await this.prisma.user.findMany({
-      where: {
-        OR: [
-          { email: { contains: searchTerm } },
-          { name: { contains: searchTerm } },
-        ],
-      },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        profilePictureUrl: true,
-      },
-    });
-    return users;
-  }
 
   async handleGoogleOAuthLogin(req: any) {
     const { emails, displayName: name, photos } = req.user;
@@ -139,5 +121,34 @@ export class AuthService {
         email,
       },
     });
+  }
+
+  async linkSocialAccount(userId: string, provider: string, accessToken: string) {
+    const user = await this.findUserById(userId);
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+
+    let email: string | undefined;
+
+    const existingUser = await this.findUserByEmail(email);
+    if (existingUser && existingUser.id !== user.id) {
+      throw new HttpException('Social account already linked to a different user', HttpStatus.CONFLICT);
+    }
+
+    user.socialAccounts = user.socialAccounts || [];
+    user.socialAccounts.push({ provider, accessToken });
+
+    await this.updateUser(user);
+
+    return user;
+  }
+
+  private async findUserById(id: string) {
+    return await this.prisma.user.findUnique({ where: { id } });
+  }
+
+  private async updateUser(user: any) {
+    return await this.prisma.user.update({ where: { id: user.id }, data: user });
   }
 }
