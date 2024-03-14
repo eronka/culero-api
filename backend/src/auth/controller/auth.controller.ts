@@ -2,15 +2,14 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
   HttpException,
   HttpStatus,
   Param,
   Post,
-  Query,
   Req,
   Res,
   UseGuards,
-  Query
 } from '@nestjs/common';
 import { AuthService } from '../service/auth.service';
 import { GoogleOAuthStrategyFactory } from '../../oauth/factory/google/google-strategy.factory';
@@ -22,8 +21,20 @@ import { AppleOAuthStrategyFactory } from '../../oauth/factory/apple/apple-strat
 import { SignupDto } from '../dto/signup.dto';
 import { SigninDto } from '../dto/signin.dto';
 import { EmailVerificationDto } from '../dto/email-verification.dto';
+import {
+  ApiBadRequestResponse,
+  ApiConflictResponse,
+  ApiCreatedResponse,
+  ApiNoContentResponse,
+  ApiNotFoundResponse,
+  ApiOperation,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
+import { userProperties } from '../../schemas/user.properties';
 
 @Controller('auth')
+@ApiTags('Auth Controller')
 export class AuthController {
   constructor(
     private authService: AuthService,
@@ -35,6 +46,10 @@ export class AuthController {
 
   @Public()
   @Get('google')
+  @ApiOperation({
+    summary: 'Google auth',
+    description: 'Sign in or sign up with Google',
+  })
   async googleOAuthLogin(@Res() res) {
     if (!this.googleOAuthStrategyFactory.isOAuthEnabled()) {
       throw new HttpException(
@@ -55,6 +70,10 @@ export class AuthController {
 
   @Public()
   @Get('facebook')
+  @ApiOperation({
+    summary: 'Facebook auth',
+    description: 'Sign in or sign up with Facebook',
+  })
   async facebookOAuthLogin(@Res() res) {
     if (!this.facebookOAuthStrategyFactory.isOAuthEnabled()) {
       throw new HttpException(
@@ -75,6 +94,10 @@ export class AuthController {
 
   @Public()
   @Get('linkedin')
+  @ApiOperation({
+    summary: 'LinkedIn auth',
+    description: 'Sign in or sign up with LinkedIn',
+  })
   async linkedinOAuthLogin(@Res() res) {
     if (!this.linkedinOAuthStrategyFactory.isOAuthEnabled()) {
       throw new HttpException(
@@ -95,6 +118,10 @@ export class AuthController {
 
   @Public()
   @Get('apple')
+  @ApiOperation({
+    summary: 'Apple auth',
+    description: 'Sign in or sign up with Apple',
+  })
   async appleOAuthLogin(@Res() res) {
     if (!this.appleOAuthStrategyFactory.isOAuthEnabled()) {
       throw new HttpException(
@@ -115,39 +142,87 @@ export class AuthController {
 
   @Public()
   @Post('sign-up')
+  @ApiOperation({
+    summary: 'Sign up',
+    description: 'Sign up with email and password',
+  })
+  @ApiNoContentResponse({
+    description: 'User signed up successfully',
+  })
+  @ApiConflictResponse({
+    description: 'User with this email already exists',
+  })
+  @HttpCode(HttpStatus.NO_CONTENT)
   async signUp(@Body() dto: SignupDto) {
     return await this.authService.signUp(dto);
   }
 
   @Public()
   @Post('sign-in')
+  @ApiOperation({
+    summary: 'Sign in',
+    description: 'Sign in with email and password',
+  })
+  @ApiNotFoundResponse({
+    description: 'User not found',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Invalid password',
+  })
+  @ApiCreatedResponse({
+    description: 'User signed in successfully',
+    schema: {
+      type: 'object',
+      properties: {
+        ...userProperties,
+        token: { type: 'string' },
+      },
+    },
+  })
   async signIn(@Body() dto: SigninDto) {
     return await this.authService.signIn(dto);
   }
 
   @Public()
   @Get('regenerate-code/:email')
+  @ApiOperation({
+    summary: 'Resend email verification code',
+    description: 'Resend email verification code to the user',
+  })
+  @ApiNoContentResponse({
+    description: 'Email verification code sent successfully',
+  })
+  @ApiNotFoundResponse({
+    description: 'User not found',
+  })
+  @HttpCode(HttpStatus.NO_CONTENT)
   async resendEmailVerificationCode(@Param('email') email: string) {
     return await this.authService.resendEmailVerificationCode(email);
   }
 
   @Public()
   @Post('verify-email')
+  @ApiOperation({
+    summary: 'Verify email',
+    description: 'Verify email with the verification code',
+  })
+  @ApiNotFoundResponse({
+    description: 'User not found',
+  })
+  @ApiBadRequestResponse({
+    description: 'Invalid verification code',
+  })
+  @ApiCreatedResponse({
+    description: 'Email verified successfully',
+    schema: {
+      type: 'object',
+      properties: {
+        ...userProperties,
+        token: { type: 'string' },
+      },
+    },
+  })
   async verifyEmail(@Body() dto: EmailVerificationDto) {
     return await this.authService.verifyEmail(dto.email, dto.code);
-  }
-
-  @Public()
-  @Get('search')
-  async searchUsers(@Query('searchTerm') searchTerm: string) {
-    if (!searchTerm) {
-      throw new HttpException(
-        'Search term is required.',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-
-    const users = await this.authService.searchUsers(searchTerm);
-    return users;
   }
 }
