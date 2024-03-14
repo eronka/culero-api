@@ -7,7 +7,8 @@ import {
   Res,
   UseGuards,
   Post,
-  Body
+  Body,
+  Query
 } from '@nestjs/common';
 import { AuthService } from '../service/auth.service';
 import { GoogleOAuthStrategyFactory } from '../../oauth/factory/google/google-strategy.factory';
