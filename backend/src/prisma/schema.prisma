@@ -28,6 +28,8 @@ model User {
   connections          Connection[]          @relation("follower")
   followedConnections  Connection[]          @relation("following")
   LinkedSocialAccounts LinkedSocialAccount[]
+  ratings              Rating[]              @relation("ratedUser")
+  ratingsReceived      Rating[]              @relation("raterUser")
 }
 
 model Review {
@@ -66,4 +68,18 @@ model LinkedSocialAccount {
   refreshTokenExpiry DateTime?
 
   @@unique([userId, platform])
+}
+
+model Rating {
+  id              Int      @id @default(autoincrement())
+  ratedUser       User     @relation(fields: [ratedUserId], references: [id], onDelete: Cascade, onUpdate: Cascade, name: "ratedUser")
+  ratedUserId     String
+  raterUser       User?    @relation(fields: [raterUserId], references: [id], onDelete: SetNull, onUpdate: Cascade, name: "raterUser")
+  raterUserId     String?
+  professionalism Int      @default(0)
+  reliability     Int      @default(0)
+  communication   Int      @default(0)
+  comment         String?
+  createdAt       DateTime @default(now())
+  anonymous       Boolean  @default(false)
 }
