@@ -104,4 +104,15 @@ export class AuthController {
   async appleOAuthCallback(@Req() req) {
     return await this.authService.handleAppleOAuthLogin(req);
   }
+
+  @Public()
+  @Get('search')
+  async searchUsers(@Query('searchTerm') searchTerm: string) {
+    if (!searchTerm) {
+      throw new HttpException('Search term is required.', HttpStatus.BAD_REQUEST);
+    }
+
+    const users = await this.authService.searchUsers(searchTerm);
+    return users;
+  }
 }

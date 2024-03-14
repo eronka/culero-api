@@ -10,6 +10,24 @@ export class AuthService {
     private jwt: JwtService,
   ) {}
 
+  async searchUsers(searchTerm: string) {
+    const users = await this.prisma.user.findMany({
+      where: {
+        OR: [
+          { email: { contains: searchTerm } },
+          { name: { contains: searchTerm } },
+        ],
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        profilePictureUrl: true,
+      },
+    });
+    return users;
+  }
+
   async handleGoogleOAuthLogin(req: any) {
     const { emails, displayName: name, photos } = req.user;
     const email = emails[0].value;
