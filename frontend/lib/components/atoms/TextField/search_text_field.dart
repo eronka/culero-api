@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/components/atoms/TextField/text_field_config.dart';
 import 'package:frontend/utils/color.dart';
 import 'package:frontend/utils/font_size.dart';
-
+// TODO: Refactoring
 class SearchTextField extends StatelessWidget {
   final bool bordered;
   final Color? backgroundColor;
@@ -36,27 +36,24 @@ class SearchTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoSearchTextField(
-      controller: controller,
-      onChanged: onChanged,
-      onSuffixTap: onSuffixTap,
-      onSubmitted: onSubmitted,
-      onTap: onTap,
-      prefixIcon: prefix,
-      prefixInsets: const EdgeInsets.symmetric(horizontal: 16),
-      suffixInsets: const EdgeInsets.symmetric(horizontal: 16),
-      placeholderStyle: const TextStyle(
-        fontStyle: FontStyle.italic,
-        fontSize: FontSizes.h4,
+    return SearchBar(
+      hintText: "Search",
+      trailing: [FilledButton(onPressed: () {}, child: const Text("Hello"))],
+      side: const MaterialStatePropertyAll<BorderSide>(BorderSide(color: primaryBg)),
+      elevation: const MaterialStatePropertyAll<double>(0),
+      textStyle: const MaterialStatePropertyAll<TextStyle>(TextStyle(fontSize: FontSizes.h4)),
+      hintStyle: const MaterialStatePropertyAll<TextStyle>(
+        TextStyle(
+          fontStyle: FontStyle.italic,
+          fontSize: FontSizes.h4,
+          color: placehoderText,
+        ),
+      ),
+      backgroundColor: const MaterialStatePropertyAll<Color>(searchTextFieldBgColor),
+      padding: const MaterialStatePropertyAll<EdgeInsets>(EdgeInsets.symmetric(horizontal: 16.0)),
+      leading: const Icon(
+        Icons.search,
         color: placehoderText,
-      ),
-      style: const TextStyle(
-        fontSize: FontSizes.h4,
-      ),
-      itemColor: Colors.black,
-      decoration: BoxDecoration(
-        border: Border.all(color: primaryBg),
-        borderRadius: const BorderRadius.all(Radius.circular(TextFieldBorderRadius.full)),
       ),
     );
   }
