@@ -47,6 +47,6 @@ License
 Culero is released under the MIT license. See LICENSE for details.
 
 Contact Us
-If you have any questions or suggestions, feel free to reach out to us on GitHub or via email at hello@culero.com.
+If you have any questions or suggestions, feel free to reach out to us on GitHub or https://discordapp.com/users/2733.
 
 Join us today and let's build a better future for the modern workplace together!
