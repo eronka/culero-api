@@ -10,6 +10,7 @@ The backend is a NestJS based application. It uses PostgreSQL as a database and 
 - **pnpm** installed
 - **PostgreSQL** up and running on your machine on port `5432`. If you change this, or you are using a different database, you will need to change the connection string in the `.env` file.
 - Port `4200` should be free. This will be used by the backend to run the server.
+- **AWS S3 bucket** for storing the images. This is optional, but if you want to use the image upload feature, you will need to fill in the required values in the `.env` file.
 
 ### Installation
 

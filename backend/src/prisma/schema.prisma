@@ -12,16 +12,18 @@ enum AuthType {
   APPLE
   FACEBOOK
   LINKEDIN
+  EMAIL
 }
 
 model User {
   id                   String                @id @default(cuid())
   email                String                @unique
+  password             String?
   name                 String?
   profilePictureUrl    String?
   socialAccounts       UserSocialAccount[]
   authType             AuthType
-  fullName             String
+  isEmailVerified      Boolean               @default(false)
   headline             String?
   jobTitle             String?
   reviews              Review[]              @relation("author")
@@ -92,4 +94,12 @@ model UserSocialAccount {
 
   user            User     @relation(fields: [userId], references: [id])
   userId          String
+}
+
+model VerificationCode {
+  code      String   @id
+  email     String
+  expiresAt DateTime
+
+  @@unique([email])
 }

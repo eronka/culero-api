@@ -10,6 +10,7 @@ import { FacebookStrategy } from '../oauth/strategy/facebook/facebook.strategy';
 import { LinkedInStrategy } from '../oauth/strategy/linkedin/linkedin.strategy';
 import { AppleOAuthStrategyFactory } from '../oauth/factory/apple/apple-strategy.factory';
 import { AppleStrategy } from '../oauth/strategy/apple/apple.strategy';
+import { MailService } from 'src/mail/mail.service';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { AppleStrategy } from '../oauth/strategy/apple/apple.strategy';
   ],
   controllers: [AuthController],
   providers: [
+    MailService,
     AuthService,
     GoogleOAuthStrategyFactory,
     {
