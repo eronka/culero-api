@@ -1,7 +1,9 @@
 # Culero
 
-
 🌟 Introducing Culero: Empowering Transparency & Accountability in the Workplace 🌟
+
+Please join our community! https://discord.gg/tyaRVrJsDW.
+
 
 In today's fast-paced world, where we spend a significant portion of our lives in the workplace, the importance of a positive work environment cannot be overstated. Unfortunately, the reality is that not all bosses or managers foster such environments, and having a bad boss can take a toll on our mental health.
 
