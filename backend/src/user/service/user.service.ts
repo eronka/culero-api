@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { RatingDto } from '../dto/rating.dto';
@@ -49,12 +53,12 @@ export class UserService {
 
     // Check if the user exists
     if (!ratedUser) {
-      throw new Error('User not found');
+      throw new NotFoundException('User not found');
     }
 
     // Check if the user is trying to rate himself
     if (user.id === ratedUserId) {
-      throw new Error('You cannot rate yourself');
+      throw new BadRequestException('You cannot rate yourself');
     }
 
     // Rate the user
@@ -85,18 +89,9 @@ export class UserService {
     });
 
     if (!revieweeUser) {
-      throw new Error('User not found');
+      throw new NotFoundException('User not found');
     }
 
-    if (self)
-      return revieweeUser.receivedReviews.map((review) => ({
-        userName: review.author.name,
-        profilePictureUrl: review.author.profilePictureUrl ?? '',
-        professionalism: review.professionalism,
-        reliability: review.reliability,
-        communication: review.communication,
-        createdOn: review.createdAt.toISOString(),
-      }));
     return revieweeUser.receivedReviews.map((review) => ({
       userName: review.author.name,
       profilePictureUrl: review.author.profilePictureUrl ?? '',
@@ -104,7 +99,28 @@ export class UserService {
       reliability: review.reliability,
       communication: review.communication,
       createdOn: review.createdAt.toISOString(),
-      comment: review.comment,
+      comment: !self ? review.comment : undefined,
     }));
+  }
+
+  async searchUsers(searchTerm?: string) {
+    if (!searchTerm) {
+      throw new BadRequestException('Search term is required');
+    }
+    const users = await this.prisma.user.findMany({
+      where: {
+        OR: [
+          { email: { contains: searchTerm } },
+          { name: { contains: searchTerm } },
+        ],
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        profilePictureUrl: true,
+      },
+    });
+    return users;
   }
 }

@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { config as AWSConfig } from 'aws-sdk';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 function initializeS3() {
   const logger = new Logger('initializeS3');
@@ -22,6 +23,17 @@ function initializeS3() {
   }
 }
 
+function initializeSwagger(app: any) {
+  const config = new DocumentBuilder()
+    .setTitle('culero API')
+    .setDescription('The culero API description')
+    .setVersion('1.0')
+    .addBearerAuth({ type: 'http', scheme: 'bearer', bearerFormat: 'JWT' })
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('docs', app, document);
+}
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const globalPrefix = 'api';
@@ -33,6 +45,7 @@ async function bootstrap() {
     }),
   );
   initializeS3();
+  initializeSwagger(app);
   await app.listen(4200);
 }
 bootstrap();

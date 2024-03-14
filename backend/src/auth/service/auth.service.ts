@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -31,14 +32,10 @@ export class AuthService {
       null,
       null,
       hashPassword(dto.password),
+      true,
     );
 
-    const token = await this.generateToken(user);
-
-    return {
-      ...user,
-      token,
-    };
+    return user;
   }
 
   async signIn(dto: SigninDto) {
@@ -64,24 +61,6 @@ export class AuthService {
       ...user,
       token,
     };
-  }
-
-  async searchUsers(searchTerm: string) {
-    const users = await this.prisma.user.findMany({
-      where: {
-        OR: [
-          { email: { contains: searchTerm } },
-          { name: { contains: searchTerm } },
-        ],
-      },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        profilePictureUrl: true,
-      },
-    });
-    return users;
   }
 
   async handleGoogleOAuthLogin(req: any) {
@@ -230,8 +209,12 @@ export class AuthService {
     name?: string,
     profilePictureUrl?: string,
     password?: string,
+    throwErrorIfUserExists?: boolean,
   ) {
     let user = await this.findUserByEmail(email);
+    if (user && throwErrorIfUserExists) {
+      throw new ConflictException('User already exists');
+    }
     // We need to create the user if it doesn't exist yet
     if (!user) {
       user = await this.prisma.user.create({
