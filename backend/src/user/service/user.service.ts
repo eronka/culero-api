@@ -3,9 +3,11 @@ import { User } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { RatingDto } from '../dto/rating.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
+import { S3 } from 'aws-sdk';
 
 @Injectable()
 export class UserService {
+  private readonly s3 = new S3();
   constructor(private readonly prisma: PrismaService) {}
 
   async getSelf(user: User) {
@@ -18,6 +20,24 @@ export class UserService {
       data: {
         name: dto.name,
         headline: dto.headline,
+      },
+    });
+  }
+
+  async updateProfilePicture(user: User, file: Express.Multer.File) {
+    const uploadResult = await this.s3
+      .upload({
+        Bucket: process.env.AWS_S3_BUCKET_NAME,
+        Key: `profile-pictures/${user.id}`,
+        Body: file.buffer,
+        ContentType: file.mimetype,
+      })
+      .promise();
+
+    return await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        profilePictureUrl: uploadResult.Location,
       },
     });
   }
