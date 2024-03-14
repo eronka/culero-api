@@ -1,9 +1,38 @@
 # Culero
 
+## How to join our community
+
+On our Discord Channel : https://discord.gg/tyaRVrJsDW.
+
+## Introduction
+
+Culero is an open-source project aimed at creating a more transparent and democratic workplace by allowing employees to review their managers. Our goal is to shift the power dynamic in traditional organizations and give employees a voice in the decision-making process.
+
+
+## Features
+
+Employees can confidentially rate and review their managers on various aspects such as communication, leadership, and fairness.
+Managers can receive feedback and use it to improve their management style.
+The platform provides anonymous data to organizations, helping them identify areas for improvement and promoting positive change from within.
+
+## Wireframe
+
+https://www.figma.com/file/p4gfqRDn3ma4zPaPAj8vH4?node-id=0:1&locale=en&type=design
+
+## Contributing
+
+Here are some ways you can contribute to Culero:
+Write code or fix bugs.
+Improve the user interface design.
+Contribute to the documentation.
+Spread the word about Culero and its mission.
+Before contributing, please take a moment to review our contribution guidelines.
+
+
+
+## Why we need Culero
+
 🌟 Introducing Culero: Empowering Transparency & Accountability in the Workplace 🌟
-
-Please join our community! https://discord.gg/tyaRVrJsDW.
-
 
 In today's fast-paced world, where we spend a significant portion of our lives in the workplace, the importance of a positive work environment cannot be overstated. Unfortunately, the reality is that not all bosses or managers foster such environments, and having a bad boss can take a toll on our mental health.
 
@@ -19,30 +48,11 @@ Join us in our mission to foster healthier, more transparent workplaces. Togethe
 
 #Culero #Transparency #Accountability #WorkplaceWellness #CommunityEmpowerment
 
-## Introduction
-
-Culero is an open-source project aimed at creating a more transparent and democratic workplace by allowing employees to review their managers. Our goal is to shift the power dynamic in traditional organizations and give employees a voice in the decision-making process.
-
-## Features
-
-Employees can confidentially rate and review their managers on various aspects such as communication, leadership, and fairness.
-Managers can receive feedback and use it to improve their management style.
-The platform provides anonymous data to organizations, helping them identify areas for improvement and promoting positive change from within.
 
 
-## Wireframe
-
-https://www.figma.com/file/p4gfqRDn3ma4zPaPAj8vH4?node-id=0:1&locale=en&type=design
 
 
-## Contributing
 
-Here are some ways you can contribute to Culero:
-Write code or fix bugs.
-Improve the user interface design.
-Contribute to the documentation.
-Spread the word about Culero and its mission.
-Before contributing, please take a moment to review our contribution guidelines.
 
 ## License
 
