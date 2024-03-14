@@ -12,15 +12,17 @@ enum AuthType {
   APPLE
   FACEBOOK
   LINKEDIN
+  EMAIL
 }
 
 model User {
   id                   String                @id @default(cuid())
   email                String                @unique
+  password             String?
   name                 String?
   profilePictureUrl    String?
   authType             AuthType
-  fullName             String
+  isEmailVerified      Boolean               @default(false)
   headline             String?
   jobTitle             String?
   reviews              Review[]              @relation("author")
@@ -82,4 +84,12 @@ model Rating {
   comment         String?
   createdAt       DateTime @default(now())
   anonymous       Boolean  @default(false)
+}
+
+model VerificationCode {
+  code      String   @id
+  email     String
+  expiresAt DateTime
+
+  @@unique([email])
 }

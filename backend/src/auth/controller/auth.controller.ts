@@ -1,8 +1,12 @@
 import {
+  Body,
   Controller,
   Get,
   HttpException,
   HttpStatus,
+  Param,
+  Post,
+  Query,
   Req,
   Res,
   UseGuards,
@@ -15,6 +19,9 @@ import { Public } from '../../decorators/public.decorator';
 import { FacebookOAuthStrategyFactory } from '../../oauth/factory/facebook/facebook-strategy.factory';
 import { LinkedInOAuthStrategyFactory } from '../../oauth/factory/linkedin/linkedin-strategy.factory';
 import { AppleOAuthStrategyFactory } from '../../oauth/factory/apple/apple-strategy.factory';
+import { SignupDto } from '../dto/signup.dto';
+import { SigninDto } from '../dto/signin.dto';
+import { EmailVerificationDto } from '../dto/email-verification.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -107,10 +114,37 @@ export class AuthController {
   }
 
   @Public()
+  @Post('sign-up')
+  async signUp(@Body() dto: SignupDto) {
+    return await this.authService.signUp(dto);
+  }
+
+  @Public()
+  @Post('sign-in')
+  async signIn(@Body() dto: SigninDto) {
+    return await this.authService.signIn(dto);
+  }
+
+  @Public()
+  @Get('regenerate-code/:email')
+  async resendEmailVerificationCode(@Param('email') email: string) {
+    return await this.authService.resendEmailVerificationCode(email);
+  }
+
+  @Public()
+  @Post('verify-email')
+  async verifyEmail(@Body() dto: EmailVerificationDto) {
+    return await this.authService.verifyEmail(dto.email, dto.code);
+  }
+
+  @Public()
   @Get('search')
   async searchUsers(@Query('searchTerm') searchTerm: string) {
     if (!searchTerm) {
-      throw new HttpException('Search term is required.', HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        'Search term is required.',
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     const users = await this.authService.searchUsers(searchTerm);
