@@ -17,6 +17,8 @@ The platform provides anonymous data to organizations, helping them identify are
 
 ## Wireframe
 
+Click and request for access!
+
 https://www.figma.com/file/p4gfqRDn3ma4zPaPAj8vH4?node-id=0:1&locale=en&type=design
 
 ## Contributing
