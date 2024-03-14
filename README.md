@@ -1,7 +1,9 @@
 # Culero
 
-
 🌟 Introducing Culero: Empowering Transparency & Accountability in the Workplace 🌟
+
+Please join our community! https://discord.gg/tyaRVrJsDW.
+
 
 In today's fast-paced world, where we spend a significant portion of our lives in the workplace, the importance of a positive work environment cannot be overstated. Unfortunately, the reality is that not all bosses or managers foster such environments, and having a bad boss can take a toll on our mental health.
 
@@ -47,6 +49,6 @@ Before contributing, please take a moment to review our contribution guidelines.
 Culero is released under the MIT license. See LICENSE for details.
 
 ## Contact Us
-If you have any questions or suggestions, feel free to reach out to us on GitHub or https://discordapp.com/users/2733.
+If you have any questions or suggestions, feel free to reach out to us on GitHub or https://discord.gg/tyaRVrJsDW.
 
 Join us today and let's build a better future for the modern workplace together!

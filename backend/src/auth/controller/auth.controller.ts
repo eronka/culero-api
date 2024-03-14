@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Param,
   Post,
+  Query,
   Req,
   Res,
   UseGuards,
@@ -133,5 +134,19 @@ export class AuthController {
   @Post('verify-email')
   async verifyEmail(@Body() dto: EmailVerificationDto) {
     return await this.authService.verifyEmail(dto.email, dto.code);
+  }
+
+  @Public()
+  @Get('search')
+  async searchUsers(@Query('searchTerm') searchTerm: string) {
+    if (!searchTerm) {
+      throw new HttpException(
+        'Search term is required.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const users = await this.authService.searchUsers(searchTerm);
+    return users;
   }
 }
