@@ -1,8 +1,23 @@
 # Culero
 
+Why we care about culero?
+We passionatly beleive that as world citizens, we are all public figures & need to be help hold each other accountable for our words, thoughts & deeds. Culero is the public forum for people to express their opinions & share their experiences. Together we can create a better world.
+
+Thanks to the open source community for your contribution. I am absolutely loving witnessing the project grows by the community and looking forward to seeing the evolution we can make to the project
+
 ## Join our community
 
 On our Discord Channel : https://discord.gg/tyaRVrJsDW.
+
+## Contribution Requirement
+### Backend API
+- All API endpoint requires Swagger API annotation, Thanks to @rajdip-b for setting up the base
+- Future - All API endpoint requires basic test case to be added. (Basic testing framework is work in progress)
+
+## Wireframe
+
+Click and request for access!
+https://www.figma.com/file/p4gfqRDn3ma4zPaPAj8vH4?node-id=0:1&locale=en&type=design
 
 ## What is Culero
 
@@ -15,11 +30,6 @@ Employees can confidentially rate and review their managers on various aspects s
 Managers can receive feedback and use it to improve their management style.
 The platform provides anonymous data to organizations, helping them identify areas for improvement and promoting positive change from within.
 
-## Wireframe
-
-Click and request for access!
-
-https://www.figma.com/file/p4gfqRDn3ma4zPaPAj8vH4?node-id=0:1&locale=en&type=design
 
 ## Contributing
 
@@ -29,6 +39,7 @@ Improve the user interface design.
 Contribute to the documentation.
 Spread the word about Culero and its mission.
 Before contributing, please take a moment to review our contribution guidelines.
+
 
 
 
