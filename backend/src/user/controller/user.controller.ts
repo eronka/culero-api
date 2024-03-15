@@ -164,20 +164,54 @@ export class UserController {
       },
     },
   })
-
   async getUserReviews(
     @CurrentUser() user: User,
     @Param('revieweeUserId') revieweeUserId: string,
   ) {
     return this.userService.getUserReviews(user, false, revieweeUserId);
   }
-  
+
   @Get('ratings/self')
+  @ApiOperation({
+    summary: 'Get self average rating',
+    description: 'Get average rating of the currently logged in user',
+  })
+  @ApiOkResponse({
+    description: 'Average Rating calculated',
+    schema: {
+      type: 'object',
+      properties: {
+        professionalism: { type: 'number' },
+        reliability: { type: 'number' },
+        communication: { type: 'number' },
+        overall: { type: 'number' },
+      },
+    },
+  })
   async getSelfRatings(@CurrentUser() user: User) {
     return this.userService.getUserRatings(user, true);
   }
 
   @Get('ratings/:userId')
+  @ApiOperation({
+    summary: 'Get user average rating',
+    description: 'Get average rating of another user',
+  })
+  @ApiNotFoundResponse({
+    description: 'User not found',
+  })
+  @ApiOkResponse({
+    description: 'Average Rating calculated',
+    schema: {
+      type: 'object',
+      properties: {
+        professionalism: { type: 'number' },
+        reliability: { type: 'number' },
+        communication: { type: 'number' },
+        overall: { type: 'number' },
+      },
+    },
+  })
   async getUserRatings(
     @CurrentUser() user: User,
     @Param('userId') userId: string,
