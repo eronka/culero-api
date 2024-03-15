@@ -1,5 +1,8 @@
 # Culero
 
+Why we care about culero?
+We passionatly beleive that as world citizens, we are all public figures & need to be help hold each other accountable for our words, thoughts & deeds. Culero is the public forum for people to express their opinions & share their experiences. Together we can create a better world.
+
 Thanks to the open source community for your contribution. I am absolutely loving witnessing the project grows by the community and looking forward to seeing the evolution we can make to the project
 
 ## Join our community
