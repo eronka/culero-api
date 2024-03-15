@@ -20,6 +20,7 @@ import {
   ApiBadRequestResponse,
   ApiBearerAuth,
   ApiBody,
+  ApiInternalServerErrorResponse,
   ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -85,6 +86,9 @@ export class UserController {
       type: 'object',
       properties: userProperties,
     },
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Failed to upload profile picture',
   })
   @ApiBody({
     schema: {
