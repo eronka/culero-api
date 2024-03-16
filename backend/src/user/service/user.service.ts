@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  Inject,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -11,20 +12,16 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { RatingDto } from '../dto/rating.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { S3_CLIENT } from '../../provider/s3.provider';
 
 @Injectable()
 export class UserService {
-  private readonly s3 = new S3Client({
-    credentials: {
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-    },
-    region: process.env.AWS_REGION,
-  });
-
   private readonly logger = new Logger('UserService');
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    @Inject(S3_CLIENT) private readonly s3: S3Client,
+    private readonly prisma: PrismaService,
+  ) {}
 
   async getSelf(user: User) {
     return user;

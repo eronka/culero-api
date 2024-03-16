@@ -32,6 +32,8 @@ import {
   reviewProperties,
   reviewPropertiesWithComment,
 } from '../../schemas/review.properties';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { Multer } from 'multer';
 
 @Controller('user')
 @ApiBearerAuth()

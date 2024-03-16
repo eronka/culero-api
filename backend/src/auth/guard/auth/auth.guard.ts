@@ -72,11 +72,11 @@ export class AuthGuard implements CanActivate {
       if (!user.isEmailVerified) {
         throw new ForbiddenException('Email not verified');
       }
-
-      // We attach the user to the request object.
-      request['user'] = user;
-      return true;
     }
+
+    // We attach the user to the request object.
+    request['user'] = user;
+    return true;
   }
 
   private extractTokenFromHeader(request: Request): string | undefined {
