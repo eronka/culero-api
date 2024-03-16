@@ -1,8 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Transporter, createTransport } from 'nodemailer';
+import { IMailService } from './interface.service';
 
 @Injectable()
-export class MailService {
+export class MailService implements IMailService {
   private readonly transporter: Transporter;
   private readonly log = new Logger(MailService.name);
 

@@ -197,7 +197,7 @@ export class UserService {
     if (!UserData) {
       throw new Error('User not found');
     }
-    
+
     const result = await this.prisma.rating.aggregate({
       where: { ratedUserId: userId },
       _avg: {
@@ -211,11 +211,11 @@ export class UserService {
       professionalism: result._avg.professionalism ?? 0,
       reliability: result._avg.reliability ?? 0,
       communication: result._avg.communication ?? 0,
-      overall: (
-        (result._avg.professionalism ?? 0) +
-        (result._avg.reliability ?? 0) +
-        (result._avg.communication ?? 0)
-      ) / 3,
-    }; 
-  }  
+      overall:
+        ((result._avg.professionalism ?? 0) +
+          (result._avg.reliability ?? 0) +
+          (result._avg.communication ?? 0)) /
+        3,
+    };
+  }
 }

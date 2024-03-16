@@ -11,6 +11,8 @@ import { IS_PUBLIC_KEY } from '../../../decorators/public.decorator';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { User } from '@prisma/client';
 
+const X_E2E_USER_EMAIL = 'x-e2e-user-email';
+
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
@@ -34,32 +36,47 @@ export class AuthGuard implements CanActivate {
     let user: User | null = null;
     const request = context.switchToHttp().getRequest();
 
-    const token = this.extractTokenFromHeader(request);
-    if (!token) {
-      throw new ForbiddenException();
-    }
-    try {
-      const payload = await this.jwtService.verifyAsync(token, {
-        secret: process.env.JWT_SECRET,
-      });
+    // In case the environment is e2e, we want to authenticate the user using the email
+    // else we want to authenticate the user using the JWT token.
+    if (process.env.NODE_ENV === 'e2e') {
+      const email = request.headers[X_E2E_USER_EMAIL];
+      if (!email) {
+        throw new ForbiddenException();
+      }
 
       user = await this.prisma.user.findUnique({
         where: {
-          id: payload['id'],
+          email,
         },
       });
-    } catch {
-      throw new ForbiddenException();
-    }
+    } else {
+      const token = this.extractTokenFromHeader(request);
+      if (!token) {
+        throw new ForbiddenException();
+      }
+      try {
+        const payload = await this.jwtService.verifyAsync(token, {
+          secret: process.env.JWT_SECRET,
+        });
 
-    // Check if the user's email is verified.
-    if (!user.isEmailVerified) {
-      throw new ForbiddenException('Email not verified');
-    }
+        user = await this.prisma.user.findUnique({
+          where: {
+            id: payload['id'],
+          },
+        });
+      } catch {
+        throw new ForbiddenException();
+      }
 
-    // We attach the user to the request object.
-    request['user'] = user;
-    return true;
+      // Check if the user's email is verified.
+      if (!user.isEmailVerified) {
+        throw new ForbiddenException('Email not verified');
+      }
+
+      // We attach the user to the request object.
+      request['user'] = user;
+      return true;
+    }
   }
 
   private extractTokenFromHeader(request: Request): string | undefined {
