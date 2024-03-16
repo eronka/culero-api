@@ -23,6 +23,7 @@ import {
   ApiBadRequestResponse,
   ApiBearerAuth,
   ApiBody,
+  ApiInternalServerErrorResponse,
   ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -88,6 +89,9 @@ export class UserController {
       type: 'object',
       properties: userProperties,
     },
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Failed to upload profile picture',
   })
   @ApiBody({
     schema: {
@@ -188,5 +192,53 @@ export class UserController {
         throw new HttpException('Failed to link social account', HttpStatus.INTERNAL_SERVER_ERROR);
       }
     }
+  }
+
+  @Get('ratings/self')
+  @ApiOperation({
+    summary: 'Get self average rating',
+    description: 'Get average rating of the currently logged in user',
+  })
+  @ApiOkResponse({
+    description: 'Average Rating calculated',
+    schema: {
+      type: 'object',
+      properties: {
+        professionalism: { type: 'number' },
+        reliability: { type: 'number' },
+        communication: { type: 'number' },
+        overall: { type: 'number' },
+      },
+    },
+  })
+  async getSelfRatings(@CurrentUser() user: User) {
+    return this.userService.getUserRatings(user, true);
+  }
+
+  @Get('ratings/:userId')
+  @ApiOperation({
+    summary: 'Get user average rating',
+    description: 'Get average rating of another user',
+  })
+  @ApiNotFoundResponse({
+    description: 'User not found',
+  })
+  @ApiOkResponse({
+    description: 'Average Rating calculated',
+    schema: {
+      type: 'object',
+      properties: {
+        professionalism: { type: 'number' },
+        reliability: { type: 'number' },
+        communication: { type: 'number' },
+        overall: { type: 'number' },
+      },
+    },
+  })
+  async getUserRatings(
+    @CurrentUser() user: User,
+    @Param('userId') userId: string,
+  ) {
+    return this.userService.getUserRatings(user, false, userId);
   }
 }

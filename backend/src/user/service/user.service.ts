@@ -2,17 +2,28 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  InternalServerErrorException,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { RatingDto } from '../dto/rating.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
-import { S3 } from 'aws-sdk';
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 
 @Injectable()
 export class UserService {
-  private readonly s3 = new S3();
+  private readonly s3 = new S3Client({
+    credentials: {
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    },
+    region: process.env.AWS_REGION,
+  });
+
+  private readonly logger = new Logger('UserService');
+
   constructor(private readonly prisma: PrismaService) {}
 
   async getSelf(user: User) {
@@ -30,21 +41,29 @@ export class UserService {
   }
 
   async updateProfilePicture(user: User, file: Express.Multer.File) {
-    const uploadResult = await this.s3
-      .upload({
-        Bucket: process.env.AWS_S3_BUCKET_NAME,
-        Key: `profile-pictures/${user.id}`,
-        Body: file.buffer,
-        ContentType: file.mimetype,
-      })
-      .promise();
-
-    return await this.prisma.user.update({
-      where: { id: user.id },
-      data: {
-        profilePictureUrl: uploadResult.Location,
-      },
+    const putObjectRequest = new PutObjectCommand({
+      Bucket: process.env.AWS_S3_BUCKET_NAME,
+      Key: `profile-pictures/${user.id}`,
+      Body: file.buffer,
+      ContentType: file.mimetype,
     });
+
+    try {
+      await this.s3.send(putObjectRequest);
+      this.logger.log('Profile picture uploaded');
+
+      return await this.prisma.user.update({
+        where: { id: user.id },
+        data: {
+          profilePictureUrl: `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/profile-pictures/${user.id}`,
+        },
+      });
+    } catch (err) {
+      this.logger.error(err);
+      throw new InternalServerErrorException(
+        'Failed to upload profile picture',
+      );
+    }
   }
 
   async rateUser(user: User, ratedUserId: User['id'], rating: RatingDto) {
@@ -167,4 +186,36 @@ export class UserService {
       },
     });
   }
+
+  async getUserRatings(user: User, self: boolean, userId?: User['id']) {
+    if (self) userId = user.id;
+
+    const UserData = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!UserData) {
+      throw new Error('User not found');
+    }
+    
+    const result = await this.prisma.rating.aggregate({
+      where: { ratedUserId: userId },
+      _avg: {
+        professionalism: true,
+        reliability: true,
+        communication: true,
+      },
+    });
+
+    return {
+      professionalism: result._avg.professionalism ?? 0,
+      reliability: result._avg.reliability ?? 0,
+      communication: result._avg.communication ?? 0,
+      overall: (
+        (result._avg.professionalism ?? 0) +
+        (result._avg.reliability ?? 0) +
+        (result._avg.communication ?? 0)
+      ) / 3,
+    }; 
+  }  
 }
