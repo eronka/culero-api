@@ -18,6 +18,7 @@ import {
   ApiBadRequestResponse,
   ApiBearerAuth,
   ApiBody,
+  ApiConflictResponse,
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
@@ -183,6 +184,36 @@ export class UserController {
     @Param('userId') revieweeUserId: string,
   ) {
     return this.userService.getUserRatings(user, false, revieweeUserId);
+  }
+
+  @Public()
+  @Post('/link-social')
+  @ApiOperation({
+    summary: 'Link social account',
+    description: 'Link a social account to the currently logged in user',
+  })
+  @ApiBadRequestResponse({
+    description: 'Invalid social account',
+  })
+  @ApiConflictResponse({
+    description: 'Social account already linked',
+  })
+  @ApiCreatedResponse({
+    description: 'Social account linked successfully',
+  })
+  async linkSocialAccount(
+    @Body()
+    {
+      userId,
+      provider,
+      accessToken,
+    }: {
+      userId: string;
+      provider: string;
+      accessToken: string;
+    },
+  ) {
+    await this.userService.linkSocialAccount(userId, provider, accessToken);
   }
 
   @Get('avg-rating/self')

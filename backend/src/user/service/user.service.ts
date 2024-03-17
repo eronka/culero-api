@@ -163,8 +163,6 @@ export class UserService {
         userId,
       },
     });
-
-    return user;
   }
 
   async getAvgUserRatings(user: User, self: boolean, userId?: User['id']) {
