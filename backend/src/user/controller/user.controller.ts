@@ -7,9 +7,12 @@ import {
   Param,
   Post,
   Put,
+  UseGuards,
+  HttpException,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { CurrentUser } from '../../decorators/current-user.decorator';
 import { UserService } from '../service/user.service';
 import { User } from '@prisma/client';
@@ -173,6 +176,22 @@ export class UserController {
     @Param('revieweeUserId') revieweeUserId: string,
   ) {
     return this.userService.getUserReviews(user, false, revieweeUserId);
+  }
+  @Post('/link-social')
+  @UseGuards(AuthGuard('jwt')) 
+  async linkSocialAccount(
+    @Body() { userId, provider, accessToken }: { userId: string; provider: string; accessToken: string },
+  ) {
+    try {
+      const linkedUser = await this.userService.linkSocialAccount(userId, provider, accessToken);
+      return linkedUser;
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      } else {
+        throw new HttpException('Failed to link social account', HttpStatus.INTERNAL_SERVER_ERROR);
+      }
+    }
   }
 
   @Get('ratings/self')
