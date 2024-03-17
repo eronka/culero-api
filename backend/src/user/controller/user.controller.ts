@@ -2,8 +2,6 @@ import {
   Body,
   Controller,
   Get,
-  HttpCode,
-  HttpStatus,
   Param,
   Post,
   Put,
@@ -20,8 +18,8 @@ import {
   ApiBadRequestResponse,
   ApiBearerAuth,
   ApiBody,
+  ApiCreatedResponse,
   ApiInternalServerErrorResponse,
-  ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
@@ -34,6 +32,7 @@ import {
 } from '../../schemas/review.properties';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Multer } from 'multer';
+import { Public } from '../../decorators/public.decorator';
 
 @Controller('user')
 @ApiBearerAuth()
@@ -111,7 +110,6 @@ export class UserController {
   }
 
   @Post('rate/:userId')
-  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({
     summary: 'Rate user',
     description: 'Rate another user',
@@ -122,8 +120,21 @@ export class UserController {
   @ApiNotFoundResponse({
     description: 'User not found',
   })
-  @ApiNoContentResponse({
+  @ApiCreatedResponse({
     description: 'User rated successfully',
+    schema: {
+      type: 'object',
+      properties: {
+        id: { type: 'number' },
+        ratedUserId: { type: 'string' },
+        raterUserId: { type: 'string' },
+        professionalism: { type: 'number' },
+        reliability: { type: 'number' },
+        communication: { type: 'number' },
+        comment: { type: 'string' },
+        anonymous: { type: 'boolean' },
+      },
+    },
   })
   async rateUser(
     @CurrentUser() user: User,
@@ -133,7 +144,7 @@ export class UserController {
     return this.userService.rateUser(user, ratedUserId, rating);
   }
 
-  @Get('reviews/self')
+  @Get('ratings/self')
   @ApiOperation({
     summary: 'Get self reviews',
     description: 'Get reviews of the currently logged in user',
@@ -149,16 +160,13 @@ export class UserController {
     },
   })
   async getSelfReviews(@CurrentUser() user: User) {
-    return this.userService.getUserReviews(user, true);
+    return this.userService.getUserRatings(user, true);
   }
 
-  @Get('reviews/:userId')
+  @Get('ratings/:userId')
   @ApiOperation({
     summary: 'Get user reviews',
     description: 'Get reviews of another user',
-  })
-  @ApiNotFoundResponse({
-    description: 'User not found',
   })
   @ApiOkResponse({
     description: 'User reviews found',
@@ -172,12 +180,12 @@ export class UserController {
   })
   async getUserReviews(
     @CurrentUser() user: User,
-    @Param('revieweeUserId') revieweeUserId: string,
+    @Param('userId') revieweeUserId: string,
   ) {
-    return this.userService.getUserReviews(user, false, revieweeUserId);
+    return this.userService.getUserRatings(user, false, revieweeUserId);
   }
 
-  @Get('ratings/self')
+  @Get('avg-rating/self')
   @ApiOperation({
     summary: 'Get self average rating',
     description: 'Get average rating of the currently logged in user',
@@ -195,16 +203,13 @@ export class UserController {
     },
   })
   async getSelfRatings(@CurrentUser() user: User) {
-    return this.userService.getUserRatings(user, true);
+    return this.userService.getAvgUserRatings(user, true);
   }
 
-  @Get('ratings/:userId')
+  @Get('avg-rating/:userId')
   @ApiOperation({
     summary: 'Get user average rating',
     description: 'Get average rating of another user',
-  })
-  @ApiNotFoundResponse({
-    description: 'User not found',
   })
   @ApiOkResponse({
     description: 'Average Rating calculated',
@@ -222,6 +227,26 @@ export class UserController {
     @CurrentUser() user: User,
     @Param('userId') userId: string,
   ) {
-    return this.userService.getUserRatings(user, false, userId);
+    return this.userService.getAvgUserRatings(user, false, userId);
+  }
+
+  @Public()
+  @Get('search/:query')
+  @ApiOperation({
+    summary: 'Search users',
+    description: 'Search for users',
+  })
+  @ApiOkResponse({
+    description: 'Users found',
+    schema: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: userProperties,
+      },
+    },
+  })
+  async searchUsers(@Param('query') query: string) {
+    return this.userService.searchUsers(query);
   }
 }

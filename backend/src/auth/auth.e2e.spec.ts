@@ -1,0 +1,190 @@
+import {
+  FastifyAdapter,
+  NestFastifyApplication,
+} from '@nestjs/platform-fastify';
+import { PrismaService } from '../prisma/prisma.service';
+import { AuthModule } from './auth.module';
+import { MAIL_SERVICE } from '../mail/interface.service';
+import { MockMailService } from '../mail/mail.mock';
+import { Test } from '@nestjs/testing';
+import { AppModule } from '../app/app.module';
+import { ValidationPipe } from '@nestjs/common';
+import { AuthType } from '@prisma/client';
+import { SHA256 } from 'crypto-js';
+
+describe('Auth Controller Tests', () => {
+  let app: NestFastifyApplication;
+  let prisma: PrismaService;
+
+  beforeAll(async () => {
+    const moduleRef = await Test.createTestingModule({
+      imports: [AppModule, AuthModule],
+    })
+      .overrideProvider(MAIL_SERVICE)
+      .useClass(MockMailService)
+      .compile();
+    app = moduleRef.createNestApplication<NestFastifyApplication>(
+      new FastifyAdapter(),
+    );
+    app.useGlobalPipes(new ValidationPipe());
+    prisma = moduleRef.get(PrismaService);
+
+    await app.init();
+    await app.getHttpAdapter().getInstance().ready();
+  });
+
+  it('should be defined', () => {
+    expect(app).toBeDefined();
+    expect(prisma).toBeDefined();
+  });
+
+  it('should fail sign up if password does not meet requirements', async () => {
+    const response = await app.inject({
+      method: 'POST',
+      url: '/auth/sign-up',
+      payload: {
+        email: 'janedoe@example.com',
+        password: 'password',
+      },
+    });
+
+    expect(response.statusCode).toEqual(400);
+  });
+
+  it('should be able to sign up using email and password', async () => {
+    const response = await app.inject({
+      method: 'POST',
+      url: '/auth/sign-up',
+      payload: {
+        email: 'jane@example.com',
+        password: 'Password123',
+      },
+    });
+
+    expect(response.statusCode).toEqual(201);
+    expect(response.json().email).toEqual('jane@example.com');
+    expect(response.json().password).toBeUndefined();
+  });
+
+  it('should be able to sign in using email and password', async () => {
+    await prisma.user.create({
+      data: {
+        email: 'jane@example.com',
+        password: SHA256('password').toString(),
+        isEmailVerified: true,
+        authType: AuthType.EMAIL,
+      },
+    });
+
+    const response = await app.inject({
+      method: 'POST',
+      url: '/auth/sign-in',
+      payload: {
+        email: 'jane@example.com',
+        password: 'password',
+      },
+    });
+
+    expect(response.statusCode).toEqual(201);
+    expect(response.json().email).toEqual('jane@example.com');
+    expect(response.json().password).toBeUndefined();
+    expect(response.json().token).toBeDefined();
+  });
+
+  it('should send verification code to email on sign up', async () => {
+    await app.inject({
+      method: 'POST',
+      url: '/auth/sign-up',
+      payload: {
+        email: 'jane@example.com',
+        password: 'Password123',
+      },
+    });
+
+    const verificationCode = await prisma.verificationCode.findUnique({
+      where: {
+        email: 'jane@example.com',
+      },
+    });
+
+    expect(verificationCode).toBeDefined();
+    expect(verificationCode.code).toBeDefined();
+    expect(verificationCode.email).toEqual('jane@example.com');
+  });
+
+  it('should not resend verification code if email is already verified', async () => {
+    await prisma.user.create({
+      data: {
+        email: 'jane@example.com',
+        password: SHA256('password').toString(),
+        isEmailVerified: true,
+        authType: AuthType.EMAIL,
+      },
+    });
+
+    const response = await app.inject({
+      method: 'GET',
+      url: '/regenerate-code/jane@example.com',
+    });
+
+    expect(response.statusCode).toEqual(404);
+  });
+
+  it('should not resend verification code if user does not exist', async () => {
+    const response = await app.inject({
+      method: 'GET',
+      url: '/regenerate-code/abc',
+    });
+
+    expect(response.statusCode).toEqual(404);
+  });
+
+  it('should be able to verify email using verification code', async () => {
+    // Sign up
+    await app.inject({
+      method: 'POST',
+      url: '/auth/sign-up',
+      payload: {
+        email: 'jane@example.com',
+        password: 'Password123',
+      },
+    });
+
+    // Get verification code
+    const verificationCode = await prisma.verificationCode.findUnique({
+      where: {
+        email: 'jane@example.com',
+      },
+    });
+
+    // Verify email
+    const response = await app.inject({
+      method: 'POST',
+      url: '/auth/verify-email',
+      payload: {
+        email: 'jane@example.com',
+        code: verificationCode.code,
+      },
+    });
+
+    expect(response.statusCode).toEqual(201);
+    expect(response.json().email).toEqual('jane@example.com');
+    expect(response.json().isEmailVerified).toEqual(true);
+    expect(response.json().password).toBeUndefined();
+    expect(response.json().token).toBeDefined();
+
+    // Verify that the verification code is deleted
+    const deletedVerificationCode = await prisma.verificationCode.findUnique({
+      where: {
+        email: 'jane@example.com',
+      },
+    });
+
+    expect(deletedVerificationCode).toBeNull();
+  });
+
+  afterEach(async () => {
+    await prisma.user.deleteMany();
+    await prisma.verificationCode.deleteMany();
+  });
+});

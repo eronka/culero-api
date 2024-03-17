@@ -146,13 +146,12 @@ export class AuthController {
     summary: 'Sign up',
     description: 'Sign up with email and password',
   })
-  @ApiNoContentResponse({
+  @ApiCreatedResponse({
     description: 'User signed up successfully',
   })
   @ApiConflictResponse({
     description: 'User with this email already exists',
   })
-  @HttpCode(HttpStatus.NO_CONTENT)
   async signUp(@Body() dto: SignupDto) {
     return await this.authService.signUp(dto);
   }
@@ -191,6 +190,9 @@ export class AuthController {
   })
   @ApiNoContentResponse({
     description: 'Email verification code sent successfully',
+  })
+  @ApiBadRequestResponse({
+    description: 'Email already verified',
   })
   @ApiNotFoundResponse({
     description: 'User not found',

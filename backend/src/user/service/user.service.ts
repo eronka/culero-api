@@ -78,8 +78,10 @@ export class UserService {
       throw new BadRequestException('You cannot rate yourself');
     }
 
+    rating.anonymous = rating.anonymous ?? false;
+
     // Rate the user
-    await this.prisma.rating.create({
+    return await this.prisma.rating.create({
       data: {
         ratedUserId: ratedUserId,
         raterUserId: rating.anonymous ? null : user.id,
@@ -92,26 +94,19 @@ export class UserService {
     });
   }
 
-  async getUserReviews(user: User, self: boolean, revieweeUserId?: User['id']) {
+  async getUserRatings(user: User, self: boolean, revieweeUserId?: User['id']) {
     if (self) revieweeUserId = user.id;
-    const revieweeUser = await this.prisma.user.findUnique({
-      where: { id: revieweeUserId },
+
+    const ratings = await this.prisma.rating.findMany({
+      where: { ratedUserId: revieweeUserId },
       include: {
-        receivedReviews: {
-          include: {
-            author: true,
-          },
-        },
+        raterUser: true,
       },
     });
 
-    if (!revieweeUser) {
-      throw new NotFoundException('User not found');
-    }
-
-    return revieweeUser.receivedReviews.map((review) => ({
-      userName: review.author.name,
-      profilePictureUrl: review.author.profilePictureUrl ?? '',
+    return ratings.map((review) => ({
+      userName: review.raterUser ? review.raterUser.name : 'Anonymous',
+      profilePictureUrl: review.raterUser?.profilePictureUrl,
       professionalism: review.professionalism,
       reliability: review.reliability,
       communication: review.communication,
@@ -172,28 +167,8 @@ export class UserService {
     return user;
   }
 
-  private async findUserById(id: string) {
-    return await this.prisma.user.findUnique({ where: { id } });
-  }
-
-  private async findUserByEmail(email: string) {
-    return await this.prisma.user.findUnique({
-      where: {
-        email,
-      },
-    });
-  }
-
-  async getUserRatings(user: User, self: boolean, userId?: User['id']) {
+  async getAvgUserRatings(user: User, self: boolean, userId?: User['id']) {
     if (self) userId = user.id;
-
-    const UserData = await this.prisma.user.findUnique({
-      where: { id: userId },
-    });
-
-    if (!UserData) {
-      throw new Error('User not found');
-    }
 
     const result = await this.prisma.rating.aggregate({
       where: { ratedUserId: userId },
@@ -209,10 +184,22 @@ export class UserService {
       reliability: result._avg.reliability ?? 0,
       communication: result._avg.communication ?? 0,
       overall:
-        ((result._avg.professionalism ?? 0) +
-          (result._avg.reliability ?? 0) +
-          (result._avg.communication ?? 0)) /
+        (result._avg.professionalism +
+          result._avg.reliability +
+          result._avg.communication) /
         3,
     };
+  }
+
+  private async findUserById(id: string) {
+    return await this.prisma.user.findUnique({ where: { id } });
+  }
+
+  private async findUserByEmail(email: string) {
+    return await this.prisma.user.findUnique({
+      where: {
+        email,
+      },
+    });
   }
 }

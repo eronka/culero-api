@@ -1,8 +1,17 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Max,
+  Min,
+} from 'class-validator';
 
 export class RatingDto {
-  @IsNumber()
+  @IsNumber({}, { message: 'Quality must be a number' })
+  @Min(1, { message: 'Rating must be at least 1' })
+  @Max(5, { message: 'Rating must be at most 5' })
   @ApiProperty({
     name: 'professionalism',
     description: 'Professionalism rating',
@@ -13,7 +22,9 @@ export class RatingDto {
   })
   professionalism: number;
 
-  @IsNumber()
+  @IsNumber({}, { message: 'Reliability must be a number' })
+  @Min(1, { message: 'Rating must be at least 1' })
+  @Max(5, { message: 'Rating must be at most 5' })
   @ApiProperty({
     name: 'reliability',
     description: 'Reliability rating',
@@ -24,7 +35,9 @@ export class RatingDto {
   })
   reliability: number;
 
-  @IsNumber()
+  @IsNumber({}, { message: 'Communication must be a number' })
+  @Min(1, { message: 'Rating must be at least 1' })
+  @Max(5, { message: 'Rating must be at most 5' })
   @ApiProperty({
     name: 'communication',
     description: 'Communication rating',
@@ -43,7 +56,7 @@ export class RatingDto {
     required: false,
     example: 'Great service!',
   })
-  comment: string;
+  comment?: string;
 
   @IsOptional()
   @IsBoolean()
@@ -53,5 +66,5 @@ export class RatingDto {
     required: false,
     example: false,
   })
-  anonymous: boolean;
+  anonymous?: boolean;
 }
