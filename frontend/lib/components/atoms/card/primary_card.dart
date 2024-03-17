@@ -16,12 +16,16 @@ class PrimaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+
       padding:padding ,
+
       decoration: BoxDecoration(
         color: primaryCardBg,
         borderRadius: BorderRadius.circular(15),
         border: border ? Border.all(color: cardBorderColor, width: 1) : null,
+
       ),
+        child:child,
     );
   }
 }

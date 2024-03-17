@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/components/atoms/TextField/text_field_config.dart';
+import 'package:frontend/components/atoms/Text/body_text.dart';
+import 'package:frontend/components/atoms/Text/heading_text.dart';
+import 'package:frontend/components/atoms/TextField/primary_text_form_field.dart';
+import 'package:frontend/components/atoms/TextField/search_text_field.dart';
 import 'package:frontend/components/atoms/buttons/primary_button.dart';
-import 'package:frontend/utils/color.dart';
-import 'package:flutter/cupertino.dart';
-
-import 'utils/font_size.dart';
+import 'package:frontend/components/atoms/buttons/secondary_button.dart';
+import 'package:frontend/components/atoms/card/primary_card.dart';
+import 'package:frontend/components/atoms/indicator/indicator.dart';
+import 'package:frontend/utils/font_size.dart';
 
 void main() {
   runApp(const MyApp());
 }
+
+final controller = TextEditingController();
+final controller2 = TextEditingController();
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -21,57 +27,77 @@ class MyApp extends StatelessWidget {
       title: 'Culero',
       home: Scaffold(
         body: Container(
-          width: 500,
+          height: MediaQuery.of(context).size.height,
           padding: const EdgeInsets.all(8.0),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-
-              SearchBar(
-                hintText: "Search",
-                trailing: [FilledButton(onPressed: () {}, child: const Text("Hello"))],
-                side: const MaterialStatePropertyAll<BorderSide>(BorderSide(color: primaryBg)),
-                elevation: const MaterialStatePropertyAll<double>(0),
-                textStyle: const MaterialStatePropertyAll<TextStyle>(TextStyle(fontSize: FontSizes.h4)),
-                hintStyle: const MaterialStatePropertyAll<TextStyle>(
-                  TextStyle(
-                    fontStyle: FontStyle.italic,
-                    fontSize: FontSizes.h4,
-                    color: placehoderText,
-                  ),
-                ),
-                backgroundColor: const MaterialStatePropertyAll<Color>(searchTextFieldBgColor),
-                padding: const MaterialStatePropertyAll<EdgeInsets>(EdgeInsets.symmetric(horizontal: 16.0)),
-                leading: const Icon(
-                  Icons.search,
-                  color: placehoderText,
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: PrimaryTextFormField(
+                  hintText: 'Hint',
+                  onChanged: (e) {},
+                  controller: controller,
                 ),
               ),
-              TextFormField(
-                autofocus: true,
-                cursorColor: placehoderText,
-                cursorOpacityAnimates: true,
-                style: const TextStyle(
-                  fontSize: FontSizes.h4,
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: SearchTextField(controller: controller2, hintText: "Search Here"),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Flexible(child: PrimaryButton(text: "PrimaryButton", onPressed: () {})),
+                    Flexible(child: SecondaryButton(text: "SecondaryButton", onPressed: () {})),
+                  ],
                 ),
-                decoration: const InputDecoration(
-                  filled: true,
-                  fillColor: bgColor,
-                  alignLabelWithHint: true,
-                  isDense: true,
-                  hintText: "hint",
-                  hintStyle: TextStyle(
-                    fontStyle: FontStyle.italic,
-                    fontSize: FontSizes.h4,
-                    color: placehoderText,
+              ),
+              const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: PrimaryCard(
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: HeadingText(text: "Heading Text", fontSize: FontSizes.h1),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: HeadingText(text: "Heading Text", fontSize: FontSizes.h2),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: HeadingText(text: "Heading Text", fontSize: FontSizes.h3),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: HeadingText(text: "Heading Text", fontSize: FontSizes.h4),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: HeadingText(text: "Heading Text", fontSize: FontSizes.h5),
+                      ),
+                       Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: BodyText(text: "Body Text", fontSize: FontSizes.p1),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: BodyText(text: "Body Text", fontSize: FontSizes.p2),
+                      ),
+                       Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: BodyText(text: "Body Text", fontSize: FontSizes.p3),
+                      )
+
+                    ],
                   ),
-                  contentPadding: EdgeInsets.all(18),
-                  border: OutlineInputBorder(borderSide: BorderSide.none),
-                  focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: primaryBg)),
-                  errorBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.red)),
+
                 ),
-              )
+
+              ),
+              const Indicator(value  : 0.5, color: Colors.red,size: Size.fromHeight(50),)
             ],
           ),
         ),

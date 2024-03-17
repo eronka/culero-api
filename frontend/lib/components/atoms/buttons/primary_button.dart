@@ -54,24 +54,21 @@ class PrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      height: _buttonHeight(size),
-      child: TextButton(
-        onPressed: onPressed,
-        style: TextButton.styleFrom(
-          foregroundColor: textColor,
-          backgroundColor: color,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(radius),
-          ),
-          elevation: 0,
+    return TextButton(
+      onPressed: onPressed,
+      style: TextButton.styleFrom(
+        fixedSize: Size.fromHeight(_buttonHeight(size)),
+        foregroundColor: textColor,
+        backgroundColor: color,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(radius),
         ),
-        child: Text(
-          text,
-          style: GoogleFonts.inter(
-            textStyle: _titleStyle(textColor, size),
-          ),
+        elevation: 0,
+      ),
+      child: Text(
+        text,
+        style: GoogleFonts.inter(
+          textStyle: _titleStyle(textColor, size),
         ),
       ),
     );

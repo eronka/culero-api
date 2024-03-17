@@ -54,12 +54,10 @@ class SecondaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      height: _buttonHeight(size),
-      child: TextButton(
+    return  TextButton(
         onPressed: onPressed,
         style: TextButton.styleFrom(
+            fixedSize: Size.fromHeight(_buttonHeight(size)),
           foregroundColor: textColor,
           backgroundColor: Colors
               .transparent,
@@ -75,7 +73,7 @@ class SecondaryButton extends StatelessWidget {
             textStyle: _titleStyle(textColor, size),
           ),
         ),
-      ),
+
     );
   }
 }
