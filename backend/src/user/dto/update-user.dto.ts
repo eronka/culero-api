@@ -10,7 +10,7 @@ export class UpdateUserDto {
     required: false,
     example: 'John Doe',
   })
-  name: string;
+  name?: string;
 
   @IsOptional()
   @IsString()
@@ -20,5 +20,5 @@ export class UpdateUserDto {
     required: false,
     example: 'Software Engineer',
   })
-  headline: string;
+  headline?: string;
 }

@@ -8,6 +8,8 @@ import { LinkedInOAuthStrategyFactory } from '../../oauth/factory/linkedin/linke
 import { FacebookOAuthStrategyFactory } from '../../oauth/factory/facebook/facebook-strategy.factory';
 import { AppleOAuthStrategyFactory } from '../../oauth/factory/apple/apple-strategy.factory';
 import { ConfigService } from '@nestjs/config';
+import { MailService } from '../../mail/mail.service';
+import { mockDeep } from 'jest-mock-extended';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -24,8 +26,12 @@ describe('AuthController', () => {
         FacebookOAuthStrategyFactory,
         AppleOAuthStrategyFactory,
         ConfigService,
+        MailService,
       ],
-    }).compile();
+    })
+      .overrideProvider(MailService)
+      .useValue(mockDeep<MailService>())
+      .compile();
 
     controller = module.get<AuthController>(AuthController);
   });

@@ -1,22 +1,27 @@
-import * as fs from 'fs'; 
+import * as fs from 'fs';
 import * as path from 'path';
 import * as cheerio from 'cheerio';
 import axios from 'axios';
 
-async function generateSitemap(domain: string, profilesDirectory: string): Promise<void> {
+async function generateSitemap(
+  domain: string,
+  profilesDirectory: string,
+): Promise<void> {
   try {
-    
     if (!domain || !profilesDirectory) {
-      throw new Error('Missing required environment variables: DOMAIN and PROFILES_DIRECTORY');
+      throw new Error(
+        'Missing required environment variables: DOMAIN and PROFILES_DIRECTORY',
+      );
     }
 
     const baseUrl = `${domain}/user/profiles/`;
 
-    const sitemapPath = path.join(__dirname, '..', 'sitemap.xml'); 
+    const sitemapPath = path.join(__dirname, '..', 'sitemap.xml');
     const stream = fs.createWriteStream(sitemapPath);
 
     const XML_DECLARATION = '<?xml version="1.0" encoding="UTF-8"?>\n';
-    const URLSET_OPEN = '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
+    const URLSET_OPEN =
+      '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
     const URLSET_CLOSE = '</urlset>';
 
     await stream.write(XML_DECLARATION);
@@ -64,7 +69,10 @@ async function generateSitemap(domain: string, profilesDirectory: string): Promi
   }
 }
 
-async function extractReviewUrlFromProfile(domain: string, profileUrl: string): Promise<string | null> {
+async function extractReviewUrlFromProfile(
+  domain: string,
+  profileUrl: string,
+): Promise<string | null> {
   try {
     const response = await axios.get(profileUrl);
     const $ = cheerio.load(response.data);
@@ -72,7 +80,7 @@ async function extractReviewUrlFromProfile(domain: string, profileUrl: string): 
     const reviewLink = $('a[href*="/reviews/"]').attr('href');
 
     if (reviewLink) {
-      return `${domain}${reviewLink}`; 
+      return `${domain}${reviewLink}`;
     } else {
       return null;
     }
@@ -82,7 +90,12 @@ async function extractReviewUrlFromProfile(domain: string, profileUrl: string): 
   }
 }
 
-async function writeUrl(stream: fs.WriteStream, loc: string, changefreq: string, priority: string): Promise<void> {
+async function writeUrl(
+  stream: fs.WriteStream,
+  loc: string,
+  changefreq: string,
+  priority: string,
+): Promise<void> {
   const url = `\t<url>\n\t\t<loc>${loc}</loc>\n\t\t<changefreq>${changefreq}</changefreq>\n\t\t<priority>${priority}</priority>\n\t</url>\n`;
   await stream.write(url);
 }
