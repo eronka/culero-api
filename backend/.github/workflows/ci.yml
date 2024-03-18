@@ -9,21 +9,6 @@ on:
       - '*'
 
 jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Use Node.js 16
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
-      - name: Install dependencies
-        run: pnpm install
-      - name: Run ESLint
-        run: pnpm run lint
-      - name: Run Prettier
-        run: pnpm run format
-
   test:
     runs-on: ubuntu-latest
     steps:
@@ -38,3 +23,8 @@ jobs:
         run: pnpm run test
       - name: Run e2e tests
         run: pnpm run test:e2e
+
+.husky/pre-commit:
+  #!/bin/sh
+  pnpm run lint
+  pnpm run format
