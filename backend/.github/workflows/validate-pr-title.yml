@@ -1,0 +1,14 @@
+# This workflow validates pull request titles against Commitlint rules.
+name: Validate PR Title
+
+on:
+  pull_request:
+
+jobs:
+  validate-title:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dreampulse/action-lint-pull-request-title@v3 # Action for title validation
+        with:
+          config: '.commitlintrc.js'
