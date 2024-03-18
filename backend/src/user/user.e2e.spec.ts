@@ -6,10 +6,11 @@ import { Test } from '@nestjs/testing';
 import { AppModule } from '../app/app.module';
 import { PrismaService } from '../prisma/prisma.service';
 import { UserModule } from './user.module';
-import { MAIL_SERVICE } from '../mail/interface.service';
-import { MockMailService } from '../mail/mail.mock';
 import { AuthType } from '@prisma/client';
 import { ValidationPipe } from '@nestjs/common';
+import { MailService } from '../mail/mail.service';
+import { mockDeep } from 'jest-mock-extended';
+import { MailModule } from '../mail/mail.module';
 
 describe('User Controller Tests', () => {
   let app: NestFastifyApplication;
@@ -17,10 +18,10 @@ describe('User Controller Tests', () => {
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
-      imports: [AppModule, UserModule],
+      imports: [AppModule, UserModule, MailModule],
     })
-      .overrideProvider(MAIL_SERVICE)
-      .useClass(MockMailService)
+      .overrideProvider(MailService)
+      .useValue(mockDeep<MailService>())
       .compile();
     app = moduleRef.createNestApplication<NestFastifyApplication>(
       new FastifyAdapter(),

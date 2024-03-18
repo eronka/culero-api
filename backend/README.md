@@ -11,6 +11,8 @@ The backend is a NestJS based application. It uses PostgreSQL as a database and 
 - **PostgreSQL** up and running on your machine on port `5432`. If you change this, or you are using a different database, you will need to change the connection string in the `.env` file.
 - Port `4200` should be free. This will be used by the backend to run the server.
 - **AWS S3 bucket** for storing the images. This is optional, but if you want to use the image upload feature, you will need to fill in the required values in the `.env` file.
+- **nest cli** installed globally. If not, you can install it by running `pnpm i -g @nestjs/cli`
+- **Docker** installed. This is optional, but if you want to run the database in a container, or you will need to run the E2E tests, you will need to have Docker installed.
 
 ### Installation
 
@@ -71,6 +73,36 @@ pnpm db:generate-types
 pnpm db:generate-migrations
 pnpm db:deploy-migrations
 ```
+
+Apart from database changes, in case you feel you need to add another module, simply do `nest g module <module_name>`
+
+### Testing
+
+### Writing tests
+
+Any updates that you make to the code, or for features that you create, you will need to add proper tests for those features. Our repository currently employs unit and e2e tests. These are the usages:
+
+- You create unit tests when you have created some util function. Do keep the default test file that is created when you create a new file using nest cli.
+- You create e2e tests when you have created a new module or a new feature. There won't be a default file for this, so lets say you have created a new module named `project`, then inside the `project` module, you will be creating a `project.e2e.spec.ts` file.
+
+### Running the tests
+
+Before you make a PR, or push the code, do ensure that your code passes the existing tests. Note that, the E2E test tries to set up a local database using `docker compose` on port `5432`. If you have a database running on that port, you will need to stop it before running the tests.
+
+You will need to run both the E2E and unit tests.
+
+```sh
+pnpm test
+```
+
+If you want to run the tests individually, you can do so by running the following commands:
+
+```sh
+pnpm test:unit
+pnpm test:e2e
+```
+
+Once you ensure that the tests are passing, you can push your code.
 
 ### OAuth Configuration
 

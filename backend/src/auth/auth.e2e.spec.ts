@@ -4,13 +4,14 @@ import {
 } from '@nestjs/platform-fastify';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuthModule } from './auth.module';
-import { MAIL_SERVICE } from '../mail/interface.service';
-import { MockMailService } from '../mail/mail.mock';
 import { Test } from '@nestjs/testing';
 import { AppModule } from '../app/app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { AuthType } from '@prisma/client';
 import { SHA256 } from 'crypto-js';
+import { MailService } from '../mail/mail.service';
+import { mockDeep } from 'jest-mock-extended';
+import { MailModule } from '../mail/mail.module';
 
 describe('Auth Controller Tests', () => {
   let app: NestFastifyApplication;
@@ -18,10 +19,10 @@ describe('Auth Controller Tests', () => {
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
-      imports: [AppModule, AuthModule],
+      imports: [AppModule, AuthModule, MailModule],
     })
-      .overrideProvider(MAIL_SERVICE)
-      .useClass(MockMailService)
+      .overrideProvider(MailService)
+      .useValue(mockDeep<MailService>())
       .compile();
     app = moduleRef.createNestApplication<NestFastifyApplication>(
       new FastifyAdapter(),

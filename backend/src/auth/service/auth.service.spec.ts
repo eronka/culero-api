@@ -8,6 +8,7 @@ import { LinkedInOAuthStrategyFactory } from '../../oauth/factory/linkedin/linke
 import { FacebookOAuthStrategyFactory } from '../../oauth/factory/facebook/facebook-strategy.factory';
 import { AppleOAuthStrategyFactory } from '../../oauth/factory/apple/apple-strategy.factory';
 import { ConfigService } from '@nestjs/config';
+import { MailService } from '../../mail/mail.service';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -23,8 +24,11 @@ describe('AuthService', () => {
         FacebookOAuthStrategyFactory,
         AppleOAuthStrategyFactory,
         ConfigService,
+        MailService,
       ],
     })
+      .overrideProvider(MailService)
+      .useValue(mockDeep<MailService>())
       .overrideProvider(PrismaService)
       .useValue(mockDeep<PrismaService>())
       .compile();
