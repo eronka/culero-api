@@ -66,6 +66,12 @@ cp .env.example .env
 
 ### Developing
 
+You would need a PostgreSQL database to be up and running. If you don't have it installed, you can run it in a container using the following command:
+
+```sh
+docker run --name culero-psql --network host -e POSTGRES_PASSWORD=password -d postgres
+```
+
 Any changes that you make to the code will automatically show up since live reload is enabled. If you make any changes to the database file (`schema.prisma`), you will need to re-generate the migration files and deploy them. A side note, generate and deploy the migrations only when you feel that the changes are ready to be deployed.
 
 ```sh
