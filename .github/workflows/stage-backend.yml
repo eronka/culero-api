@@ -1,0 +1,32 @@
+on:
+  push:
+    branches:
+      - develop
+    paths: ['backend/**', '.github/workflows/stage-backend.yml']
+
+env:
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+jobs:
+  deploy-backend-stage:
+    runs-on: ubuntu-latest
+    name: Deploy to stage
+    if: github.ref == 'refs/heads/develop'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install fly CLI
+        run: |
+          curl -L https://fly.io/install.sh | sh
+      - name: pnpm install
+        run: pnpm install
+      - name: Deploy migrations
+        run: pnpm db:deploy-migrations
+      - name: Deploy to stage
+        run: |
+          ~/.fly/bin/fly deploy \
+            --config fly.backend.toml \
+            --dockerfile ./backend/Dockerfile \
+            --app culero-backend-stage \
+            --access-token ${{ secrets.FLY_ACCESS_TOKEN }}
