@@ -23,7 +23,8 @@
     "db:deploy-migrations": " pnpx prisma migrate deploy --schema=src/prisma/schema.prisma",
     "db:validate": "pnpm dlx prisma validate --schema=src/prisma/schema.prisma",
     "db:format": "pnpm dlx prisma format --schema=src/prisma/schema.prisma",
-    "db:reset": "pnpm dlx prisma migrate reset --force --schema=src/prisma/schema.prisma"
+    "db:reset": "pnpm dlx prisma migrate reset --force --schema=src/prisma/schema.prisma",
+    "prepare": "husky"
   },
   "dependencies": {
     "@arendajaelu/nestjs-passport-apple": "^2.0.2",
@@ -71,6 +72,7 @@
     "eslint": "^8.42.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.0",
+    "husky": "^9.0.11",
     "jest": "^29.5.0",
     "prettier": "^3.0.0",
     "source-map-support": "^0.5.21",
