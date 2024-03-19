@@ -20,7 +20,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install
       - name: Run Prettier (Pre-commit or in workflow)
-        run: pnpm run lint:fix
+        run: pnpm lint
 
   test:
     runs-on: ubuntu-latest
