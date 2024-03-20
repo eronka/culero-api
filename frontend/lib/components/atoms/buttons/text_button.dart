@@ -4,7 +4,7 @@ import 'package:frontend/utils/color.dart';
 
 import 'button_config.dart';
 
-class SecondaryButton extends StatelessWidget {
+class TextButtonAtm extends StatelessWidget {
   final String text;
   final VoidCallback onPressed;
   final Color borderColor;
@@ -13,7 +13,7 @@ class SecondaryButton extends StatelessWidget {
 
   final double radius;
 
-  const SecondaryButton({
+  const TextButtonAtm({
     super.key,
     required this.text,
     required this.onPressed,
@@ -36,19 +36,19 @@ class SecondaryButton extends StatelessWidget {
     }
   }
 
-  TextStyle _titleStyle(Color titleColor, ButtonSize size) {
+  TextStyle _titleStyle(Color textColor, ButtonSize size) {
     switch (size) {
       case ButtonSize.sm:
-        return TextStyle(fontWeight: FontWeight.w300, color: titleColor, fontSize: 14);
+        return TextStyle(fontWeight: FontWeight.w300, color: textColor, fontSize: 14);
 
       case ButtonSize.md:
-        return TextStyle(fontWeight: FontWeight.w400, color: titleColor, fontSize: 18);
+        return TextStyle(fontWeight: FontWeight.w400, color: textColor, fontSize: 18);
 
       case ButtonSize.lg:
-        return TextStyle(fontWeight: FontWeight.w500, color: titleColor, fontSize: 20);
+        return TextStyle(fontWeight: FontWeight.w500, color: textColor, fontSize: 20);
 
       default:
-        return TextStyle(fontWeight: FontWeight.w400, color: titleColor, fontSize: 18);
+        return TextStyle(fontWeight: FontWeight.w400, color: textColor, fontSize: 18);
     }
   }
 
@@ -61,7 +61,6 @@ class SecondaryButton extends StatelessWidget {
           foregroundColor: titleColor,
           backgroundColor: Colors
               .transparent,
-          side: BorderSide(color: borderColor),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(radius),
           ),

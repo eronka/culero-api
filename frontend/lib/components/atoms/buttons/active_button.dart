@@ -4,7 +4,7 @@ import 'package:frontend/utils/color.dart';
 
 import 'button_config.dart';
 
-class PrimaryButton extends StatelessWidget {
+class ActiveButton extends StatelessWidget {
   final String text;
   final VoidCallback onPressed;
   final Color color;
@@ -13,12 +13,12 @@ class PrimaryButton extends StatelessWidget {
 
   final double radius;
 
-  const PrimaryButton({
+  const ActiveButton({
     super.key,
     required this.text,
     required this.onPressed,
-    this.color = primaryBg,
-    this.titleColor = textColor,
+    this.color = secondaryBg,
+    this.titleColor = Colors.white,
     this.size = ButtonSize.md,
     this.radius = ButtonRadius.medium,
   });

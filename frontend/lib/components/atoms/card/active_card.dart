@@ -21,6 +21,8 @@ class ActiveCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(15),
         border: border ? Border.all(color: cardBorderColor, width: 1) : null,
       ),
+
+      child: child,
     );
   }
 }

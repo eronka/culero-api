@@ -4,12 +4,14 @@ import 'package:frontend/utils/color.dart';
 class Indicator extends StatelessWidget {
   final double? value;
   final Color color;
-  final Size? size;
+  final Color backgroundColor;
+  final double? height;
   final BorderRadius borderRadius;
   const Indicator({
     Key? key,
     this.color = primaryBg,
-    this.size,
+    this.backgroundColor= Colors.white,
+    this.height,
     this.value,
     this.borderRadius = const BorderRadius.all(Radius.circular(25)),
   }) : super(key: key);
@@ -18,7 +20,9 @@ class Indicator extends StatelessWidget {
   Widget build(BuildContext context) {
     return LinearProgressIndicator(
       value: value,
-      backgroundColor: bgColor,
+      minHeight: height,
+
+      backgroundColor: backgroundColor,
       valueColor: AlwaysStoppedAnimation<Color>(color),
       borderRadius: borderRadius,
     );

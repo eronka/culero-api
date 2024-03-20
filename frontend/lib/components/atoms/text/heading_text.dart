@@ -22,6 +22,7 @@ class HeadingText extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
+      softWrap: true,
       style: GoogleFonts.inter(
         textStyle: TextStyle(
           color: fontColor,

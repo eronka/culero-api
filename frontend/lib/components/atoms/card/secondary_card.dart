@@ -19,6 +19,7 @@ class SecondaryCard extends StatelessWidget {
       padding:padding ,
       decoration: BoxDecoration(
         color: secondaryCardBg,
+
         borderRadius: BorderRadius.circular(15),
         border: border ? Border.all(color: cardBorderColor, width: 1) : null,
       ),
