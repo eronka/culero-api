@@ -20,8 +20,10 @@ jobs:
         run: |
           curl -L https://fly.io/install.sh | sh
       - name: pnpm install
+        working-directory: ./backend
         run: pnpm install
       - name: Deploy migrations
+        working-directory: ./backend
         run: pnpm db:deploy-migrations
       - name: Deploy to prod
         run: |
