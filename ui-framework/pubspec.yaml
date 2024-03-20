@@ -9,6 +9,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_rating_bar: ^4.0.1
+  flutter_svg: ^2.0.10+1
   google_fonts: ^6.2.1
 
 dev_dependencies:
@@ -21,3 +23,5 @@ flutter:
 
 assets:
   - google_fonts/
+  - assets/
+  - assets/icons/

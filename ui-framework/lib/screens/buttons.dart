@@ -10,7 +10,7 @@ class ButtonShowcase extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Buttons')),
+      appBar: AppBar(title: const Text('Buttons'), backgroundColor: Colors.white,),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Center(

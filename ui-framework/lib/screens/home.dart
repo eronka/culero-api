@@ -7,9 +7,10 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final List<Map<String, String>> routes = [
       {'name': 'Button', 'route': '/buttons'},
-      {'name': 'Card', 'route': '/cards'},
+      {'name': 'Card', 'route': '/card'},
       {'name': 'Typography', 'route': '/typography'},
       {'name': 'Input', 'route': '/input'},
+      {'name': 'Review', 'route': '/review'},
     ];
 
     return Scaffold(
