@@ -28,5 +28,5 @@ jobs:
           ~/.fly/bin/fly deploy \
             --config fly.backend.toml \
             --dockerfile ./backend/Dockerfile \
-            --app culero-backend-prod \
+            --app culero-stage-api \
             --access-token ${{ secrets.FLY_ACCESS_TOKEN }}
