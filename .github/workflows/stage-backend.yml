@@ -5,7 +5,7 @@ on:
     paths: ['backend/**', '.github/workflows/stage-backend.yml']
 
 env:
-  DATABASE_URL: ${{ secrets.DATABASE_URL }}
+  DATABASE_URL: ${{ secrets.DB_STAGE_URL }}
 
 jobs:
   deploy-backend-stage:
