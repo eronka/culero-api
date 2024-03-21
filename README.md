@@ -10,9 +10,19 @@ Thanks to the open source community for your contribution. I am absolutely lovin
 On our Discord Channel : https://discord.gg/tyaRVrJsDW.
 
 ## Contribution Requirement
+
+Here's a checklist of things you need to ensure to get your PR merged:
+
+- [ ] You have added proper tests for the feature you have added.
+- [ ] You have added proper documentation for the feature you have added or modified.
+- [ ] You have added proper Swagger API annotation for the feature you have added or modified.
+- [ ] You are making a PR to the `develop` branch.
+
 ### Backend API
-- All API endpoint requires Swagger API annotation, Thanks to @rajdip-b for setting up the base
-- Future - All API endpoint requires basic test case to be added. (Basic testing framework is work in progress)
+
+- All API endpoint requires Swagger API annotation. Thanks to [@rajdip-b](https://github.com/rajdip-b) for setting up the base.
+- Any new endpoint that you create, needs to have proper jest tests associated with it. All details about writing tests are available [here](./backend/README.md#testing).
+- We are following gitflow for managing deployment. You would find the releases associated with `develop` branch in `stage-api.culero.com` and the releases associated with `main` branch in `api.culero.com`.
 
 ## Wireframe
 
@@ -23,13 +33,11 @@ https://www.figma.com/file/p4gfqRDn3ma4zPaPAj8vH4?node-id=0:1&locale=en&type=des
 
 Culero is an open-source project aimed at creating a more transparent and democratic workplace by allowing employees to review their managers. Our goal is to shift the power dynamic in traditional organizations and give employees a voice in the decision-making process.
 
-
 ## Features
 
 Employees can confidentially rate and review their managers on various aspects such as communication, leadership, and fairness.
 Managers can receive feedback and use it to improve their management style.
 The platform provides anonymous data to organizations, helping them identify areas for improvement and promoting positive change from within.
-
 
 ## Contributing
 
@@ -39,9 +47,6 @@ Improve the user interface design.
 Contribute to the documentation.
 Spread the word about Culero and its mission.
 Before contributing, please take a moment to review our contribution guidelines.
-
-
-
 
 ## Why we need Culero
 
@@ -61,17 +66,12 @@ Join us in our mission to foster healthier, more transparent workplaces. Togethe
 
 #Culero #Transparency #Accountability #WorkplaceWellness #CommunityEmpowerment
 
-
-
-
-
-
-
 ## License
 
 Culero is released under the MIT license. See LICENSE for details.
 
 ## Contact Us
+
 If you have any questions or suggestions, feel free to reach out to us on GitHub or https://discord.gg/tyaRVrJsDW.
 
 Join us today and let's build a better future for the modern workplace together!
