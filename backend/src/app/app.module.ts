@@ -9,6 +9,8 @@ import { AuthGuard } from '../auth/guard/auth/auth.guard';
 import { PrismaModule } from '../prisma/prisma.module';
 import { MailModule } from '../mail/mail.module';
 import { ProviderModule } from '../provider/provider.module';
+import { CacheModule } from '@nestjs/cache-manager';
+import * as redisStore from 'cache-manager-redis-store';
 
 @Module({
   imports: [
@@ -21,6 +23,14 @@ import { ProviderModule } from '../provider/provider.module';
     PrismaModule,
     MailModule,
     ProviderModule,
+    CacheModule.register({
+      isGlobal: true,
+      store: redisStore,
+      host: process.env.REDIS_HOST,
+      port: parseInt(process.env.REDIS_PORT),
+      password: process.env.REDIS_PASSWORD,
+      ttl: 60 * 60 * 24,
+    }),
   ],
   controllers: [AppController],
   providers: [

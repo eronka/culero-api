@@ -1,4 +1,4 @@
-primary_region = "bom"
+primary_region = "syd"
 
 [http_service]
   internal_port = 4200
