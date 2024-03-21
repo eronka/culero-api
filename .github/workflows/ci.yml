@@ -6,6 +6,9 @@ on:
       - '!main'
       - '!develop'
       - '*'
+    paths: ['apps/api/**']
+  pull_request:
+    paths: ['apps/api/**']
 
 jobs:
   lint:
