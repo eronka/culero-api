@@ -34,7 +34,11 @@ The backend is a NestJS based application. It uses PostgreSQL as a database and 
    pnpm install
    ```
 
-4. Make sure your database is running
+4. Make sure your database is running. If you would like to use docker, run the following command:
+
+   ```sh
+   docker run --name culero-psql --network host -e POSTGRES_PASSWORD=password -d postgres
+   ```
 
 5. For Prisma to work properly, generate the types
 
@@ -84,14 +88,14 @@ Apart from database changes, in case you feel you need to add another module, si
 
 ### Testing
 
-### Writing tests
+#### Writing tests
 
 Any updates that you make to the code, or for features that you create, you will need to add proper tests for those features. Our repository currently employs unit and e2e tests. These are the usages:
 
 - You create unit tests when you have created some util function. Do keep the default test file that is created when you create a new file using nest cli.
 - You create e2e tests when you have created a new module or a new feature. There won't be a default file for this, so lets say you have created a new module named `project`, then inside the `project` module, you will be creating a `project.e2e.spec.ts` file.
 
-### Running the tests
+#### Running the tests
 
 Before you make a PR, or push the code, do ensure that your code passes the existing tests. Note that, the E2E test tries to set up a local database using `docker compose` on port `5432`. If you have a database running on that port, you will need to stop it before running the tests.
 
