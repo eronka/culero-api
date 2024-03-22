@@ -23,14 +23,20 @@ import * as redisStore from 'cache-manager-redis-store';
     PrismaModule,
     MailModule,
     ProviderModule,
-    CacheModule.register({
-      isGlobal: true,
-      store: redisStore,
-      host: process.env.REDIS_HOST,
-      port: parseInt(process.env.REDIS_PORT),
-      password: process.env.REDIS_PASSWORD,
-      ttl: 60 * 60 * 24,
-    }),
+    CacheModule.register(
+      process.env.NODE_ENV === 'e2e'
+        ? {
+            isGlobal: true,
+          }
+        : {
+            isGlobal: true,
+            store: redisStore,
+            host: process.env.REDIS_HOST ?? 'localhost',
+            port: parseInt(process.env.REDIS_PORT ?? '6379', 10),
+            password: process.env.REDIS_PASSWORD ?? 'password',
+            ttl: 60 * 60 * 24,
+          },
+    ),
   ],
   controllers: [AppController],
   providers: [
