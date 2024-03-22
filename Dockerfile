@@ -6,12 +6,12 @@ WORKDIR /app
 
 RUN npm i -g pnpm
 
-COPY backend/package.json .
-COPY backend/tsconfig.json .
+COPY package.json .
+COPY tsconfig.json .
 
 RUN pnpm install
 
-COPY backend .
+COPY . .
 
 RUN pnpm db:generate-types
 RUN pnpm build

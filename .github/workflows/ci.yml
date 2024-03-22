@@ -6,9 +6,7 @@ on:
       - '!main'
       - '!develop'
       - '*'
-    paths: ['apps/api/**']
   pull_request:
-    paths: ['apps/api/**']
 
 jobs:
   lint:
@@ -22,10 +20,8 @@ jobs:
       - name: Install pnpm
         run: npm install -g pnpm
       - name: Install dependencies
-        working-directory: ./backend
         run: pnpm install
-      - name: Run Prettier (Pre-commit or in workflow)
-        working-directory: ./backend
+      - name: Run ESLint
         run: pnpm lint
 
   test:
@@ -39,14 +35,10 @@ jobs:
       - name: Install pnpm
         run: npm install -g pnpm
       - name: Install dependencies
-        working-directory: ./backend
         run: pnpm install
       - name: Run ESLint
-        working-directory: ./backend
         run: pnpm lint
       - name: Run unit tests
-        working-directory: ./backend
         run: pnpm run test:unit
       - name: Run e2e tests
-        working-directory: ./backend
         run: pnpm run test:e2e

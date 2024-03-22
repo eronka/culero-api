@@ -2,7 +2,14 @@ on:
   push:
     branches:
       - develop
-    paths: ['backend/**', '.github/workflows/stage-backend.yml']
+    paths:
+      [
+        'Dockerfile',
+        '.github/workflows/stage-backend.yml',
+        'fly.backend.toml',
+        'api/**/*',
+        'package.json',
+      ]
 
 env:
   DATABASE_URL: ${{ secrets.DB_STAGE_URL }}
@@ -22,15 +29,13 @@ jobs:
       - name: Install pnpm
         run: npm install -g pnpm
       - name: pnpm install
-        working-directory: ./backend
         run: pnpm install
       - name: Deploy migrations
-        working-directory: ./backend
         run: pnpm db:deploy-migrations
       - name: Deploy to stage
         run: |
           ~/.fly/bin/fly deploy \
             --config fly.backend.toml \
-            --dockerfile ./backend/Dockerfile \
+            --dockerfile Dockerfile \
             --app culero-stage-api \
             --access-token ${{ secrets.FLY_ACCESS_TOKEN }}
