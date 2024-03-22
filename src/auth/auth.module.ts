@@ -16,7 +16,7 @@ import { MailService } from '../mail/mail.service';
   imports: [
     JwtModule.register({
       global: true,
-      secret: process.env.JWT_SECRET,
+      secret: process.env.JWT_SECRET ?? 'secret',
       signOptions: {
         expiresIn: '1d',
         issuer: 'culero',

@@ -188,4 +188,12 @@ describe('Auth Controller Tests', () => {
     await prisma.user.deleteMany();
     await prisma.verificationCode.deleteMany();
   });
+
+  afterAll(async () => {
+    try {
+      await app.close();
+    } catch (error) {
+      console.log('error', error);
+    }
+  });
 });

@@ -24,7 +24,9 @@
     "db:validate": "pnpm dlx prisma validate --schema=src/prisma/schema.prisma",
     "db:format": "pnpm dlx prisma format --schema=src/prisma/schema.prisma",
     "db:reset": "pnpm dlx prisma migrate reset --force --schema=src/prisma/schema.prisma",
-    "prepare": "husky"
+    "prepare": "husky",
+    "docker:build": "docker build -t culero-api .",
+    "docker:run": "docker run --network host --env-file .env --rm culero-api"
   },
   "dependencies": {
     "@arendajaelu/nestjs-passport-apple": "^2.0.2",

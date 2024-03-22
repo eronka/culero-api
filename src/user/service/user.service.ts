@@ -15,6 +15,9 @@ import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { S3_CLIENT } from '../../provider/s3.provider';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
+// This is needed for file upload to work. Don't remove this
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { Multer } from 'multer';
 
 @Injectable()
 export class UserService {
