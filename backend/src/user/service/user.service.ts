@@ -13,6 +13,8 @@ import { RatingDto } from '../dto/rating.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { S3_CLIENT } from '../../provider/s3.provider';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class UserService {
@@ -20,6 +22,7 @@ export class UserService {
 
   constructor(
     @Inject(S3_CLIENT) private readonly s3: S3Client,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private readonly prisma: PrismaService,
   ) {}
 
@@ -63,7 +66,7 @@ export class UserService {
     }
   }
 
-  async rateUser(user: User, ratedUserId: User['id'], rating: RatingDto) {
+  async rateUser(user: User, ratedUserId: User['id'], ratingDto: RatingDto) {
     const ratedUser = await this.prisma.user.findUnique({
       where: { id: ratedUserId },
     });
@@ -78,20 +81,26 @@ export class UserService {
       throw new BadRequestException('You cannot rate yourself');
     }
 
-    rating.anonymous = rating.anonymous ?? false;
+    ratingDto.anonymous = ratingDto.anonymous ?? false;
 
     // Rate the user
-    return await this.prisma.rating.create({
+    const rating = await this.prisma.rating.create({
       data: {
         ratedUserId: ratedUserId,
-        raterUserId: rating.anonymous ? null : user.id,
-        professionalism: rating.professionalism,
-        reliability: rating.reliability,
-        communication: rating.communication,
-        comment: rating.comment,
-        anonymous: rating.anonymous,
+        raterUserId: ratingDto.anonymous ? null : user.id,
+        professionalism: ratingDto.professionalism,
+        reliability: ratingDto.reliability,
+        communication: ratingDto.communication,
+        comment: ratingDto.comment,
+        anonymous: ratingDto.anonymous,
       },
     });
+
+    // Update the cache
+    const avgRatings = await this.calculateAvgRating(ratedUserId);
+    await this.cacheManager.set(`avg-ratings-${ratedUserId}`, avgRatings);
+
+    return rating;
   }
 
   async getUserRatings(user: User, self: boolean, revieweeUserId?: User['id']) {
@@ -168,6 +177,36 @@ export class UserService {
   async getAvgUserRatings(user: User, self: boolean, userId?: User['id']) {
     if (self) userId = user.id;
 
+    // Check the cache first
+    const cachedRatings = await this.cacheManager.get(`avg-ratings-${userId}`);
+
+    // If present, return the cached ratings
+    if (cachedRatings) {
+      return cachedRatings;
+    }
+
+    // If not, calculate the average ratings
+    const avgRatings = await this.calculateAvgRating(userId);
+
+    // Cache the ratings for 24 hours
+    await this.cacheManager.set(`avg-ratings-${userId}`, avgRatings);
+
+    return avgRatings;
+  }
+
+  private async findUserById(id: string) {
+    return await this.prisma.user.findUnique({ where: { id } });
+  }
+
+  private async findUserByEmail(email: string) {
+    return await this.prisma.user.findUnique({
+      where: {
+        email,
+      },
+    });
+  }
+
+  private async calculateAvgRating(userId: User['id']) {
     const result = await this.prisma.rating.aggregate({
       where: { ratedUserId: userId },
       _avg: {
@@ -187,17 +226,5 @@ export class UserService {
           result._avg.communication) /
         3,
     };
-  }
-
-  private async findUserById(id: string) {
-    return await this.prisma.user.findUnique({ where: { id } });
-  }
-
-  private async findUserByEmail(email: string) {
-    return await this.prisma.user.findUnique({
-      where: {
-        email,
-      },
-    });
   }
 }
