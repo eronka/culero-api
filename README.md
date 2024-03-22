@@ -5,6 +5,12 @@ We passionatly beleive that as world citizens, we are all public figures & need 
 
 Thanks to the open source community for your contribution. I am absolutely loving witnessing the project grows by the community and looking forward to seeing the evolution we can make to the project
 
+## Repositories
+
+Flutter client - https://github.com/eronka/culero-client
+API - https://github.com/eronka/culero-api
+
+
 ## Join our community
 
 On our Discord Channel : https://discord.gg/tyaRVrJsDW.
