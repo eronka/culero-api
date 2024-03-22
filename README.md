@@ -7,8 +7,8 @@ Thanks to the open source community for your contribution. I am absolutely lovin
 
 ## Repositories
 
-Flutter client - https://github.com/eronka/culero-client
-API - https://github.com/eronka/culero-api
+- Flutter client - https://github.com/eronka/culero-client
+- API - https://github.com/eronka/culero-api
 
 
 ## Join our community
