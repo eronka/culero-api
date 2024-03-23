@@ -10,6 +10,7 @@ class ActiveButton extends StatelessWidget {
   final Color color;
   final Color titleColor;
   final ButtonSize size;
+  final double? width;
 
   final double radius;
 
@@ -21,6 +22,7 @@ class ActiveButton extends StatelessWidget {
     this.titleColor = Colors.white,
     this.size = ButtonSize.md,
     this.radius = ButtonRadius.medium,
+    this.width,
   });
 
   double _buttonHeight(ButtonSize size) {
@@ -57,7 +59,7 @@ class ActiveButton extends StatelessWidget {
     return TextButton(
       onPressed: onPressed,
       style: TextButton.styleFrom(
-        fixedSize: Size.fromHeight(_buttonHeight(size)),
+        fixedSize: width != null ? Size(width!, _buttonHeight(size)) : Size.fromHeight(_buttonHeight(size)),
         foregroundColor: titleColor,
         backgroundColor: color,
         shape: RoundedRectangleBorder(

@@ -57,7 +57,7 @@ class PrimaryButton extends StatelessWidget {
     return TextButton(
       onPressed: onPressed,
       style: TextButton.styleFrom(
-        fixedSize: Size.fromHeight(_buttonHeight(size)),
+        maximumSize: Size.fromHeight(_buttonHeight(size)),
         foregroundColor: titleColor,
         backgroundColor: color,
         shape: RoundedRectangleBorder(

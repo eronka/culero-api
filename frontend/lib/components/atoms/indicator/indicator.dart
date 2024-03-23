@@ -21,6 +21,7 @@ class Indicator extends StatelessWidget {
     return LinearProgressIndicator(
       value: value,
       minHeight: height,
+     
 
       backgroundColor: backgroundColor,
       valueColor: AlwaysStoppedAnimation<Color>(color),

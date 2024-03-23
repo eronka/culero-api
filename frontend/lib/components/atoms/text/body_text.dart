@@ -9,6 +9,7 @@ class BodyText extends StatelessWidget {
   final Color fontColor;
   final FontWeight fontWeight;
   final FontStyle fontStyle;
+  final TextAlign textAlign;
   const BodyText({
     Key? key,
     required this.text,
@@ -16,12 +17,14 @@ class BodyText extends StatelessWidget {
     this.fontSize = FontSizes.p1,
     this.fontWeight = FontWeight.normal,
     this.fontStyle = FontStyle.normal,
+    this.textAlign =TextAlign.justify,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Text(
       text,
+      textAlign:textAlign ,
       style: GoogleFonts.inter(
         textStyle: TextStyle(
           color: fontColor,

@@ -16,6 +16,7 @@ class ReviewCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return SecondaryCard(
       border: false,
+     
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [

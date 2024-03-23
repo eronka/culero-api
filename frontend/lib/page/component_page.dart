@@ -30,39 +30,63 @@ class ComponentPage extends StatelessWidget {
       body: SingleChildScrollView(
         child: Container(
           padding: const EdgeInsets.all(8.0),
-          child:  Column(
+          child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               // My Review
-              const MyReviewCard(data: {
-                "over_all": 4.6,
-                "star_rating": 5,
-                "Professionalism": 4.4,
-                "Reliability": 4.2,
-                "Communication": 4.9,
-              }),
+              const Row(
+                children: [
+                  SizedBox(
+                    width: 518,
+                    child: Column(
+                      children: [
+                        MyReviewCard(data: {
+                          "over_all": 4.6,
+                          "star_rating": 5,
+                          "Professionalism": 4.4,
+                          "Reliability": 4.2,
+                          "Communication": 4.9,
+                        }),
+                        // My List tile
+                        Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: NeedReviewTile(data: {
+                            "avatar": "https://avatars.githubusercontent.com/u/58112334?v=4",
+                            "name": "Rutik Thakre",
+                            "title": "Flutter Developer",
+                          }),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: NeedReviewTile(data: {
+                            "avatar": "https://avatars.githubusercontent.com/u/58112334?v=4",
+                            "name": "Rutik Thakre",
+                            "title": "Flutter Developer",
+                          }),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: NeedReviewTile(data: {
+                            "avatar": "https://avatars.githubusercontent.com/u/58112334?v=4",
+                            "name": "Rutik Thakre",
+                            "title": "Flutter Developer",
+                          }),
+                        ),
+                      ],
+                    ),
+                  ),
+                  LatestReviewItem(data: {
+                    "avatar": "https://avatars.githubusercontent.com/u/58112334?v=4",
+                    "name": "Noah Smith",
+                    "star_rating": 5,
+                    "Professionalism": 4.4,
+                    "Reliability": 4.2,
+                    "Communication": 4.9,
+                  }),
+                ],
+              ),
               // Latest Review Item
-              const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: LatestReviewItem(data: {
-                  "avatar": "https://avatars.githubusercontent.com/u/58112334?v=4",
-                  "name": "Noah Smith",
-                  "star_rating": 5,
-                  "Professionalism": 4.4,
-                  "Reliability": 4.2,
-                  "Communication": 4.9,
-                }),
-              ),
 
-              // My List tile
-              const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: NeedReviewTile(data: {
-                  "avatar": "https://avatars.githubusercontent.com/u/58112334?v=4",
-                  "name": "Rutik Thakre",
-                  "title": "Flutter Developer",
-                }),
-              ),
               // Review Card
               const ReviewCard(data: {
                 "over_all": 4.6,
