@@ -75,3 +75,11 @@ Culero is released under the MIT license. See LICENSE for details.
 If you have any questions or suggestions, feel free to reach out to us on GitHub or https://discord.gg/tyaRVrJsDW.
 
 Join us today and let's build a better future for the modern workplace together!
+
+
+
+
+
+
+
+
