@@ -9,6 +9,7 @@ import 'package:frontend/components/atoms/text_field/primary_text_form_field.dar
 import 'package:frontend/utils/color.dart';
 import 'package:frontend/utils/font_size.dart';
 import 'package:frontend/utils/screen_sizes.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 
@@ -84,7 +85,7 @@ class CreateYourAccount extends StatelessWidget {
                       child: Row(
                         children: [
                           TextButton(
-                            onPressed: () {},
+                            onPressed: () =>context.go("/moreoptions"),
                             style: TextButton.styleFrom(
                               minimumSize: isMobile(mediaQuery) ? const Size(363, 65) : const Size(573, 60),
                               foregroundColor: textColor,
@@ -136,7 +137,9 @@ class CreateYourAccount extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          context.go("/signupemail");
+                        },
                         style: TextButton.styleFrom(
                           minimumSize: const Size(573, 60),
                           foregroundColor: textColor,
@@ -149,7 +152,7 @@ class CreateYourAccount extends StatelessWidget {
                         child: Text(
                           "Get Started",
                           style: GoogleFonts.inter(
-                            textStyle: const TextStyle(fontWeight: FontWeight.w500, color: bodyText1, fontSize: 20),
+                            textStyle: const TextStyle(fontWeight: FontWeight.bold, color: bodyText1, fontSize: 20),
                           ),
                         ),
                       ),

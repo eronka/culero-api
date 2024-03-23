@@ -3,12 +3,12 @@ import 'package:frontend/utils/color.dart';
 import 'package:frontend/utils/font_size.dart';
 
 class PrimaryTextFormField extends StatelessWidget {
-  final TextEditingController controller;
+  final TextEditingController? controller;
   final String hintText;
   final void Function(String)? onChanged;
   final void Function()? onEditingComplete;
   final void Function(String)? onFieldSubmitted;
-  final String Function(String?)? validator;
+  final String? Function(String?)? validator;
 final int? maxLength ;
   final TextInputType keyboardType;
 
@@ -16,7 +16,7 @@ final int? maxLength ;
     Key? key,
     required this.hintText,
     required this.onChanged,
-    required this.controller,
+     this.controller,
     this.onEditingComplete,
     this.onFieldSubmitted,
     this.validator,

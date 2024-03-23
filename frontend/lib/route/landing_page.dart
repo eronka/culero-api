@@ -9,6 +9,7 @@ import 'package:frontend/components/atoms/buttons/active_button.dart';
 import 'package:frontend/components/atoms/buttons/text_button.dart';
 import 'package:frontend/utils/color.dart';
 import 'package:frontend/utils/font_size.dart';
+import 'package:go_router/go_router.dart';
 
 final _controller = TextEditingController();
 
@@ -50,7 +51,7 @@ class LandingPage extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           TextButtonAtm(
-                            onPressed: () {},
+                            onPressed: () => context.go("/signup"),
                             text: "Sign in/Sign up",
                           ),
                           ActiveButton(text: "Write Review", onPressed: () {})

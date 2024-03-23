@@ -9,6 +9,7 @@ class HeadingText extends StatelessWidget {
   final Color fontColor;
   final FontWeight fontWeight;
   final FontStyle fontStyle;
+  final TextAlign textAlign;
   const HeadingText({
     Key? key,
     required this.text,
@@ -16,12 +17,14 @@ class HeadingText extends StatelessWidget {
     this.fontSize = FontSizes.h3,
     this.fontWeight = FontWeight.w600,
     this.fontStyle = FontStyle.normal,
+    this.textAlign = TextAlign.justify,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Text(
       text,
+      textAlign: textAlign,
       softWrap: true,
       style: GoogleFonts.inter(
         textStyle: TextStyle(

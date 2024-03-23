@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/components/atoms/card/secondary_card.dart';
 import 'package:frontend/components/atoms/text/body_text.dart';
@@ -20,11 +21,16 @@ class ConnectionListTile extends StatelessWidget {
           Row(
             children: [
               Stack(
+                alignment: Alignment.bottomRight,
                 children: [
-                  CircleAvatar(
-                    radius: 50,
-                    backgroundImage: NetworkImage(data['avatar']!),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: CircleAvatar(
+                      radius: 50,
+                      backgroundImage: NetworkImage(data['avatar']!),
+                    ),
                   ),
+                   Positioned(left: 75, top: 70, child: Image.asset("assets/images/green-tick.png", height: 30,)),
                 ],
               ),
                Padding(

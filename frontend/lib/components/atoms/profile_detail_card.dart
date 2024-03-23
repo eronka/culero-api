@@ -28,15 +28,19 @@ class ProfileDetailCard extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Stack(
-                  alignment: Alignment.bottomRight,
-                  children: [
-                    CircleAvatar(
+                  Stack(
+                alignment: Alignment.bottomRight,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: CircleAvatar(
                       radius: 45,
-                      backgroundImage: NetworkImage(data["avatar"]!),
+                      backgroundImage: NetworkImage(data['avatar']!),
                     ),
-                  ],
-                ),
+                  ),
+                  Positioned(left: 75, top: 75, child: Image.asset("assets/images/green-tick.png", height: 25,)),
+                ],
+              ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 18),
                   child: Column(
