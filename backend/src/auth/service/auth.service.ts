@@ -35,7 +35,9 @@ export class AuthService {
       true,
     );
 
-    return user;
+    const token = await this.generateToken(user);
+
+    return { ...user, token };
   }
 
   async signIn(dto: SigninDto) {
