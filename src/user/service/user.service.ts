@@ -13,11 +13,11 @@ import { RatingDto } from '../dto/rating.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { S3_CLIENT } from '../../provider/s3.provider';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Cache } from 'cache-manager';
 // This is needed for file upload to work. Don't remove this
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Multer } from 'multer';
+import { REDIS_CLIENT } from '../../provider/redis.provider';
+import { Redis } from 'ioredis';
 
 @Injectable()
 export class UserService {
@@ -25,7 +25,7 @@ export class UserService {
 
   constructor(
     @Inject(S3_CLIENT) private readonly s3: S3Client,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    @Inject(REDIS_CLIENT) private cache: Redis,
     private readonly prisma: PrismaService,
   ) {}
 
@@ -101,7 +101,7 @@ export class UserService {
 
     // Update the cache
     const avgRatings = await this.calculateAvgRating(ratedUserId);
-    await this.cacheManager.set(`avg-ratings-${ratedUserId}`, avgRatings);
+    await this.cache.set(`avg-ratings-${ratedUserId}`, avgRatings);
 
     return rating;
   }
@@ -181,7 +181,9 @@ export class UserService {
     if (self) userId = user.id;
 
     // Check the cache first
-    const cachedRatings = await this.cacheManager.get(`avg-ratings-${userId}`);
+    const cachedRatings = JSON.parse(
+      await this.cache.get(`avg-ratings-${userId}`),
+    );
 
     // If present, return the cached ratings
     if (cachedRatings) {
@@ -192,7 +194,7 @@ export class UserService {
     const avgRatings = await this.calculateAvgRating(userId);
 
     // Cache the ratings for 24 hours
-    await this.cacheManager.set(`avg-ratings-${userId}`, avgRatings);
+    await this.cache.set(`avg-ratings-${userId}`, avgRatings);
 
     return avgRatings;
   }
@@ -219,7 +221,7 @@ export class UserService {
       },
     });
 
-    return {
+    return JSON.stringify({
       professionalism: result._avg.professionalism ?? 0,
       reliability: result._avg.reliability ?? 0,
       communication: result._avg.communication ?? 0,
@@ -228,6 +230,6 @@ export class UserService {
           result._avg.reliability +
           result._avg.communication) /
         3,
-    };
+    });
   }
 }
