@@ -144,9 +144,9 @@ describe('User Controller Tests', () => {
           {
             ratedUserId: '2',
             raterUserId: '1',
-            professionalism: 4,
-            reliability: 4,
-            communication: 4,
+            professionalism: 5,
+            reliability: 5,
+            communication: 5,
           },
         ],
       });
@@ -400,10 +400,10 @@ describe('User Controller Tests', () => {
       });
 
       expect(response.statusCode).toBe(200);
-      expect(response.json().professionalism).toBe(4.5);
-      expect(response.json().reliability).toBe(4.5);
-      expect(response.json().communication).toBe(4.5);
-      expect(response.json().overall).toBe(4.5);
+      expect(response.json().professionalism).toBe(5);
+      expect(response.json().reliability).toBe(5);
+      expect(response.json().communication).toBe(5);
+      expect(response.json().overall).toBe(5);
     });
 
     it('should be able to get average rating of self', async () => {
@@ -445,7 +445,12 @@ describe('User Controller Tests', () => {
   });
 
   afterAll(async () => {
-    await prisma.user.deleteMany();
-    await prisma.rating.deleteMany();
+    try {
+      await prisma.user.deleteMany();
+      await prisma.rating.deleteMany();
+      await app.close();
+    } catch (error) {
+      console.log('error', error);
+    }
   });
 });

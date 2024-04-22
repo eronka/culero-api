@@ -1,28 +1,39 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { UserService } from './user.service';
+import { UserController } from './user.controller';
+import { UserService } from '../service/user.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { mockDeep } from 'jest-mock-extended';
 import { ProviderModule } from '../../provider/provider.module';
 import { MailService } from '../../mail/mail.service';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 
-describe('UserService', () => {
-  let service: UserService;
+describe('UserController', () => {
+  let controller: UserController;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      controllers: [UserController],
       imports: [ProviderModule],
-      providers: [UserService, PrismaService, MailService],
+      providers: [
+        UserService,
+        PrismaService,
+        MailService,
+        {
+          provide: CACHE_MANAGER,
+          useValue: {},
+        },
+      ],
     })
       .overrideProvider(MailService)
       .useValue(mockDeep<MailService>())
       .overrideProvider(PrismaService)
-      .useValue(mockDeep<PrismaService>())
+      .useValue({})
       .compile();
 
-    service = module.get<UserService>(UserService);
+    controller = module.get<UserController>(UserController);
   });
 
   it('should be defined', () => {
-    expect(service).toBeDefined();
+    expect(controller).toBeDefined();
   });
 });

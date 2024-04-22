@@ -6,7 +6,7 @@ services:
   db:
     image: postgres:14
     restart: always
-    container_name: integration-tests-prisma
+    container_name: culero-psql-test
     ports:
       - '5432:5432'
     environment:
@@ -15,17 +15,6 @@ services:
       POSTGRES_DB: tests
     networks:
       - culero-test
-
-  redis:
-    image: redis:6
-    restart: always
-    container_name: culero-redis
-    environment:
-      REDIS_PASSWORD: password
-    ports:
-      - '6379:6379'
-    networks:
-      - culero-dev
 
 networks:
   culero-test:
