@@ -5,7 +5,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { mockDeep } from 'jest-mock-extended';
 import { ProviderModule } from '../../provider/provider.module';
 import { MailService } from '../../mail/mail.service';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { REDIS_CLIENT } from '../../provider/redis.provider';
 
 describe('UserController', () => {
   let controller: UserController;
@@ -19,7 +19,7 @@ describe('UserController', () => {
         PrismaService,
         MailService,
         {
-          provide: CACHE_MANAGER,
+          provide: REDIS_CLIENT,
           useValue: {},
         },
       ],
