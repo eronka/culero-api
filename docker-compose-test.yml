@@ -16,6 +16,15 @@ services:
     networks:
       - culero-test
 
+  redis:
+    image: redis:6
+    restart: always
+    container_name: culero-redis-test
+    ports:
+      - '6379:6379'
+    networks:
+      - culero-test
+
 networks:
   culero-test:
     driver: bridge

@@ -38,5 +38,5 @@ lerna-debug.log*
 .env.prod
 .env.stage
 
-data/
+data
 coverage-e2e/
