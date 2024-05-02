@@ -20,40 +20,34 @@ The backend is a NestJS based application. It uses PostgreSQL as a database and 
 1. Clone the repository
 
    ```sh
-   git clone https://github.com/eronka/culero
+   git clone https://github.com/eronka/culero-api
    ```
 
-2. Head into the `backend` folder
-
-   ```sh
-   cd backend
-   ```
-
-3. Install the dependencies
+2. Install the dependencies
 
    ```sh
    pnpm install
    ```
 
-4. Make sure your database and redis server are up and running. If you don't have them installed, you can run them in a container using the following command:
+3. Make sure your database and redis server are up and running. If you don't have them installed, you can run them in a container using the following command:
 
    ```sh
    docker compose up -d
    ```
 
-5. For Prisma to work properly, generate the types
+4. For Prisma to work properly, generate the types
 
    ```sh
    pnpm db:generate-types
    ```
 
-6. Deploy the migrations
+5. Deploy the migrations
 
    ```sh
    pnpm db:deploy-migrations
    ```
 
-7. Start the server
+6. Start the server
 
    ```sh
    pnpm start:dev
