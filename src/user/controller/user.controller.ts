@@ -28,6 +28,7 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { userExtraProps, userProperties } from '../../schemas/user.properties';
