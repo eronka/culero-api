@@ -142,6 +142,7 @@ export class UserService {
         id: true,
         email: true,
         name: true,
+        joinedAt: true,
         profilePictureUrl: true,
       },
     });

@@ -31,6 +31,7 @@ model User {
   LinkedSocialAccounts LinkedSocialAccount[]
   ratings              Rating[]              @relation("ratedUser")
   ratingsReceived      Rating[]              @relation("raterUser")
+  joinedAt             DateTime              @default(now())
 }
 
 model Connection {
@@ -75,12 +76,12 @@ model Rating {
 }
 
 model UserSocialAccount {
-  id              String   @id @default(cuid())  
-  provider        String   @unique                  
-  accessToken     String
+  id          String @id @default(cuid())
+  provider    String @unique
+  accessToken String
 
-  user            User     @relation(fields: [userId], references: [id])
-  userId          String
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
 }
 
 model VerificationCode {
