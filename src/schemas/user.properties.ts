@@ -14,6 +14,6 @@ export const userProperties = {
 };
 
 export const userExtraProps = {
-  connections: { type: 'number' },
-  ratings: { type: 'number' },
+  connectionsCount: { type: 'number' },
+  ratingsCount: { type: 'number' },
 };

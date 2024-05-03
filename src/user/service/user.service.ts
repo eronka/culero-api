@@ -101,7 +101,10 @@ export class UserService {
 
     // Update the cache
     const avgRatings = await this.calculateAvgRating(ratedUserId);
-    await this.cache.set(`avg-ratings-${ratedUserId}`, avgRatings);
+    await this.cache.set(
+      `avg-ratings-${ratedUserId}`,
+      JSON.stringify(avgRatings),
+    );
 
     return rating;
   }
@@ -143,6 +146,8 @@ export class UserService {
         email: true,
         name: true,
         joinedAt: true,
+        isEmailVerified: true,
+        jobTitle: true,
         profilePictureUrl: true,
         _count: {
           select: {
@@ -152,7 +157,11 @@ export class UserService {
         },
       },
     });
-    return users.map(({ _count, ...user }) => ({ ..._count, ...user }));
+    return users.map(({ _count, ...user }) => ({
+      connectionsCount: _count.connections,
+      ratingsCount: _count.ratings,
+      ...user,
+    }));
   }
 
   async linkSocialAccount(
@@ -201,7 +210,7 @@ export class UserService {
     const avgRatings = await this.calculateAvgRating(userId);
 
     // Cache the ratings for 24 hours
-    await this.cache.set(`avg-ratings-${userId}`, avgRatings);
+    await this.cache.set(`avg-ratings-${userId}`, JSON.stringify(avgRatings));
 
     return avgRatings;
   }
@@ -228,7 +237,7 @@ export class UserService {
       },
     });
 
-    return JSON.stringify({
+    return {
       professionalism: result._avg.professionalism ?? 0,
       reliability: result._avg.reliability ?? 0,
       communication: result._avg.communication ?? 0,
@@ -237,6 +246,6 @@ export class UserService {
           result._avg.reliability +
           result._avg.communication) /
         3,
-    });
+    };
   }
 }
