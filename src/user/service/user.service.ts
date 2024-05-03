@@ -131,7 +131,7 @@ export class UserService {
     }));
   }
 
-  async searchUsers(searchTerm?: string) {
+  async searchUsers(userId: User['id'], searchTerm?: string) {
     if (!searchTerm) {
       throw new BadRequestException('Search term is required');
     }
