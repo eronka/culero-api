@@ -12,3 +12,8 @@ export const userProperties = {
   jobTitle: { type: 'string' },
   joinedAt: { type: 'string', format: 'date-time' },
 };
+
+export const userExtraProps = {
+  connections: { type: 'number' },
+  ratings: { type: 'number' },
+};

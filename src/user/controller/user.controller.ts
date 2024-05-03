@@ -5,6 +5,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -25,9 +26,10 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
-import { userProperties } from '../../schemas/user.properties';
+import { userExtraProps, userProperties } from '../../schemas/user.properties';
 import {
   reviewProperties,
   reviewPropertiesWithComment,
@@ -264,7 +266,7 @@ export class UserController {
   }
 
   @Public()
-  @Get('search/:query')
+  @Get('search')
   @ApiOperation({
     summary: 'Search users',
     description: 'Search for users',
@@ -275,11 +277,15 @@ export class UserController {
       type: 'array',
       items: {
         type: 'object',
-        properties: userProperties,
+        properties: { ...userExtraProps, ...userProperties },
       },
     },
   })
-  async searchUsers(@Param('query') query: string) {
+  @ApiQuery({
+    name: 'query',
+    type: 'string',
+  })
+  async searchUsers(@Query() { query }: { query: string }) {
     return this.userService.searchUsers(query);
   }
 }

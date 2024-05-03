@@ -144,9 +144,15 @@ export class UserService {
         name: true,
         joinedAt: true,
         profilePictureUrl: true,
+        _count: {
+          select: {
+            connections: true,
+            ratings: true,
+          },
+        },
       },
     });
-    return users;
+    return users.map(({ _count, ...user }) => ({ ..._count, ...user }));
   }
 
   async linkSocialAccount(
