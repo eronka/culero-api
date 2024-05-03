@@ -26,11 +26,11 @@ model User {
   isEmailVerified      Boolean               @default(false)
   headline             String?
   jobTitle             String?
-  connections          Connection[]          @relation("follower")
-  followedConnections  Connection[]          @relation("following")
+  connections          Connection[]          @relation("following")
+  followedConnections  Connection[]          @relation("follower")
   LinkedSocialAccounts LinkedSocialAccount[]
-  ratings              Rating[]              @relation("ratedUser")
-  ratingsReceived      Rating[]              @relation("raterUser")
+  ratings              Rating[]              @relation("raterUser")
+  ratingsReceived      Rating[]              @relation("ratedUser")
   joinedAt             DateTime              @default(now())
 }
 
