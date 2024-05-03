@@ -130,7 +130,7 @@ export class UserService {
     }));
   }
 
-  async searchUsers(searchTerm?: string) {
+  async searchUsers(userId: User['id'], searchTerm?: string) {
     if (!searchTerm) {
       throw new BadRequestException('Search term is required');
     }
@@ -149,17 +149,23 @@ export class UserService {
         isEmailVerified: true,
         jobTitle: true,
         profilePictureUrl: true,
+        connections: {
+          where: {
+            followerId: userId,
+          },
+        },
         _count: {
           select: {
             connections: true,
-            ratings: true,
+            ratingsReceived: true,
           },
         },
       },
     });
-    return users.map(({ _count, ...user }) => ({
+    return users.map(({ _count, connections, ...user }) => ({
       connectionsCount: _count.connections,
-      ratingsCount: _count.ratings,
+      ratingsCount: _count.ratingsReceived,
+      isConnection: connections.length == 0,
       ...user,
     }));
   }

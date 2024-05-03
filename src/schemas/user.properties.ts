@@ -16,4 +16,5 @@ export const userProperties = {
 export const userExtraProps = {
   connectionsCount: { type: 'number' },
   ratingsCount: { type: 'number' },
+  isConnection: { type: 'boolean' },
 };

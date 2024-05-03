@@ -7,6 +7,7 @@ import {
   Put,
   Query,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { CurrentUser } from '../../decorators/current-user.decorator';
@@ -37,6 +38,7 @@ import {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Multer } from 'multer';
 import { Public } from '../../decorators/public.decorator';
+import { AuthGuard } from '../../auth/guard/auth/auth.guard';
 
 @Controller('user')
 @ApiBearerAuth()
@@ -265,7 +267,6 @@ export class UserController {
     return this.userService.getAvgUserRatings(user, false, userId);
   }
 
-  @Public()
   @Get('search')
   @ApiOperation({
     summary: 'Search users',
@@ -285,7 +286,11 @@ export class UserController {
     name: 'query',
     type: 'string',
   })
-  async searchUsers(@Query() { query }: { query: string }) {
-    return this.userService.searchUsers(query);
+  @UseGuards(AuthGuard)
+  async searchUsers(
+    @CurrentUser() user: User,
+    @Query() { query }: { query: string },
+  ) {
+    return this.userService.searchUsers(user.id, query);
   }
 }
