@@ -26,19 +26,19 @@ model User {
   isEmailVerified      Boolean               @default(false)
   headline             String?
   jobTitle             String?
-  connections          Connection[]          @relation("following")
-  followedConnections  Connection[]          @relation("follower")
+  followers            Connection[]          @relation("followsTheUser")
+  followings           Connection[]          @relation("followedByUser")
   LinkedSocialAccounts LinkedSocialAccount[]
-  ratings              Rating[]              @relation("raterUser")
-  ratingsReceived      Rating[]              @relation("ratedUser")
+  ratingsPosted        Rating[]              @relation("ratingsGivenToOtherUsers")
+  ratingsReceived      Rating[]              @relation("ratingsRecievedFromOtherUsers")
   joinedAt             DateTime              @default(now())
 }
 
 model Connection {
   id          Int    @id @default(autoincrement())
-  follower    User   @relation("follower", fields: [followerId], references: [id])
+  follower    User   @relation("followedByUser", fields: [followerId], references: [id])
   followerId  String
-  following   User   @relation("following", fields: [followingId], references: [id])
+  following   User   @relation("followsTheUser", fields: [followingId], references: [id])
   followingId String
 
   @@unique([followerId, followingId])
@@ -62,11 +62,11 @@ model LinkedSocialAccount {
 model Rating {
   id              Int      @id @default(autoincrement())
   // Person who is being rated
-  ratedUser       User     @relation(fields: [ratedUserId], references: [id], onDelete: Cascade, onUpdate: Cascade, name: "ratedUser")
-  ratedUserId     String
+  postedTo        User     @relation(fields: [postedToId], references: [id], onDelete: Cascade, onUpdate: Cascade, name: "ratingsRecievedFromOtherUsers")
+  postedToId      String
   // Person who is rating
-  raterUser       User?    @relation(fields: [raterUserId], references: [id], onDelete: SetNull, onUpdate: Cascade, name: "raterUser")
-  raterUserId     String?
+  postedBy        User?    @relation(fields: [postedById], references: [id], onDelete: SetNull, onUpdate: Cascade, name: "ratingsGivenToOtherUsers")
+  postedById      String?
   professionalism Int      @default(0)
   reliability     Int      @default(0)
   communication   Int      @default(0)
