@@ -39,39 +39,23 @@ describe('Auth Controller Tests', () => {
     expect(prisma).toBeDefined();
   });
 
-  it('should fail sign up if password does not meet requirements', async () => {
-    const response = await app.inject({
-      method: 'POST',
-      url: '/auth/sign-up',
-      payload: {
-        email: 'janedoe@example.com',
-        password: 'password',
-      },
-    });
-
-    expect(response.statusCode).toEqual(400);
-  });
-
-  it('should be able to sign up using email and password', async () => {
+  it('should be able to sign up using email', async () => {
     const response = await app.inject({
       method: 'POST',
       url: '/auth/sign-up',
       payload: {
         email: 'jane@example.com',
-        password: 'Password123',
       },
     });
 
     expect(response.statusCode).toEqual(201);
     expect(response.json().email).toEqual('jane@example.com');
-    expect(response.json().password).toBeUndefined();
   });
 
-  it('should be able to sign in using email and password', async () => {
+  it('should be able to sign in using email', async () => {
     await prisma.user.create({
       data: {
         email: 'jane@example.com',
-        password: SHA256('password').toString(),
         isEmailVerified: true,
         authType: AuthType.EMAIL,
       },
@@ -82,14 +66,11 @@ describe('Auth Controller Tests', () => {
       url: '/auth/sign-in',
       payload: {
         email: 'jane@example.com',
-        password: 'password',
       },
     });
 
     expect(response.statusCode).toEqual(201);
     expect(response.json().email).toEqual('jane@example.com');
-    expect(response.json().password).toBeUndefined();
-    expect(response.json().token).toBeDefined();
   });
 
   it('should send verification code to email on sign up', async () => {
