@@ -170,8 +170,8 @@ export class AuthController {
     schema: {
       type: 'object',
       properties: {
-        ...userProperties,
-        token: { type: 'string' },
+        isEmailVerified: userProperties.isEmailVerified,
+        email: userProperties.email,
       },
     },
   })

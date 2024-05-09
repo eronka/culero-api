@@ -36,18 +36,18 @@ export class AuthService {
       where: {
         email: dto.email,
       },
+      select: {
+        isEmailVerified: true,
+        email: true,
+      },
     });
 
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
-    const token = await this.generateToken(user);
-
-    return {
-      ...user,
-      token,
-    };
+    await this.sendEmailVerificationCode(dto.email);
+    return user;
   }
 
   async handleGoogleOAuthLogin(req: any) {
