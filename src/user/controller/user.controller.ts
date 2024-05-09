@@ -133,7 +133,7 @@ export class UserController {
       type: 'object',
       properties: {
         id: { type: 'number' },
-        ratedUserId: { type: 'string' },
+        postedToId: { type: 'string' },
         raterUserId: { type: 'string' },
         professionalism: { type: 'number' },
         reliability: { type: 'number' },
@@ -145,10 +145,10 @@ export class UserController {
   })
   async rateUser(
     @CurrentUser() user: User,
-    @Param('userId') ratedUserId: string,
+    @Param('userId') postedToId: string,
     @Body() rating: RatingDto,
   ) {
-    return this.userService.rateUser(user, ratedUserId, rating);
+    return this.userService.rateUser(user, postedToId, rating);
   }
 
   @Get('ratings/self')

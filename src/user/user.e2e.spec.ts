@@ -134,7 +134,7 @@ describe('User Controller Tests', () => {
       await prisma.rating.createMany({
         data: [
           {
-            ratedUserId: '2',
+            postedToId: '2',
             raterUserId: '1',
             professionalism: 5,
             reliability: 5,
@@ -142,7 +142,7 @@ describe('User Controller Tests', () => {
             comment: 'Something',
           },
           {
-            ratedUserId: '2',
+            postedToId: '2',
             raterUserId: '1',
             professionalism: 5,
             reliability: 5,
@@ -153,7 +153,7 @@ describe('User Controller Tests', () => {
 
       await prisma.rating.create({
         data: {
-          ratedUserId: '1',
+          postedToId: '1',
           raterUserId: '2',
           professionalism: 5,
           reliability: 5,
@@ -295,7 +295,7 @@ describe('User Controller Tests', () => {
       });
 
       expect(response.statusCode).toBe(201);
-      expect(response.json().ratedUserId).toBe('2');
+      expect(response.json().postedToId).toBe('2');
       expect(response.json().raterUserId).toBe('1');
       expect(response.json().professionalism).toBe(5);
       expect(response.json().reliability).toBe(5);
@@ -307,7 +307,7 @@ describe('User Controller Tests', () => {
         },
       });
       expect(rating).toBeDefined();
-      expect(rating.ratedUserId).toBe('2');
+      expect(rating.postedToId).toBe('2');
       expect(rating.raterUserId).toBe('1');
       expect(rating.professionalism).toBe(5);
       expect(rating.reliability).toBe(5);
@@ -330,7 +330,7 @@ describe('User Controller Tests', () => {
       });
 
       expect(response.statusCode).toBe(201);
-      expect(response.json().ratedUserId).toBe('2');
+      expect(response.json().postedToId).toBe('2');
       expect(response.json().raterUserId).toBe(null);
       expect(response.json().professionalism).toBe(5);
       expect(response.json().reliability).toBe(5);
@@ -343,7 +343,7 @@ describe('User Controller Tests', () => {
         },
       });
       expect(rating).toBeDefined();
-      expect(rating.ratedUserId).toBe('2');
+      expect(rating.postedToId).toBe('2');
       expect(rating.raterUserId).toBe(null);
       expect(rating.professionalism).toBe(5);
       expect(rating.reliability).toBe(5);

@@ -69,9 +69,9 @@ export class UserService {
     }
   }
 
-  async rateUser(user: User, ratedUserId: User['id'], ratingDto: RatingDto) {
+  async rateUser(user: User, postedToId: User['id'], ratingDto: RatingDto) {
     const ratedUser = await this.prisma.user.findUnique({
-      where: { id: ratedUserId },
+      where: { id: postedToId },
     });
 
     // Check if the user exists
@@ -80,7 +80,7 @@ export class UserService {
     }
 
     // Check if the user is trying to rate himself
-    if (user.id === ratedUserId) {
+    if (user.id === postedToId) {
       throw new BadRequestException('You cannot rate yourself');
     }
 
@@ -89,8 +89,8 @@ export class UserService {
     // Rate the user
     const rating = await this.prisma.rating.create({
       data: {
-        ratedUserId: ratedUserId,
-        raterUserId: ratingDto.anonymous ? null : user.id,
+        postedToId: postedToId,
+        postedById: ratingDto.anonymous ? null : user.id,
         professionalism: ratingDto.professionalism,
         reliability: ratingDto.reliability,
         communication: ratingDto.communication,
@@ -100,9 +100,9 @@ export class UserService {
     });
 
     // Update the cache
-    const avgRatings = await this.calculateAvgRating(ratedUserId);
+    const avgRatings = await this.calculateAvgRating(postedToId);
     await this.cache.set(
-      `avg-ratings-${ratedUserId}`,
+      `avg-ratings-${postedToId}`,
       JSON.stringify(avgRatings),
     );
 
@@ -113,15 +113,15 @@ export class UserService {
     if (self) revieweeUserId = user.id;
 
     const ratings = await this.prisma.rating.findMany({
-      where: { ratedUserId: revieweeUserId },
+      where: { postedToId: revieweeUserId },
       include: {
-        raterUser: true,
+        postedBy: true,
       },
     });
 
     return ratings.map((review) => ({
-      userName: review.raterUser ? review.raterUser.name : 'Anonymous',
-      profilePictureUrl: review.raterUser?.profilePictureUrl,
+      userName: review.postedBy ? review.postedBy.name : 'Anonymous',
+      profilePictureUrl: review.postedBy?.profilePictureUrl,
       professionalism: review.professionalism,
       reliability: review.reliability,
       communication: review.communication,
@@ -149,23 +149,23 @@ export class UserService {
         isEmailVerified: true,
         jobTitle: true,
         profilePictureUrl: true,
-        connections: {
+        followings: {
           where: {
             followerId: userId,
           },
         },
         _count: {
           select: {
-            connections: true,
+            followings: true,
             ratingsReceived: true,
           },
         },
       },
     });
-    return users.map(({ _count, connections, ...user }) => ({
-      connectionsCount: _count.connections,
+    return users.map(({ _count, followings, ...user }) => ({
+      connectionsCount: _count.followings,
       ratingsCount: _count.ratingsReceived,
-      isConnection: connections.length == 0,
+      isConnection: followings.length == 0,
       ...user,
     }));
   }
@@ -235,7 +235,7 @@ export class UserService {
 
   private async calculateAvgRating(userId: User['id']) {
     const result = await this.prisma.rating.aggregate({
-      where: { ratedUserId: userId },
+      where: { postedToId: userId },
       _avg: {
         professionalism: true,
         reliability: true,
