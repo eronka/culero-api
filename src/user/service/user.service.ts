@@ -165,7 +165,7 @@ export class UserService {
     return users.map(({ _count, followings, ...user }) => ({
       connectionsCount: _count.followings,
       ratingsCount: _count.ratingsReceived,
-      isConnection: followings.length == 0,
+      isConnection: followings.length != 0,
       ...user,
     }));
   }
