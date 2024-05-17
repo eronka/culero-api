@@ -130,16 +130,25 @@ export class UserService {
       include: {
         postedBy: true,
       },
+      orderBy: {
+        createdAt: 'desc',
+      },
     });
 
     return ratings.map((review) => ({
       userName: review.postedBy ? review.postedBy.name : 'Anonymous',
+      isEmailVerified: review.postedBy
+        ? review.postedBy.isEmailVerified
+        : false,
+      isAnonymous: !review.postedBy,
       profilePictureUrl: review.postedBy?.profilePictureUrl,
       professionalism: review.professionalism,
       reliability: review.reliability,
       communication: review.communication,
+      comment: review.comment,
       createdOn: review.createdAt.toISOString(),
-      comment: !self ? review.comment : undefined,
+      postedById:
+        review.postedBy && !review.anonymous ? review.postedById : undefined,
     }));
   }
 

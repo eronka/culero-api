@@ -7,6 +7,14 @@ const base = {
     type: 'string',
     example: 'https://example.com/profile.jpg',
   },
+  isEmailVerified: {
+    type: 'boolean',
+    example: true,
+  },
+  isAnonymous: {
+    type: 'boolean',
+    example: true,
+  },
   professionalism: {
     type: 'number',
     example: 5,
@@ -18,6 +26,14 @@ const base = {
   communication: {
     type: 'number',
     example: 5,
+  },
+  comment: {
+    type: 'string',
+    example: 'Great.',
+  },
+  postedById: {
+    type: 'string',
+    example: 1,
   },
   createdOn: {
     type: 'string',
