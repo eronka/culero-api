@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { json } from 'express';
 
 function initializeSwagger(app: any) {
   const config = new DocumentBuilder()
@@ -26,6 +27,8 @@ async function bootstrap() {
     }),
   );
   // initializeS3();
+  app.use('/api/user/profile-picture', json({ limit: '10mb' }));
+  app.use(json({ limit: '100kb' }));
   initializeSwagger(app);
   await app.listen(4200);
 }

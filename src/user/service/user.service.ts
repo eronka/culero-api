@@ -19,6 +19,7 @@ import { REDIS_CLIENT } from '../../provider/redis.provider';
 import { Redis } from 'ioredis';
 import { ProfileFetcherDelegator } from '../profile-fetcher/delegator.profile-fetcher';
 import { v4 } from 'uuid';
+import { getMimeType } from 'utils/image';
 
 @Injectable()
 export class UserService {
@@ -44,12 +45,23 @@ export class UserService {
     });
   }
 
-  async updateProfilePicture(user: User, file: Express.Multer.File) {
+  async updateProfilePicture(user: User, file: string) {
+    const type = getMimeType(file);
+    if (type !== 'image/jpg' && type !== 'image/jpeg' && type !== 'image/png') {
+      throw new BadRequestException('Only jpg, jpeg and png are accepted');
+    }
+
+    const buf = Buffer.from(
+      file.replace(/^data:image\/\w+;base64,/, ''),
+      'base64',
+    );
+
+    console.log('here', file, user);
     const putObjectRequest = new PutObjectCommand({
       Bucket: process.env.AWS_S3_BUCKET_NAME,
       Key: `profile-pictures/${user.id}`,
-      Body: file.buffer,
-      ContentType: file.mimetype,
+      Body: buf,
+      ContentType: type,
     });
 
     try {
