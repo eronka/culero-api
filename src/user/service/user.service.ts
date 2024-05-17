@@ -1,13 +1,12 @@
 import {
   BadRequestException,
-  ConflictException,
   Inject,
   Injectable,
   InternalServerErrorException,
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { User } from '@prisma/client';
+import { AuthType, SocialAccountType, User } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { RatingDto } from '../dto/rating.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
@@ -18,6 +17,8 @@ import { S3_CLIENT } from '../../provider/s3.provider';
 import { Multer } from 'multer';
 import { REDIS_CLIENT } from '../../provider/redis.provider';
 import { Redis } from 'ioredis';
+import { ProfileFetcherDelegator } from '../profile-fetcher/delegator.profile-fetcher';
+import { v4 } from 'uuid';
 
 @Injectable()
 export class UserService {
@@ -170,33 +171,104 @@ export class UserService {
     }));
   }
 
-  async linkSocialAccount(
-    userId: string,
-    provider: string,
-    accessToken: string,
-  ) {
-    const user = await this.findUserById(userId);
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
+  /**
+   * This function aims to either create a social account link for the user. If a social
+   * account with the same profile URL already exists, it will be linked to the user, and
+   * all the followers and ratings will be transferred to the current user. The existing
+   * account will be deleted.
+   * @param req The request object returned from the passport strategy
+   * @param socialAccountType The type of social account to link
+   */
+  async linkSocialAccount(req: any, socialAccountType: SocialAccountType) {
+    const { emails, profileUrl } = req.user;
+    const email = emails[0].value;
 
-    let email: string | undefined;
+    // Check if the user exists
+    const currentUser = await this.prisma.user.findUniqueOrThrow({
+      where: { email },
+    });
 
-    const existingUser = await this.findUserByEmail(email);
-    if (existingUser && existingUser.id !== user.id) {
-      throw new ConflictException(
-        'Social account already linked to a different user',
-      );
-    }
-
-    // Add the social account to the user
-    await this.prisma.linkedSocialAccount.create({
-      data: {
-        platform: provider,
-        accessToken,
-        userId,
+    // Check if the particular account exists for any other user
+    const existingAccount = await this.prisma.socialAccount.findFirst({
+      where: {
+        platform: socialAccountType,
+        profileUrl: profileUrl,
       },
     });
+    if (existingAccount) {
+      const socialAccountUser = await this.prisma.user.findUnique({
+        where: { id: existingAccount.userId },
+      });
+
+      // TODO: Merge account here
+      await this.prisma.$transaction([
+        // Update all the ratings to the existing account with the current user
+        this.prisma.rating.updateMany({
+          where: { raterUserId: socialAccountUser.id },
+          data: { raterUserId: currentUser.id },
+        }),
+
+        // Update all the followers to the existing account with the current user
+        this.prisma.connection.updateMany({
+          where: { followingId: socialAccountUser.id },
+          data: { followingId: currentUser.id },
+        }),
+
+        // Delete the existing account
+        this.prisma.socialAccount.delete({
+          where: { id: existingAccount.id },
+        }),
+      ]);
+    } else {
+      // Add the social account to the user
+      await this.prisma.socialAccount.create({
+        data: {
+          platform: socialAccountType,
+          profileUrl,
+          userId: currentUser.id,
+        },
+      });
+    }
+  }
+
+  async searchUserByExternalProfile(profileUrl: string) {
+    // Fetch the profile details
+    const profileData = await new ProfileFetcherDelegator(
+      profileUrl,
+    ).getProfileDetails();
+
+    // Check if the profile by url exists
+    const socialAccount = await this.prisma.socialAccount.findFirst({
+      where: { profileUrl },
+      include: {
+        user: true,
+      },
+    });
+
+    // If the account exists, we just return the user associated with it.
+    // Else, we create a new user, associate the social account with it, and return the user.
+    if (socialAccount) {
+      return socialAccount.user;
+    } else {
+      const newUserId = v4();
+      const [newUser] = await this.prisma.$transaction([
+        this.prisma.user.create({
+          data: {
+            id: newUserId,
+            name: profileData.name,
+            authType: AuthType.EXTERNAL,
+          },
+        }),
+        this.prisma.socialAccount.create({
+          data: {
+            platform: profileData.socialAccountType,
+            profileUrl,
+            userId: newUserId,
+          },
+        }),
+      ]);
+      return newUser;
+    }
   }
 
   async getAvgUserRatings(user: User, self: boolean, userId?: User['id']) {
@@ -219,18 +291,6 @@ export class UserService {
     await this.cache.set(`avg-ratings-${userId}`, JSON.stringify(avgRatings));
 
     return avgRatings;
-  }
-
-  private async findUserById(id: string) {
-    return await this.prisma.user.findUnique({ where: { id } });
-  }
-
-  private async findUserByEmail(email: string) {
-    return await this.prisma.user.findUnique({
-      where: {
-        email,
-      },
-    });
   }
 
   private async calculateAvgRating(userId: User['id']) {

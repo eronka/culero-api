@@ -1,10 +1,13 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
   Param,
   Post,
   Put,
+  Req,
+  Res,
   Query,
   UploadedFile,
   UseGuards,
@@ -12,7 +15,7 @@ import {
 } from '@nestjs/common';
 import { CurrentUser } from '../../decorators/current-user.decorator';
 import { UserService } from '../service/user.service';
-import { User } from '@prisma/client';
+import { SocialAccountType, User } from '@prisma/client';
 import { RatingDto } from '../dto/rating.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -20,7 +23,6 @@ import {
   ApiBadRequestResponse,
   ApiBearerAuth,
   ApiBody,
-  ApiConflictResponse,
   ApiConsumes,
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
@@ -38,13 +40,18 @@ import {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Multer } from 'multer';
 import { Public } from '../../decorators/public.decorator';
-import { AuthGuard } from '../../auth/guard/auth/auth.guard';
+import { Request, Response } from 'express';
+import { LinkedInOAuthStrategyFactory } from '../../oauth/factory/linkedin/linkedin-strategy.factory';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('user')
 @ApiBearerAuth()
 @ApiTags('User Controller')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private linkedinOAuthStrategyFactory: LinkedInOAuthStrategyFactory,
+  ) {}
 
   @Get()
   @ApiOperation({
@@ -192,34 +199,25 @@ export class UserController {
     return this.userService.getUserRatings(user, false, revieweeUserId);
   }
 
+  @Get('link-social/linkedin/callback')
+  @UseGuards(AuthGuard('linkedin'))
   @Public()
-  @Post('/link-social')
-  @ApiOperation({
-    summary: 'Link social account',
-    description: 'Link a social account to the currently logged in user',
-  })
-  @ApiBadRequestResponse({
-    description: 'Invalid social account',
-  })
-  @ApiConflictResponse({
-    description: 'Social account already linked',
-  })
-  @ApiCreatedResponse({
-    description: 'Social account linked successfully',
-  })
-  async linkSocialAccount(
-    @Body()
-    {
-      userId,
-      provider,
-      accessToken,
-    }: {
-      userId: string;
-      provider: string;
-      accessToken: string;
-    },
-  ) {
-    await this.userService.linkSocialAccount(userId, provider, accessToken);
+  async facebookOAuthCallback(@Req() req: Request) {
+    return await this.userService.linkSocialAccount(
+      req,
+      SocialAccountType.LINKEDIN,
+    );
+  }
+
+  @Get('link-social/linkedin')
+  async linkedinOAuthLogin(@Res() res: Response) {
+    if (!this.linkedinOAuthStrategyFactory.isSocialAccountLinkEnabled()) {
+      throw new BadRequestException(
+        'LinkedIn Social Account Link is not enabled in this environment.',
+      );
+    }
+
+    res.status(302).redirect('/api/user/link-social/linkedin/callback');
   }
 
   @Get('avg-rating/self')
@@ -292,5 +290,25 @@ export class UserController {
     @Query() { query }: { query: string },
   ) {
     return this.userService.searchUsers(user.id, query);
+  }
+
+  @Public()
+  @Get('search-by-external-profile/:profileUrl')
+  @ApiOperation({
+    summary: 'Search users by external profile',
+    description: 'Search for users by external profile URL',
+  })
+  @ApiOkResponse({
+    description: 'Users found',
+    schema: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: userProperties,
+      },
+    },
+  })
+  async searchUsersByExternalProfile(@Param('profileUrl') profileUrl: string) {
+    return this.userService.searchUserByExternalProfile(profileUrl);
   }
 }

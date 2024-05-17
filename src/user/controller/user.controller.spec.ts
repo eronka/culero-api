@@ -6,6 +6,8 @@ import { mockDeep } from 'jest-mock-extended';
 import { ProviderModule } from '../../provider/provider.module';
 import { MailService } from '../../mail/mail.service';
 import { REDIS_CLIENT } from '../../provider/redis.provider';
+import { LinkedInOAuthStrategyFactory } from '../../oauth/factory/linkedin/linkedin-strategy.factory';
+import { ConfigService } from '@nestjs/config';
 
 describe('UserController', () => {
   let controller: UserController;
@@ -18,6 +20,8 @@ describe('UserController', () => {
         UserService,
         PrismaService,
         MailService,
+        ConfigService,
+        LinkedInOAuthStrategyFactory,
         {
           provide: REDIS_CLIENT,
           useValue: {},

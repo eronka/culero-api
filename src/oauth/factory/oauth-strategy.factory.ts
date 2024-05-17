@@ -14,5 +14,11 @@ import { PassportStrategy } from '@nestjs/passport';
 export interface OAuthStrategyFactory {
   createOAuthStrategy<T extends typeof PassportStrategy>(): T | null;
 
+  createSocialAccountLinkStrategy<
+    T extends typeof PassportStrategy,
+  >(): T | null;
+
   isOAuthEnabled(): boolean;
+
+  isSocialAccountLinkEnabled(): boolean;
 }
