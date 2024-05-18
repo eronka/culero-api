@@ -160,7 +160,7 @@ export class UserService {
       name: true,
       joinedAt: true,
       isEmailVerified: true,
-      jobTitle: true,
+      headline: true,
       profilePictureUrl: true,
       followings: {
         where: {
