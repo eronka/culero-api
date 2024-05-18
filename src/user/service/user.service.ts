@@ -152,6 +152,30 @@ export class UserService {
     }));
   }
 
+  //user props returned to backend
+  private selectUserWithExtraProps(currentUserId: User['id']) {
+    return {
+      id: true,
+      email: true,
+      name: true,
+      joinedAt: true,
+      isEmailVerified: true,
+      jobTitle: true,
+      profilePictureUrl: true,
+      followings: {
+        where: {
+          followerId: currentUserId,
+        },
+      },
+      _count: {
+        select: {
+          followings: true,
+          ratingsReceived: true,
+        },
+      },
+    };
+  }
+
   async searchUsers(userId: User['id'], searchTerm?: string) {
     if (!searchTerm) {
       throw new BadRequestException('Search term is required');
@@ -163,23 +187,9 @@ export class UserService {
           { name: { contains: searchTerm } },
         ],
       },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        joinedAt: true,
-        isEmailVerified: true,
-        headline: true,
-        profilePictureUrl: true,
-        followings: true,
-        _count: {
-          select: {
-            followings: true,
-            ratingsReceived: true,
-          },
-        },
-      },
+      select: this.selectUserWithExtraProps(userId),
     });
+
     return users.map(({ _count, followings, ...user }) => ({
       connectionsCount: _count.followings,
       ratingsCount: _count.ratingsReceived,
@@ -310,6 +320,34 @@ export class UserService {
     await this.cache.set(`avg-ratings-${userId}`, JSON.stringify(avgRatings));
 
     return avgRatings;
+  }
+
+  private async findUserById(id: string) {
+    return await this.prisma.user.findUnique({ where: { id } });
+  }
+
+  public async getUser(currentUserId: User['id'], id: User['id']) {
+    const userWithCounts = await this.prisma.user.findUnique({
+      where: { id },
+      select: this.selectUserWithExtraProps(currentUserId),
+    });
+
+    const { _count, followings, ...user } = userWithCounts;
+
+    return {
+      connectionsCount: _count.followings,
+      ratingsCount: _count.ratingsReceived,
+      isConnection: followings.length != 0,
+      ...user,
+    };
+  }
+
+  private async findUserByEmail(email: string) {
+    return await this.prisma.user.findUnique({
+      where: {
+        email,
+      },
+    });
   }
 
   private async calculateAvgRating(userId: User['id']) {

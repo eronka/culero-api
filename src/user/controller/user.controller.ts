@@ -65,6 +65,25 @@ export class UserController {
     return this.userService.getSelf(user);
   }
 
+  @Get('/:userId')
+  @ApiOperation({
+    summary: 'Get another user',
+    description: 'Get the currently logged in user',
+  })
+  @ApiOkResponse({
+    description: 'User found',
+    schema: {
+      type: 'object',
+      properties: { ...userExtraProps, ...userProperties },
+    },
+  })
+  async getUser(
+    @CurrentUser() user: User,
+    @Param('userId') userId: User['id'],
+  ) {
+    return this.userService.getUser(user.id, userId);
+  }
+
   @Put()
   @ApiOperation({
     summary: 'Update current user',
