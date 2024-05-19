@@ -69,9 +69,9 @@ export class UserService {
     }
   }
 
-  async rateUser(user: User, ratedUserId: User['id'], ratingDto: RatingDto) {
+  async rateUser(user: User, postedToId: User['id'], ratingDto: RatingDto) {
     const ratedUser = await this.prisma.user.findUnique({
-      where: { id: ratedUserId },
+      where: { id: postedToId },
     });
 
     // Check if the user exists
@@ -80,7 +80,7 @@ export class UserService {
     }
 
     // Check if the user is trying to rate himself
-    if (user.id === ratedUserId) {
+    if (user.id === postedToId) {
       throw new BadRequestException('You cannot rate yourself');
     }
 
@@ -89,8 +89,8 @@ export class UserService {
     // Rate the user
     const rating = await this.prisma.rating.create({
       data: {
-        ratedUserId: ratedUserId,
-        raterUserId: ratingDto.anonymous ? null : user.id,
+        postedToId: postedToId,
+        postedById: ratingDto.anonymous ? null : user.id,
         professionalism: ratingDto.professionalism,
         reliability: ratingDto.reliability,
         communication: ratingDto.communication,
@@ -100,8 +100,11 @@ export class UserService {
     });
 
     // Update the cache
-    const avgRatings = await this.calculateAvgRating(ratedUserId);
-    await this.cache.set(`avg-ratings-${ratedUserId}`, avgRatings);
+    const avgRatings = await this.calculateAvgRating(postedToId);
+    await this.cache.set(
+      `avg-ratings-${postedToId}`,
+      JSON.stringify(avgRatings),
+    );
 
     return rating;
   }
@@ -110,15 +113,15 @@ export class UserService {
     if (self) revieweeUserId = user.id;
 
     const ratings = await this.prisma.rating.findMany({
-      where: { ratedUserId: revieweeUserId },
+      where: { postedToId: revieweeUserId },
       include: {
-        raterUser: true,
+        postedBy: true,
       },
     });
 
     return ratings.map((review) => ({
-      userName: review.raterUser ? review.raterUser.name : 'Anonymous',
-      profilePictureUrl: review.raterUser?.profilePictureUrl,
+      userName: review.postedBy ? review.postedBy.name : 'Anonymous',
+      profilePictureUrl: review.postedBy?.profilePictureUrl,
       professionalism: review.professionalism,
       reliability: review.reliability,
       communication: review.communication,
@@ -127,7 +130,7 @@ export class UserService {
     }));
   }
 
-  async searchUsers(searchTerm?: string) {
+  async searchUsers(userId: User['id'], searchTerm?: string) {
     if (!searchTerm) {
       throw new BadRequestException('Search term is required');
     }
@@ -142,10 +145,29 @@ export class UserService {
         id: true,
         email: true,
         name: true,
+        joinedAt: true,
+        isEmailVerified: true,
+        jobTitle: true,
         profilePictureUrl: true,
+        followings: {
+          where: {
+            followerId: userId,
+          },
+        },
+        _count: {
+          select: {
+            followings: true,
+            ratingsReceived: true,
+          },
+        },
       },
     });
-    return users;
+    return users.map(({ _count, followings, ...user }) => ({
+      connectionsCount: _count.followings,
+      ratingsCount: _count.ratingsReceived,
+      isConnection: followings.length == 0,
+      ...user,
+    }));
   }
 
   async linkSocialAccount(
@@ -194,7 +216,7 @@ export class UserService {
     const avgRatings = await this.calculateAvgRating(userId);
 
     // Cache the ratings for 24 hours
-    await this.cache.set(`avg-ratings-${userId}`, avgRatings);
+    await this.cache.set(`avg-ratings-${userId}`, JSON.stringify(avgRatings));
 
     return avgRatings;
   }
@@ -213,7 +235,7 @@ export class UserService {
 
   private async calculateAvgRating(userId: User['id']) {
     const result = await this.prisma.rating.aggregate({
-      where: { ratedUserId: userId },
+      where: { postedToId: userId },
       _avg: {
         professionalism: true,
         reliability: true,
@@ -221,7 +243,7 @@ export class UserService {
       },
     });
 
-    return JSON.stringify({
+    return {
       professionalism: result._avg.professionalism ?? 0,
       reliability: result._avg.reliability ?? 0,
       communication: result._avg.communication ?? 0,
@@ -230,6 +252,6 @@ export class UserService {
           result._avg.reliability +
           result._avg.communication) /
         3,
-    });
+    };
   }
 }

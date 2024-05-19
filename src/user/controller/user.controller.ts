@@ -5,7 +5,9 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { CurrentUser } from '../../decorators/current-user.decorator';
@@ -25,9 +27,10 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
-import { userProperties } from '../../schemas/user.properties';
+import { userExtraProps, userProperties } from '../../schemas/user.properties';
 import {
   reviewProperties,
   reviewPropertiesWithComment,
@@ -35,6 +38,7 @@ import {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Multer } from 'multer';
 import { Public } from '../../decorators/public.decorator';
+import { AuthGuard } from '../../auth/guard/auth/auth.guard';
 
 @Controller('user')
 @ApiBearerAuth()
@@ -129,7 +133,7 @@ export class UserController {
       type: 'object',
       properties: {
         id: { type: 'number' },
-        ratedUserId: { type: 'string' },
+        postedToId: { type: 'string' },
         raterUserId: { type: 'string' },
         professionalism: { type: 'number' },
         reliability: { type: 'number' },
@@ -141,10 +145,10 @@ export class UserController {
   })
   async rateUser(
     @CurrentUser() user: User,
-    @Param('userId') ratedUserId: string,
+    @Param('userId') postedToId: string,
     @Body() rating: RatingDto,
   ) {
-    return this.userService.rateUser(user, ratedUserId, rating);
+    return this.userService.rateUser(user, postedToId, rating);
   }
 
   @Get('ratings/self')
@@ -263,8 +267,7 @@ export class UserController {
     return this.userService.getAvgUserRatings(user, false, userId);
   }
 
-  @Public()
-  @Get('search/:query')
+  @Get('search')
   @ApiOperation({
     summary: 'Search users',
     description: 'Search for users',
@@ -275,11 +278,19 @@ export class UserController {
       type: 'array',
       items: {
         type: 'object',
-        properties: userProperties,
+        properties: { ...userExtraProps, ...userProperties },
       },
     },
   })
-  async searchUsers(@Param('query') query: string) {
-    return this.userService.searchUsers(query);
+  @ApiQuery({
+    name: 'query',
+    type: 'string',
+  })
+  @UseGuards(AuthGuard)
+  async searchUsers(
+    @CurrentUser() user: User,
+    @Query() { query }: { query: string },
+  ) {
+    return this.userService.searchUsers(user.id, query);
   }
 }

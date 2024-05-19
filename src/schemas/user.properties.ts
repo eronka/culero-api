@@ -10,4 +10,11 @@ export const userProperties = {
   isEmailVerified: { type: 'boolean' },
   headline: { type: 'string' },
   jobTitle: { type: 'string' },
+  joinedAt: { type: 'string', format: 'date-time' },
+};
+
+export const userExtraProps = {
+  connectionsCount: { type: 'number' },
+  ratingsCount: { type: 'number' },
+  isConnection: { type: 'boolean' },
 };
