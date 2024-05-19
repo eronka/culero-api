@@ -3,19 +3,13 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { AuthType, User } from '@prisma/client';
 import { SignupDto } from '../dto/signup.dto';
-import { SHA256 } from 'crypto-js';
 import { MailService } from '../../mail/mail.service';
 import { SigninDto } from '../dto/signin.dto';
-
-function hashPassword(password: string) {
-  return SHA256(password).toString();
-}
 
 @Injectable()
 export class AuthService {
@@ -31,7 +25,6 @@ export class AuthService {
       AuthType.EMAIL,
       null,
       null,
-      hashPassword(dto.password),
       true,
     );
 
@@ -43,24 +36,18 @@ export class AuthService {
       where: {
         email: dto.email,
       },
+      select: {
+        isEmailVerified: true,
+        email: true,
+      },
     });
 
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
-    if (user.password !== hashPassword(dto.password)) {
-      throw new UnauthorizedException('Invalid password');
-    }
-
-    user.password = undefined;
-
-    const token = await this.generateToken(user);
-
-    return {
-      ...user,
-      token,
-    };
+    await this.sendEmailVerificationCode(dto.email);
+    return user;
   }
 
   async handleGoogleOAuthLogin(req: any) {
@@ -212,7 +199,6 @@ export class AuthService {
     authType: AuthType,
     name?: string,
     profilePictureUrl?: string,
-    password?: string,
     throwErrorIfUserExists?: boolean,
   ) {
     let user = await this.findUserByEmail(email);
@@ -227,7 +213,6 @@ export class AuthService {
           name: name,
           profilePictureUrl: profilePictureUrl,
           authType,
-          password,
         },
         select: {
           id: true,

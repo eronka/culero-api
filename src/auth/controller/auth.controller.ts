@@ -7,6 +7,7 @@ import {
   HttpStatus,
   Param,
   Post,
+  Put,
   Req,
   Res,
   UseGuards,
@@ -29,7 +30,6 @@ import {
   ApiNotFoundResponse,
   ApiOperation,
   ApiTags,
-  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { userProperties } from '../../schemas/user.properties';
 
@@ -144,7 +144,7 @@ export class AuthController {
   @Post('sign-up')
   @ApiOperation({
     summary: 'Sign up',
-    description: 'Sign up with email and password',
+    description: 'Sign up with email',
   })
   @ApiCreatedResponse({
     description: 'User signed up successfully',
@@ -160,21 +160,18 @@ export class AuthController {
   @Post('sign-in')
   @ApiOperation({
     summary: 'Sign in',
-    description: 'Sign in with email and password',
+    description: 'Sign in with email',
   })
   @ApiNotFoundResponse({
     description: 'User not found',
-  })
-  @ApiUnauthorizedResponse({
-    description: 'Invalid password',
   })
   @ApiCreatedResponse({
     description: 'User signed in successfully',
     schema: {
       type: 'object',
       properties: {
-        ...userProperties,
-        token: { type: 'string' },
+        isEmailVerified: userProperties.isEmailVerified,
+        email: userProperties.email,
       },
     },
   })
@@ -183,7 +180,7 @@ export class AuthController {
   }
 
   @Public()
-  @Get('regenerate-code/:email')
+  @Put('regenerate-code/:email')
   @ApiOperation({
     summary: 'Resend email verification code',
     description: 'Resend email verification code to the user',
