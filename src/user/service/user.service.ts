@@ -231,44 +231,46 @@ export class UserService {
     }
   }
 
-  async searchUserByExternalProfile(profileUrl: string) {
-    // Fetch the profile details
-    const profileData = await new ProfileFetcherDelegator(
-      profileUrl,
-    ).getProfileDetails();
-
+  async searchUserByExternalProfile(profileUrlBase64: string) {
     // Check if the profile by url exists
+    // If the account exists, we just return the user associated with it.
+    const profileUrl = Buffer.from(profileUrlBase64, 'base64').toString();
+
     const socialAccount = await this.prisma.socialAccount.findFirst({
       where: { profileUrl },
       include: {
         user: true,
       },
     });
+    if (socialAccount) return socialAccount.user;
 
-    // If the account exists, we just return the user associated with it.
+    // Fetch the profile details
+    const profileData = await new ProfileFetcherDelegator(
+      profileUrl,
+    ).getProfileDetails();
+
     // Else, we create a new user, associate the social account with it, and return the user.
-    if (socialAccount) {
-      return socialAccount.user;
-    } else {
-      const newUserId = v4();
-      const [newUser] = await this.prisma.$transaction([
-        this.prisma.user.create({
-          data: {
-            id: newUserId,
-            name: profileData.name,
-            authType: AuthType.EXTERNAL,
-          },
-        }),
-        this.prisma.socialAccount.create({
-          data: {
-            platform: profileData.socialAccountType,
-            profileUrl,
-            userId: newUserId,
-          },
-        }),
-      ]);
-      return newUser;
-    }
+
+    const newUserId = v4();
+    const [newUser] = await this.prisma.$transaction([
+      this.prisma.user.create({
+        data: {
+          id: newUserId,
+          name: profileData.name,
+          authType: AuthType.EXTERNAL,
+          jobTitle: profileData.jobTitle,
+          profilePictureUrl: profileData.profilePictureUrl,
+        },
+      }),
+      this.prisma.socialAccount.create({
+        data: {
+          platform: profileData.socialAccountType,
+          profileUrl,
+          userId: newUserId,
+        },
+      }),
+    ]);
+    return newUser;
   }
 
   async getAvgUserRatings(user: User, self: boolean, userId?: User['id']) {

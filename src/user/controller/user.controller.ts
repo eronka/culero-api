@@ -308,7 +308,9 @@ export class UserController {
       },
     },
   })
-  async searchUsersByExternalProfile(@Param('profileUrl') profileUrl: string) {
-    return this.userService.searchUserByExternalProfile(profileUrl);
+  async searchUsersByExternalProfile(
+    @Param('profileUrl') profileUrlBase64: string,
+  ) {
+    return this.userService.searchUserByExternalProfile(profileUrlBase64);
   }
 }
