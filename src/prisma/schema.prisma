@@ -25,20 +25,20 @@ enum SocialAccountType {
 }
 
 model User {
-  id                   String                @id @default(cuid())
-  email                String                @unique
-  name                 String?
-  profilePictureUrl    String?
-  socialAccounts       SocialAccount[]
-  authType             AuthType
-  isEmailVerified      Boolean               @default(false)
-  headline             String?
-  jobTitle             String?
-  followers            Connection[]          @relation("followsTheUser")
-  followings           Connection[]          @relation("followedByUser")
-  ratingsPosted        Rating[]              @relation("ratingsGivenToOtherUsers")
-  ratingsReceived      Rating[]              @relation("ratingsRecievedFromOtherUsers")
-  joinedAt             DateTime              @default(now())
+  id                String          @id @default(cuid())
+  email             String?         @unique
+  name              String?
+  profilePictureUrl String?
+  socialAccounts    SocialAccount[]
+  authType          AuthType
+  isEmailVerified   Boolean         @default(false)
+  headline          String?
+  jobTitle          String?
+  followers         Connection[]    @relation("followsTheUser")
+  followings        Connection[]    @relation("followedByUser")
+  ratingsPosted     Rating[]        @relation("ratingsGivenToOtherUsers")
+  ratingsReceived   Rating[]        @relation("ratingsRecievedFromOtherUsers")
+  joinedAt          DateTime        @default(now())
 }
 
 model Connection {
@@ -52,10 +52,10 @@ model Connection {
 }
 
 model SocialAccount {
-  id           Int               @id @default(autoincrement())
-  platform     SocialAccountType
-  profileUrl   String
-  addedOn      DateTime          @default(now())
+  id         Int               @id @default(autoincrement())
+  platform   SocialAccountType
+  profileUrl String
+  addedOn    DateTime          @default(now())
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId String

@@ -204,8 +204,8 @@ export class UserService {
       await this.prisma.$transaction([
         // Update all the ratings to the existing account with the current user
         this.prisma.rating.updateMany({
-          where: { raterUserId: socialAccountUser.id },
-          data: { raterUserId: currentUser.id },
+          where: { postedToId: socialAccountUser.id },
+          data: { postedToId: currentUser.id },
         }),
 
         // Update all the followers to the existing account with the current user
