@@ -47,6 +47,7 @@ export class UserService {
 
   async updateProfilePicture(user: User, file: string) {
     const type = getMimeType(file);
+    this.logger.warn(type, file);
     if (type !== 'image/jpg' && type !== 'image/jpeg' && type !== 'image/png') {
       throw new BadRequestException('Only jpg, jpeg and png are accepted');
     }
@@ -56,7 +57,6 @@ export class UserService {
       'base64',
     );
 
-    console.log('here', file, user);
     const putObjectRequest = new PutObjectCommand({
       Bucket: process.env.AWS_S3_BUCKET_NAME,
       Key: `profile-pictures/${user.id}`,
@@ -75,7 +75,6 @@ export class UserService {
         },
       });
     } catch (err) {
-      this.logger.error(err);
       throw new InternalServerErrorException(
         'Failed to upload profile picture',
       );
