@@ -40,7 +40,6 @@ describe('User Controller Tests', () => {
       data: {
         id: '1',
         email: 'johndoe@example.com',
-        password: 'password',
         name: 'John Doe',
         isEmailVerified: true,
         authType: AuthType.EMAIL,
@@ -124,7 +123,6 @@ describe('User Controller Tests', () => {
         data: {
           id: '2',
           email: 'janedoe@example.com',
-          password: 'password',
           name: 'Jane Doe',
           isEmailVerified: true,
           authType: AuthType.EMAIL,
@@ -135,7 +133,7 @@ describe('User Controller Tests', () => {
         data: [
           {
             postedToId: '2',
-            raterUserId: '1',
+            postedById: '1',
             professionalism: 5,
             reliability: 5,
             communication: 5,
@@ -143,7 +141,7 @@ describe('User Controller Tests', () => {
           },
           {
             postedToId: '2',
-            raterUserId: '1',
+            postedById: '1',
             professionalism: 5,
             reliability: 5,
             communication: 5,
@@ -154,7 +152,7 @@ describe('User Controller Tests', () => {
       await prisma.rating.create({
         data: {
           postedToId: '1',
-          raterUserId: '2',
+          postedById: '2',
           professionalism: 5,
           reliability: 5,
           communication: 5,
@@ -296,7 +294,7 @@ describe('User Controller Tests', () => {
 
       expect(response.statusCode).toBe(201);
       expect(response.json().postedToId).toBe('2');
-      expect(response.json().raterUserId).toBe('1');
+      expect(response.json().postedById).toBe('1');
       expect(response.json().professionalism).toBe(5);
       expect(response.json().reliability).toBe(5);
       expect(response.json().communication).toBe(5);
@@ -308,7 +306,7 @@ describe('User Controller Tests', () => {
       });
       expect(rating).toBeDefined();
       expect(rating.postedToId).toBe('2');
-      expect(rating.raterUserId).toBe('1');
+      expect(rating.postedById).toBe('1');
       expect(rating.professionalism).toBe(5);
       expect(rating.reliability).toBe(5);
       expect(rating.communication).toBe(5);
@@ -331,7 +329,7 @@ describe('User Controller Tests', () => {
 
       expect(response.statusCode).toBe(201);
       expect(response.json().postedToId).toBe('2');
-      expect(response.json().raterUserId).toBe(null);
+      expect(response.json().postedById).toBe(null);
       expect(response.json().professionalism).toBe(5);
       expect(response.json().reliability).toBe(5);
       expect(response.json().communication).toBe(5);
@@ -344,7 +342,7 @@ describe('User Controller Tests', () => {
       });
       expect(rating).toBeDefined();
       expect(rating.postedToId).toBe('2');
-      expect(rating.raterUserId).toBe(null);
+      expect(rating.postedById).toBe(null);
       expect(rating.professionalism).toBe(5);
       expect(rating.reliability).toBe(5);
       expect(rating.communication).toBe(5);
@@ -424,20 +422,12 @@ describe('User Controller Tests', () => {
   });
 
   it('should be able to search for a user', async () => {
-    await prisma.user.create({
-      data: {
-        id: '3',
-        email: 'abc@examil.com',
-        password: 'password',
-        name: 'John',
-        isEmailVerified: true,
-        authType: AuthType.EMAIL,
-      },
-    });
-
     const response = await app.inject({
       method: 'GET',
-      url: '/user/search/doe',
+      url: '/user/search/John',
+      headers: {
+        'x-e2e-user-email': 'johndoe@example.com',
+      },
     });
 
     expect(response.statusCode).toBe(200);

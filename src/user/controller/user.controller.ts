@@ -8,7 +8,6 @@ import {
   Put,
   Req,
   Res,
-  Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -29,7 +28,6 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
-  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { userExtraProps, userProperties } from '../../schemas/user.properties';
@@ -265,7 +263,7 @@ export class UserController {
     return this.userService.getAvgUserRatings(user, false, userId);
   }
 
-  @Get('search')
+  @Get('search/:query')
   @ApiOperation({
     summary: 'Search users',
     description: 'Search for users',
@@ -280,16 +278,8 @@ export class UserController {
       },
     },
   })
-  @ApiQuery({
-    name: 'query',
-    type: 'string',
-  })
-  @UseGuards(AuthGuard)
-  async searchUsers(
-    @CurrentUser() user: User,
-    @Query() { query }: { query: string },
-  ) {
-    return this.userService.searchUsers(user.id, query);
+  async searchUsers(@CurrentUser() user: User, @Param('query') query: string) {
+    return this.userService.searchUsers(user, query);
   }
 
   @Public()

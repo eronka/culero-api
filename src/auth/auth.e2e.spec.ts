@@ -8,7 +8,6 @@ import { Test } from '@nestjs/testing';
 import { AppModule } from '../app/app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { AuthType } from '@prisma/client';
-import { SHA256 } from 'crypto-js';
 import { MailService } from '../mail/mail.service';
 import { mockDeep } from 'jest-mock-extended';
 import { MailModule } from '../mail/mail.module';
@@ -98,7 +97,6 @@ describe('Auth Controller Tests', () => {
     await prisma.user.create({
       data: {
         email: 'jane@example.com',
-        password: SHA256('password').toString(),
         isEmailVerified: true,
         authType: AuthType.EMAIL,
       },
