@@ -47,7 +47,6 @@ export class UserService {
 
   async updateProfilePicture(user: User, file: string) {
     const type = getMimeType(file);
-    this.logger.warn(type, file);
     if (type !== 'image/jpg' && type !== 'image/jpeg' && type !== 'image/png') {
       throw new BadRequestException('Only jpg, jpeg and png are accepted');
     }
