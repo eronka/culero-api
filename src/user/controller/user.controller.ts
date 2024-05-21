@@ -278,8 +278,9 @@ export class UserController {
       },
     },
   })
-  async searchUsers(@CurrentUser() user: User, @Param('query') query: string) {
-    return this.userService.searchUsers(user, query);
+  @Public()
+  async searchUsers(@Param('query') query: string) {
+    return this.userService.searchUsers(query);
   }
 
   @Public()

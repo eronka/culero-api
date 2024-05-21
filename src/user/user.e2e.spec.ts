@@ -425,9 +425,6 @@ describe('User Controller Tests', () => {
     const response = await app.inject({
       method: 'GET',
       url: '/user/search/John',
-      headers: {
-        'x-e2e-user-email': 'johndoe@example.com',
-      },
     });
 
     expect(response.statusCode).toBe(200);

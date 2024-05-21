@@ -131,7 +131,7 @@ export class UserService {
     }));
   }
 
-  async searchUsers(user: User, searchTerm?: string) {
+  async searchUsers(searchTerm?: string) {
     if (!searchTerm) {
       throw new BadRequestException('Search term is required');
     }
@@ -150,11 +150,7 @@ export class UserService {
         isEmailVerified: true,
         jobTitle: true,
         profilePictureUrl: true,
-        followings: {
-          where: {
-            followerId: user.id,
-          },
-        },
+        followings: true,
         _count: {
           select: {
             followings: true,
