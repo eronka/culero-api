@@ -1,6 +1,14 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Logger,
+  Param,
+  Post,
+} from '@nestjs/common';
 import { ReviewsService } from './reviews.service';
-import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ReviewDto } from './DTO/reviews.dto';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
 import { User } from '@prisma/client';
@@ -9,7 +17,9 @@ import { RatingDto } from './DTO/rating.dto';
 
 @Controller('reviews')
 @ApiBearerAuth()
+@ApiTags('Reviews controller')
 export class ReviewsController {
+  private logger: Logger;
   constructor(private readonly reviewsService: ReviewsService) {}
 
   @Get('/:userId')
@@ -22,7 +32,7 @@ export class ReviewsController {
   }
 
   @Post()
-  @ApiOperation({ summary: 'Create a reviews' })
+  @ApiOperation({ summary: 'Create a review.' })
   async createReview(
     @CurrentUser() user: User,
     @Body() { postedToId, review }: CreateReviewBodyDTO,
@@ -37,5 +47,27 @@ export class ReviewsController {
   })
   async getUserRatings(@Param('userId') userId: string): Promise<RatingDto> {
     return this.reviewsService.getAvgUserRatings(userId);
+  }
+
+  /**
+   * Like a review
+   */
+  @Post('/:reviewId/like')
+  async likeReview(
+    @CurrentUser() user: User,
+    @Param('reviewId') reviewId: string,
+  ): Promise<ReviewDto> {
+    return this.reviewsService.likeReview(user, reviewId);
+  }
+
+  /**
+   * Unlike a review
+   */
+  @Delete('/:reviewId/like')
+  async unlikeReview(
+    @CurrentUser() user: User,
+    @Param('reviewId') reviewId: string,
+  ): Promise<ReviewDto> {
+    return this.reviewsService.unlikeReview(user, reviewId);
   }
 }

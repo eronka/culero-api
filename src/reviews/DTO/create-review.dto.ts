@@ -73,6 +73,12 @@ export class CreateReviewDto {
 
 export class CreateReviewBodyDTO {
   @IsString()
+  @ApiProperty({
+    name: 'postedToId',
+    description: 'The Id of the reviewed user.',
+    example: 'asdjas20',
+    required: true,
+  })
   postedToId: string;
 
   @Type(() => CreateReviewDto)

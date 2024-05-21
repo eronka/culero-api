@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { ReviewState } from '@prisma/client';
 import { Type } from 'class-transformer';
-import { IsDate, ValidateNested } from 'class-validator';
+import { IsDate, IsEnum, IsOptional, ValidateNested } from 'class-validator';
 
 export class PostedByDTO {
   name?: string;
@@ -11,7 +12,7 @@ export class PostedByDTO {
 }
 
 export class ReviewDto {
-  id: number;
+  id: string;
   comment: string;
   professionalism: number;
   reliability: number;
@@ -28,8 +29,13 @@ export class ReviewDto {
   isOwnReview: boolean;
 
   isAnonymous: boolean;
+  isFavorite: boolean;
 
   @Type(() => PostedByDTO)
+  @IsOptional()
   @ValidateNested()
   postedBy?: PostedByDTO;
+
+  @IsEnum(ReviewState)
+  state: ReviewState;
 }

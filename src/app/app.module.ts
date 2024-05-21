@@ -9,6 +9,7 @@ import { AuthGuard } from '../auth/guard/auth/auth.guard';
 import { PrismaModule } from '../prisma/prisma.module';
 import { MailModule } from '../mail/mail.module';
 import { ProviderModule } from '../provider/provider.module';
+import { ReviewsModule } from 'src/reviews/reviews.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { ProviderModule } from '../provider/provider.module';
     PrismaModule,
     MailModule,
     ProviderModule,
+    ReviewsModule,
   ],
   controllers: [AppController],
   providers: [

@@ -4,7 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { User, Review } from '@prisma/client';
+import { User, Review, FavoriteReview } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ReviewDto } from './DTO/reviews.dto';
 import { REDIS_CLIENT } from 'src/provider/redis.provider';
@@ -19,12 +19,13 @@ export class ReviewsService {
     @Inject(REDIS_CLIENT) private cache: Redis,
   ) {}
 
+  // transform a review from the DB to ReviewDTO (as expected by the API)
   private transformReview(
-    review: Review & { postedBy: User },
+    review: Review & { postedBy: User } & { favorites: FavoriteReview[] },
     currentUserId: User['id'],
   ): ReviewDto {
     return {
-      postedBy: review.anonymous
+      postedBy: !review.anonymous
         ? {
             id: review.postedBy.id,
             isEmailVerified: review.postedBy.isEmailVerified,
@@ -41,6 +42,20 @@ export class ReviewsService {
       isOwnReview: review.postedById == currentUserId,
       postedToId: review.postedToId,
       id: review.id,
+      isFavorite: !!review.favorites.find((f) => f.userId === currentUserId),
+      state: review.state,
+    };
+  }
+
+  // properties to include with the review. Based on the userId to calculate if review is favorite by review.
+  private includeWithReview(currentUserId: User['id']) {
+    return {
+      postedBy: true,
+      favorites: {
+        where: {
+          userId: currentUserId,
+        },
+      },
     };
   }
 
@@ -64,9 +79,7 @@ export class ReviewsService {
   async getUserReviews(user: User, postedToId: User['id']) {
     const ratings = await this.prisma.review.findMany({
       where: { postedToId: postedToId },
-      include: {
-        postedBy: true,
-      },
+      include: this.includeWithReview(user.id),
       orderBy: {
         createdAt: 'desc',
       },
@@ -107,9 +120,7 @@ export class ReviewsService {
         comment: ratingDto.comment,
         anonymous: ratingDto.anonymous,
       },
-      include: {
-        postedBy: true,
-      },
+      include: this.includeWithReview(user.id),
     });
 
     // Update the cache
@@ -140,5 +151,48 @@ export class ReviewsService {
     await this.cache.set(`avg-ratings-${userId}`, JSON.stringify(avgRatings));
 
     return avgRatings;
+  }
+
+  async getReview(userId: User['id'], reviewId: Review['id']) {
+    return this.prisma.review.findUnique({
+      where: {
+        id: reviewId,
+      },
+      include: this.includeWithReview(userId),
+    });
+  }
+
+  async likeReview(user: User, reviewId: Review['id']): Promise<ReviewDto> {
+    this.prisma.favoriteReview.upsert({
+      where: {
+        userId_reviewId: {
+          userId: user.id,
+          reviewId: reviewId,
+        },
+      },
+      update: {},
+      create: {
+        userId: user.id,
+        reviewId: reviewId,
+      },
+    });
+    const review = await this.getReview(user.id, reviewId);
+
+    return this.transformReview(review, user.id);
+  }
+
+  async unlikeReview(user: User, reviewId: Review['id']): Promise<ReviewDto> {
+    await this.prisma.favoriteReview.delete({
+      where: {
+        userId_reviewId: {
+          userId: user.id,
+          reviewId: reviewId,
+        },
+      },
+    });
+
+    const review = await this.getReview(user.id, reviewId);
+
+    return this.transformReview(review, user.id);
   }
 }

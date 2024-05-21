@@ -85,7 +85,7 @@ model Review {
   createdAt       DateTime         @default(now())
   anonymous       Boolean          @default(true)
   state           ReviewState      @default(PENDING)
-  favoriteBy      FavoriteReview[] @relation("favoriteReview")
+  favorites       FavoriteReview[] @relation("favoriteReview")
 }
 
 model FavoriteReview {
