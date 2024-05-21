@@ -1,18 +1,20 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
   Param,
   Post,
   Put,
-  Query,
+  Req,
+  Res,
   UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { CurrentUser } from '../../decorators/current-user.decorator';
 import { UserService } from '../service/user.service';
-import { User } from '@prisma/client';
+import { SocialAccountType, User } from '@prisma/client';
 import { RatingDto } from '../dto/rating.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -20,14 +22,12 @@ import {
   ApiBadRequestResponse,
   ApiBearerAuth,
   ApiBody,
-  ApiConflictResponse,
   ApiConsumes,
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
-  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { userExtraProps, userProperties } from '../../schemas/user.properties';
@@ -38,13 +38,18 @@ import {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Multer } from 'multer';
 import { Public } from '../../decorators/public.decorator';
-import { AuthGuard } from '../../auth/guard/auth/auth.guard';
+import { Request, Response } from 'express';
+import { LinkedInOAuthStrategyFactory } from '../../oauth/factory/linkedin/linkedin-strategy.factory';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('user')
 @ApiBearerAuth()
 @ApiTags('User Controller')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private linkedinOAuthStrategyFactory: LinkedInOAuthStrategyFactory,
+  ) {}
 
   @Get()
   @ApiOperation({
@@ -192,34 +197,25 @@ export class UserController {
     return this.userService.getUserRatings(user, false, revieweeUserId);
   }
 
+  @Get('link-social/linkedin/callback')
+  @UseGuards(AuthGuard('linkedin'))
   @Public()
-  @Post('/link-social')
-  @ApiOperation({
-    summary: 'Link social account',
-    description: 'Link a social account to the currently logged in user',
-  })
-  @ApiBadRequestResponse({
-    description: 'Invalid social account',
-  })
-  @ApiConflictResponse({
-    description: 'Social account already linked',
-  })
-  @ApiCreatedResponse({
-    description: 'Social account linked successfully',
-  })
-  async linkSocialAccount(
-    @Body()
-    {
-      userId,
-      provider,
-      accessToken,
-    }: {
-      userId: string;
-      provider: string;
-      accessToken: string;
-    },
-  ) {
-    await this.userService.linkSocialAccount(userId, provider, accessToken);
+  async facebookOAuthCallback(@Req() req: Request) {
+    return await this.userService.linkSocialAccount(
+      req,
+      SocialAccountType.LINKEDIN,
+    );
+  }
+
+  @Get('link-social/linkedin')
+  async linkedinOAuthLogin(@Res() res: Response) {
+    if (!this.linkedinOAuthStrategyFactory.isSocialAccountLinkEnabled()) {
+      throw new BadRequestException(
+        'LinkedIn Social Account Link is not enabled in this environment.',
+      );
+    }
+
+    res.status(302).redirect('/api/user/link-social/linkedin/callback');
   }
 
   @Get('avg-rating/self')
@@ -267,7 +263,7 @@ export class UserController {
     return this.userService.getAvgUserRatings(user, false, userId);
   }
 
-  @Get('search')
+  @Get('search/:query')
   @ApiOperation({
     summary: 'Search users',
     description: 'Search for users',
@@ -282,15 +278,30 @@ export class UserController {
       },
     },
   })
-  @ApiQuery({
-    name: 'query',
-    type: 'string',
+  @Public()
+  async searchUsers(@Param('query') query: string) {
+    return this.userService.searchUsers(query);
+  }
+
+  @Public()
+  @Get('search-by-external-profile/:profileUrl')
+  @ApiOperation({
+    summary: 'Search users by external profile',
+    description: 'Search for users by external profile URL',
   })
-  @UseGuards(AuthGuard)
-  async searchUsers(
-    @CurrentUser() user: User,
-    @Query() { query }: { query: string },
+  @ApiOkResponse({
+    description: 'Users found',
+    schema: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: userProperties,
+      },
+    },
+  })
+  async searchUsersByExternalProfile(
+    @Param('profileUrl') profileUrlBase64: string,
   ) {
-    return this.userService.searchUsers(user.id, query);
+    return this.userService.searchUserByExternalProfile(profileUrlBase64);
   }
 }

@@ -29,6 +29,10 @@ export class AppleOAuthStrategyFactory implements OAuthStrategyFactory {
     );
   }
 
+  public isSocialAccountLinkEnabled(): boolean {
+    return false;
+  }
+
   public createOAuthStrategy<AppleStrategy>(): AppleStrategy | null {
     if (this.isOAuthEnabled()) {
       return new AppleStrategy(
@@ -42,5 +46,11 @@ export class AppleOAuthStrategyFactory implements OAuthStrategyFactory {
       Logger.warn('Apple Auth is not enabled in this environment.');
       return null;
     }
+  }
+
+  public createSocialAccountLinkStrategy<
+    AppleStrategy,
+  >(): AppleStrategy | null {
+    return null;
   }
 }

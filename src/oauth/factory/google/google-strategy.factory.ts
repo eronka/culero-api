@@ -19,6 +19,10 @@ export class GoogleOAuthStrategyFactory implements OAuthStrategyFactory {
     return Boolean(this.clientID && this.clientSecret && this.callbackURL);
   }
 
+  public isSocialAccountLinkEnabled(): boolean {
+    return false;
+  }
+
   public createOAuthStrategy<GoogleStrategy>(): GoogleStrategy | null {
     if (this.isOAuthEnabled()) {
       return new GoogleStrategy(
@@ -30,5 +34,11 @@ export class GoogleOAuthStrategyFactory implements OAuthStrategyFactory {
       Logger.warn('Google Auth is not enabled in this environment.');
       return null;
     }
+  }
+
+  public createSocialAccountLinkStrategy<
+    GoogleStrategy,
+  >(): GoogleStrategy | null {
+    return null;
   }
 }

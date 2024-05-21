@@ -50,7 +50,7 @@ export class AuthGuard implements CanActivate {
         },
       });
     } else {
-      const token = this.extractTokenFromHeader(request);
+      const token = this.extractToken(request);
       if (!token) {
         throw new ForbiddenException();
       }
@@ -79,8 +79,22 @@ export class AuthGuard implements CanActivate {
     return true;
   }
 
-  private extractTokenFromHeader(request: Request): string | undefined {
-    const [type, token] = request.headers.authorization?.split(' ') ?? [];
+  private extractToken(request: Request): string | undefined {
+    const tokenFromHeader = request.headers.authorization;
+    const tokenFromParams = request.query.token;
+
+    let type: string;
+    let token: string;
+
+    if (tokenFromHeader) {
+      [type, token] = request.headers.authorization?.split(' ') ?? [];
+    } else if (tokenFromParams) {
+      type = 'Bearer';
+      token = tokenFromParams as string;
+    } else {
+      return undefined;
+    }
+
     return type === 'Bearer' ? token : undefined;
   }
 }

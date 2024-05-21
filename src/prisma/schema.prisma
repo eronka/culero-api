@@ -13,49 +13,54 @@ enum AuthType {
   FACEBOOK
   LINKEDIN
   EMAIL
+  EXTERNAL
+}
+
+enum SocialAccountType {
+  LINKEDIN
+  GITHUB
+  TWITTER
+  FACEBOOK
+  GITLAB
 }
 
 model User {
-  id                   String                @id @default(cuid())
-  email                String                @unique
-  name                 String?
-  profilePictureUrl    String?
-  socialAccounts       UserSocialAccount[]
-  authType             AuthType
-  isEmailVerified      Boolean               @default(false)
-  headline             String?
-  jobTitle             String?
-  followers            Connection[]          @relation("followsTheUser")
-  followings           Connection[]          @relation("followedByUser")
-  LinkedSocialAccounts LinkedSocialAccount[]
-  ratingsPosted        Rating[]              @relation("ratingsGivenToOtherUsers")
-  ratingsReceived      Rating[]              @relation("ratingsRecievedFromOtherUsers")
-  joinedAt             DateTime              @default(now())
+  id                String          @id @default(cuid())
+  email             String?         @unique
+  name              String?
+  profilePictureUrl String?
+  socialAccounts    SocialAccount[]
+  authType          AuthType
+  isEmailVerified   Boolean         @default(false)
+  headline          String?
+  jobTitle          String?
+  followers         Connection[]    @relation("followsTheUser")
+  followings        Connection[]    @relation("followedByUser")
+  ratingsPosted     Rating[]        @relation("ratingsGivenToOtherUsers")
+  ratingsReceived   Rating[]        @relation("ratingsRecievedFromOtherUsers")
+  joinedAt          DateTime        @default(now())
 }
 
 model Connection {
   id          Int    @id @default(autoincrement())
-  follower    User   @relation("followedByUser", fields: [followerId], references: [id])
+  follower    User   @relation("followedByUser", fields: [followerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   followerId  String
-  following   User   @relation("followsTheUser", fields: [followingId], references: [id])
+  following   User   @relation("followsTheUser", fields: [followingId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   followingId String
 
   @@unique([followerId, followingId])
 }
 
-model LinkedSocialAccount {
-  id                 Int       @id @default(autoincrement())
-  userId             String
-  user               User      @relation(fields: [userId], references: [id])
-  platform           String
-  isConnected        Boolean   @default(false)
-  profileUrl         String?
-  accessToken        String?   @db.Text
-  refreshToken       String?   @db.Text
-  accessTokenExpiry  DateTime?
-  refreshTokenExpiry DateTime?
+model SocialAccount {
+  id         Int               @id @default(autoincrement())
+  platform   SocialAccountType
+  profileUrl String
+  addedOn    DateTime          @default(now())
 
-  @@unique([userId, platform])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId String
+
+  @@index([userId, platform, profileUrl])
 }
 
 model Rating {
@@ -72,15 +77,6 @@ model Rating {
   comment         String?
   createdAt       DateTime @default(now())
   anonymous       Boolean  @default(false)
-}
-
-model UserSocialAccount {
-  id          String @id @default(cuid())
-  provider    String @unique
-  accessToken String
-
-  user   User   @relation(fields: [userId], references: [id])
-  userId String
 }
 
 model VerificationCode {
