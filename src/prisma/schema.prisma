@@ -26,7 +26,7 @@ enum SocialAccountType {
 
 model User {
   id                String          @id @default(cuid())
-  email             String?         @unique
+  email             String          @unique
   name              String?
   profilePictureUrl String?
   socialAccounts    SocialAccount[]
@@ -36,8 +36,8 @@ model User {
   jobTitle          String?
   followers         Connection[]    @relation("followsTheUser")
   followings        Connection[]    @relation("followedByUser")
-  ratingsPosted     Rating[]        @relation("ratingsGivenToOtherUsers")
-  ratingsReceived   Rating[]        @relation("ratingsRecievedFromOtherUsers")
+  reviewsPosted     Review[]        @relation("reviewsGivenToOtherUsers")
+  reviewsReceived   Review[]        @relation("reviewsRecievedFromOtherUsers")
   joinedAt          DateTime        @default(now())
 }
 
@@ -63,13 +63,13 @@ model SocialAccount {
   @@index([userId, platform, profileUrl])
 }
 
-model Rating {
+model Review {
   id              Int      @id @default(autoincrement())
   // Person who is being rated
-  postedTo        User     @relation(fields: [postedToId], references: [id], onDelete: Cascade, onUpdate: Cascade, name: "ratingsRecievedFromOtherUsers")
+  postedTo        User     @relation(fields: [postedToId], references: [id], onDelete: Cascade, onUpdate: Cascade, name: "reviewsRecievedFromOtherUsers")
   postedToId      String
   // Person who is rating
-  postedBy        User?    @relation(fields: [postedById], references: [id], onDelete: SetNull, onUpdate: Cascade, name: "ratingsGivenToOtherUsers")
+  postedBy        User?    @relation(fields: [postedById], references: [id], onDelete: SetNull, onUpdate: Cascade, name: "reviewsGivenToOtherUsers")
   postedById      String?
   professionalism Int      @default(0)
   reliability     Int      @default(0)
