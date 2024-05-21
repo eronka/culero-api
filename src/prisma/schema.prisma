@@ -25,20 +25,21 @@ enum SocialAccountType {
 }
 
 model User {
-  id                String          @id @default(cuid())
-  email             String          @unique
+  id                String           @id @default(cuid())
+  email             String           @unique
   name              String?
   profilePictureUrl String?
   socialAccounts    SocialAccount[]
   authType          AuthType
-  isEmailVerified   Boolean         @default(false)
+  isEmailVerified   Boolean          @default(false)
   headline          String?
   jobTitle          String?
-  followers         Connection[]    @relation("followsTheUser")
-  followings        Connection[]    @relation("followedByUser")
-  reviewsPosted     Review[]        @relation("reviewsGivenToOtherUsers")
-  reviewsReceived   Review[]        @relation("reviewsRecievedFromOtherUsers")
-  joinedAt          DateTime        @default(now())
+  followers         Connection[]     @relation("followsTheUser")
+  followings        Connection[]     @relation("followedByUser")
+  reviewsPosted     Review[]         @relation("reviewsGivenToOtherUsers")
+  reviewsReceived   Review[]         @relation("reviewsRecievedFromOtherUsers")
+  joinedAt          DateTime         @default(now())
+  favoriteReviews   FavoriteReview[] @relation("userFavoriteReviews")
 }
 
 model Connection {
@@ -63,20 +64,38 @@ model SocialAccount {
   @@index([userId, platform, profileUrl])
 }
 
+enum ReviewState {
+  PENDING
+  BLOCKED
+  APPROVED
+}
+
 model Review {
-  id              Int      @id @default(autoincrement())
+  id              String           @id @default(cuid())
   // Person who is being rated
-  postedTo        User     @relation(fields: [postedToId], references: [id], onDelete: Cascade, onUpdate: Cascade, name: "reviewsRecievedFromOtherUsers")
+  postedTo        User             @relation(fields: [postedToId], references: [id], onDelete: Cascade, onUpdate: Cascade, name: "reviewsRecievedFromOtherUsers")
   postedToId      String
   // Person who is rating
-  postedBy        User?    @relation(fields: [postedById], references: [id], onDelete: SetNull, onUpdate: Cascade, name: "reviewsGivenToOtherUsers")
+  postedBy        User?            @relation(fields: [postedById], references: [id], onDelete: SetNull, onUpdate: Cascade, name: "reviewsGivenToOtherUsers")
   postedById      String?
-  professionalism Int      @default(0)
-  reliability     Int      @default(0)
-  communication   Int      @default(0)
+  professionalism Int              @default(0)
+  reliability     Int              @default(0)
+  communication   Int              @default(0)
   comment         String?
-  createdAt       DateTime @default(now())
-  anonymous       Boolean  @default(false)
+  createdAt       DateTime         @default(now())
+  anonymous       Boolean          @default(true)
+  state           ReviewState      @default(PENDING)
+  favoriteBy      FavoriteReview[] @relation("favoriteReview")
+}
+
+model FavoriteReview {
+  id       String @id @default(cuid())
+  userId   String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade, name: "userFavoriteReviews")
+  reviewId String
+  review   Review @relation(fields: [reviewId], references: [id], onDelete: Cascade, onUpdate: Cascade, name: "favoriteReview")
+
+  @@unique([userId, reviewId])
 }
 
 model VerificationCode {
