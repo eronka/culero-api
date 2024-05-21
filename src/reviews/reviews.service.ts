@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Inject,
   Injectable,
   NotFoundException,
@@ -11,6 +12,7 @@ import { REDIS_CLIENT } from 'src/provider/redis.provider';
 import Redis from 'ioredis';
 import { CreateReviewDto } from './DTO/create-review.dto';
 import { RatingDto } from './DTO/rating.dto';
+import { UpdateReviewDto } from './DTO/update-review.dto';
 
 @Injectable()
 export class ReviewsService {
@@ -40,7 +42,8 @@ export class ReviewsService {
       comment: review.comment,
       createdAt: review.createdAt,
       isOwnReview: review.postedById == currentUserId,
-      postedToId: review.postedToId,
+      // hide "postedBy" for anonymous reviews
+      postedToId: review.anonymous ? undefined : review.postedToId,
       id: review.id,
       isFavorite: !!review.favorites.find((f) => f.userId === currentUserId),
       state: review.state,
@@ -85,7 +88,9 @@ export class ReviewsService {
       },
     });
 
-    return ratings.map((review) => this.transformReview(review, user.id));
+    return ratings
+      .map((review) => this.transformReview(review, user.id))
+      .filter((r) => r.state === 'APPROVED' || r.isOwnReview);
   }
 
   async createReview(
@@ -113,7 +118,7 @@ export class ReviewsService {
     const review = await this.prisma.review.create({
       data: {
         postedToId: postedToId,
-        postedById: ratingDto.anonymous ? null : user.id,
+        postedById: user.id,
         professionalism: ratingDto.professionalism,
         reliability: ratingDto.reliability,
         communication: ratingDto.communication,
@@ -163,7 +168,7 @@ export class ReviewsService {
   }
 
   async likeReview(user: User, reviewId: Review['id']): Promise<ReviewDto> {
-    this.prisma.favoriteReview.upsert({
+    await this.prisma.favoriteReview.upsert({
       where: {
         userId_reviewId: {
           userId: user.id,
@@ -192,6 +197,53 @@ export class ReviewsService {
     });
 
     const review = await this.getReview(user.id, reviewId);
+
+    return this.transformReview(review, user.id);
+  }
+
+  // check if the review with reviewId is posted by the user with userID
+  async canUserModifyReview(userId: User['id'], reviewId: Review['id']) {
+    const review = await this.getReview(userId, reviewId);
+
+    if (!review) {
+      throw new NotFoundException('Review not found');
+    }
+
+    if (review.postedById !== userId) {
+      throw new ForbiddenException(
+        `User ${userId} has no access to review ${reviewId}`,
+      );
+    }
+
+    return true;
+  }
+
+  async deleteReview(reviewId: Review['id']) {
+    return this.prisma.review.delete({
+      where: {
+        id: reviewId,
+      },
+    });
+  }
+
+  async updateReviewDto(
+    user: User,
+    reviewId: string,
+    data: UpdateReviewDto,
+  ): Promise<ReviewDto> {
+    const review = await this.prisma.review.update({
+      where: {
+        id: reviewId,
+      },
+      data: {
+        professionalism: data.professionalism,
+        communication: data.communication,
+        reliability: data.reliability,
+        comment: data.comment,
+        anonymous: data.isAnonymous,
+      },
+      include: this.includeWithReview(user.id),
+    });
 
     return this.transformReview(review, user.id);
   }

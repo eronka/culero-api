@@ -3,27 +3,35 @@ import {
   Controller,
   Delete,
   Get,
-  Logger,
   Param,
   Post,
+  Put,
 } from '@nestjs/common';
 import { ReviewsService } from './reviews.service';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiForbiddenResponse,
+  ApiNotFoundResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { ReviewDto } from './DTO/reviews.dto';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
 import { User } from '@prisma/client';
 import { CreateReviewBodyDTO } from './DTO/create-review.dto';
 import { RatingDto } from './DTO/rating.dto';
+import { UpdateReviewDto } from './DTO/update-review.dto';
 
 @Controller('reviews')
 @ApiBearerAuth()
 @ApiTags('Reviews controller')
 export class ReviewsController {
-  private logger: Logger;
   constructor(private readonly reviewsService: ReviewsService) {}
 
+  /**
+   *  Get reviews for user with ID userID
+   */
   @Get('/:userId')
-  @ApiOperation({ summary: `Get reviews for user with ID userID` })
   async getReviews(
     @CurrentUser() user: User,
     @Param('userId') postedToId: string,
@@ -31,8 +39,11 @@ export class ReviewsController {
     return this.reviewsService.getUserReviews(user, postedToId);
   }
 
+  /**
+   *
+   * Create a review
+   */
   @Post()
-  @ApiOperation({ summary: 'Create a review.' })
   async createReview(
     @CurrentUser() user: User,
     @Body() { postedToId, review }: CreateReviewBodyDTO,
@@ -57,6 +68,7 @@ export class ReviewsController {
     @CurrentUser() user: User,
     @Param('reviewId') reviewId: string,
   ): Promise<ReviewDto> {
+    console.log('here:)');
     return this.reviewsService.likeReview(user, reviewId);
   }
 
@@ -69,5 +81,39 @@ export class ReviewsController {
     @Param('reviewId') reviewId: string,
   ): Promise<ReviewDto> {
     return this.reviewsService.unlikeReview(user, reviewId);
+  }
+
+  /**
+   *
+   * Delete a review. Only the user that posted the review can do this.
+   * @param reviewId
+   */
+  @Delete('/:reviewId')
+  @ApiNotFoundResponse()
+  @ApiForbiddenResponse()
+  async deleteReview(
+    @CurrentUser() user: User,
+    @Param('reviewId') reviewId: string,
+  ) {
+    await this.reviewsService.canUserModifyReview(user.id, reviewId);
+    await this.reviewsService.deleteReview(reviewId);
+    return { ok: true };
+  }
+
+  /**
+   * Update a review. Only the user that posted the review can do this.
+   */
+
+  @Put('/:reviewId')
+  @ApiNotFoundResponse()
+  @ApiForbiddenResponse()
+  async updateReview(
+    @CurrentUser() user: User,
+    @Param('reviewId') reviewId: string,
+    @Body() data: UpdateReviewDto,
+  ) {
+    await this.reviewsService.canUserModifyReview(user.id, reviewId);
+
+    return this.updateReview(user, reviewId, data);
   }
 }
