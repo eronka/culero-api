@@ -68,7 +68,6 @@ export class ReviewsController {
     @CurrentUser() user: User,
     @Param('reviewId') reviewId: string,
   ): Promise<ReviewDto> {
-    console.log('here:)');
     return this.reviewsService.likeReview(user, reviewId);
   }
 

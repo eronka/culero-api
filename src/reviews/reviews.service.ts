@@ -35,7 +35,7 @@ export class ReviewsService {
             name: review.postedBy.name,
           }
         : undefined,
-      isAnonymous: !review.postedBy,
+      isAnonymous: review.anonymous,
       professionalism: review.professionalism,
       reliability: review.reliability,
       communication: review.communication,
