@@ -4,7 +4,6 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
-  NotFoundException,
 } from '@nestjs/common';
 import { AuthType, SocialAccountType, User } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -108,7 +107,7 @@ export class UserService {
       // TODO: Merge account here
       await this.prisma.$transaction([
         // Update all the ratings to the existing account with the current user
-        this.prisma.rating.updateMany({
+        this.prisma.review.updateMany({
           where: { postedToId: socialAccountUser.id },
           data: { postedToId: currentUser.id },
         }),

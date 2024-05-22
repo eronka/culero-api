@@ -117,7 +117,7 @@ describe('User Controller Tests', () => {
     expect(updatedUser.name).toBe('John Doe');
   });
 
-  describe('Rating tests', () => {
+  describe('review tests', () => {
     beforeEach(async () => {
       await prisma.user.create({
         data: {
@@ -129,7 +129,7 @@ describe('User Controller Tests', () => {
         },
       });
 
-      await prisma.rating.createMany({
+      await prisma.review.createMany({
         data: [
           {
             postedToId: '2',
@@ -149,7 +149,7 @@ describe('User Controller Tests', () => {
         ],
       });
 
-      await prisma.rating.create({
+      await prisma.review.create({
         data: {
           postedToId: '1',
           postedById: '2',
@@ -299,7 +299,7 @@ describe('User Controller Tests', () => {
       expect(response.json().reliability).toBe(5);
       expect(response.json().communication).toBe(5);
 
-      const rating = await prisma.rating.findUnique({
+      const rating = await prisma.review.findUnique({
         where: {
           id: response.json().id,
         },
@@ -335,7 +335,7 @@ describe('User Controller Tests', () => {
       expect(response.json().communication).toBe(5);
       expect(response.json().anonymous).toBe(true);
 
-      const rating = await prisma.rating.findUnique({
+      const rating = await prisma.review.findUnique({
         where: {
           id: response.json().id,
         },
@@ -434,7 +434,7 @@ describe('User Controller Tests', () => {
   afterAll(async () => {
     try {
       await prisma.user.deleteMany();
-      await prisma.rating.deleteMany();
+      await prisma.review.deleteMany();
       await app.close();
     } catch (error) {
       console.log('error', error);
