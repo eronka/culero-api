@@ -76,52 +76,6 @@ export class UserService {
     }
   }
 
-  //user props returned to backend
-  private selectUserWithExtraProps(currentUserId: User['id']) {
-    return {
-      id: true,
-      email: true,
-      name: true,
-      joinedAt: true,
-      isEmailVerified: true,
-      headline: true,
-      profilePictureUrl: true,
-      followings: {
-        where: {
-          followerId: currentUserId,
-        },
-      },
-      _count: {
-        select: {
-          followings: true,
-          ratingsReceived: true,
-        },
-      },
-    };
-  }
-
-  async searchUsers(userId: User['id'], searchTerm?: string) {
-    if (!searchTerm) {
-      throw new BadRequestException('Search term is required');
-    }
-    const users = await this.prisma.user.findMany({
-      where: {
-        OR: [
-          { email: { contains: searchTerm } },
-          { name: { contains: searchTerm } },
-        ],
-      },
-      select: this.selectUserWithExtraProps(userId),
-    });
-
-    return users.map(({ _count, followings, ...user }) => ({
-      connectionsCount: _count.followings,
-      ratingsCount: _count.ratingsReceived,
-      isConnection: followings.length != 0,
-      ...user,
-    }));
-  }
-
   /**
    * This function aims to either create a social account link for the user. If a social
    * account with the same profile URL already exists, it will be linked to the user, and
@@ -226,22 +180,6 @@ export class UserService {
 
   private async findUserById(id: string) {
     return await this.prisma.user.findUnique({ where: { id } });
-  }
-
-  public async getUser(currentUserId: User['id'], id: User['id']) {
-    const userWithCounts = await this.prisma.user.findUnique({
-      where: { id },
-      select: this.selectUserWithExtraProps(currentUserId),
-    });
-
-    const { _count, followings, ...user } = userWithCounts;
-
-    return {
-      connectionsCount: _count.followings,
-      ratingsCount: _count.ratingsReceived,
-      isConnection: followings.length != 0,
-      ...user,
-    };
   }
 
   private async findUserByEmail(email: string) {

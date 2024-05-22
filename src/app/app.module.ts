@@ -10,6 +10,7 @@ import { PrismaModule } from '../prisma/prisma.module';
 import { MailModule } from '../mail/mail.module';
 import { ProviderModule } from '../provider/provider.module';
 import { ReviewsModule } from 'src/reviews/reviews.module';
+import { ConnectionsModule } from 'src/connections/connections.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { ReviewsModule } from 'src/reviews/reviews.module';
     MailModule,
     ProviderModule,
     ReviewsModule,
+    ConnectionsModule,
   ],
   controllers: [AppController],
   providers: [

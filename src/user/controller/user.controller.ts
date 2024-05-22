@@ -4,7 +4,6 @@ import {
   Controller,
   Get,
   Param,
-  Post,
   Put,
   Req,
   Res,
@@ -13,23 +12,16 @@ import {
 import { CurrentUser } from '../../decorators/current-user.decorator';
 import { UserService } from '../service/user.service';
 import { SocialAccountType, User } from '@prisma/client';
-import { RatingDto } from '../dto/rating.dto';
-import { User } from '@prisma/client';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import {
-  ApiBadRequestResponse,
   ApiBearerAuth,
   ApiBody,
-  ApiConsumes,
-  ApiConflictResponse,
-  ApiCreatedResponse,
   ApiInternalServerErrorResponse,
   ApiOkResponse,
   ApiOperation,
-  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
-import { userExtraProps, userProperties } from '../../schemas/user.properties';
+import { userProperties } from '../../schemas/user.properties';
 
 import { Public } from '../../decorators/public.decorator';
 import { Request, Response } from 'express';
@@ -59,25 +51,6 @@ export class UserController {
   })
   async getCurrentUser(@CurrentUser() user: User) {
     return this.userService.getSelf(user);
-  }
-
-  @Get('/:userId')
-  @ApiOperation({
-    summary: 'Get another user',
-    description: 'Get the currently logged in user',
-  })
-  @ApiOkResponse({
-    description: 'User found',
-    schema: {
-      type: 'object',
-      properties: { ...userExtraProps, ...userProperties },
-    },
-  })
-  async getUser(
-    @CurrentUser() user: User,
-    @Param('userId') userId: User['id'],
-  ) {
-    return this.userService.getUser(user.id, userId);
   }
 
   @Put()
@@ -147,26 +120,6 @@ export class UserController {
     }
 
     res.status(302).redirect('/api/user/link-social/linkedin/callback');
-  }
-
-  @Get('search')
-  @ApiOperation({
-    summary: 'Search users',
-    description: 'Search for users',
-  })
-  @ApiOkResponse({
-    description: 'Users found',
-    schema: {
-      type: 'array',
-      items: {
-        type: 'object',
-        properties: { ...userExtraProps, ...userProperties },
-      },
-    },
-  })
-  @Public()
-  async searchUsers(@Param('query') query: string) {
-    return this.userService.searchUsers(query);
   }
 
   @Public()
