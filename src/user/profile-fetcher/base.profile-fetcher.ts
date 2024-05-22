@@ -10,6 +10,6 @@ export interface ProfileDetails {
   profileUrl: string;
   socialAccountType: SocialAccountType;
   name?: string;
-  jobTitle?: string;
+  headline?: string;
   profilePictureUrl?: string;
 }

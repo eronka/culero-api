@@ -69,6 +69,21 @@ export class ConnectionsController {
   }
 
   /**
+   * Search for users by external profile URL
+   * @param profileUrlBase64
+   */
+
+  @Public()
+  @Get('search-by-external-profile/:profileUrl')
+  async searchUsersByExternalProfile(
+    @Param('profileUrl') profileUrlBase64: string,
+  ) {
+    return this.connectionsService.searchUserByExternalProfile(
+      profileUrlBase64,
+    );
+  }
+
+  /**
    * Get a connection.
    */
   @Get('/:userId')

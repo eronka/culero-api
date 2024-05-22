@@ -3,10 +3,12 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { User } from '@prisma/client';
+import { AuthType, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ConnectionDto } from './DTO/Connection.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { ProfileFetcherDelegator } from 'src/user/profile-fetcher/delegator.profile-fetcher';
+import { v4 } from 'uuid';
 
 @Injectable()
 @ApiTags('Connections controller')
@@ -46,7 +48,7 @@ export class ConnectionsService {
       profilePictureUrl: user.profilePictureUrl,
       isEmailVerified: user.isEmailVerified,
       joinedAt: user.joinedAt,
-
+      authType: user.authType,
       reviewsCount: user._count.reviewsReceived,
       connectionsCount: user._count.followings,
       isConnection: user.followers && user.followers.length !== 0,
@@ -128,5 +130,48 @@ export class ConnectionsService {
     });
 
     return users.map((u) => this.transformUserConnection(u));
+  }
+
+  async searchUserByExternalProfile(profileUrlBase64: string) {
+    // Check if the profile by url exists
+    // If the account exists, we just return the user associated with it.
+    const profileUrl = Buffer.from(profileUrlBase64, 'base64').toString();
+
+    const socialAccount = await this.prisma.socialAccount.findFirst({
+      where: { profileUrl },
+      include: {
+        user: true,
+      },
+    });
+    if (socialAccount) return socialAccount.user;
+
+    // Fetch the profile details
+    const profileData = await new ProfileFetcherDelegator(
+      profileUrl,
+    ).getProfileDetails();
+
+    // Else, we create a new user, associate the social account with it, and return the user.
+
+    const newUserId = v4();
+    const [newUser] = await this.prisma.$transaction([
+      this.prisma.user.create({
+        data: {
+          id: newUserId,
+          name: profileData.name,
+          authType: AuthType.EXTERNAL,
+          headline: profileData.headline,
+          profilePictureUrl: profileData.profilePictureUrl,
+        },
+        include: this.includeWithUserConnection(),
+      }),
+      this.prisma.socialAccount.create({
+        data: {
+          platform: profileData.socialAccountType,
+          profileUrl,
+          userId: newUserId,
+        },
+      }),
+    ]);
+    return this.transformUserConnection(newUser);
   }
 }

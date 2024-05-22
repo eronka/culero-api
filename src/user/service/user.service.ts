@@ -5,15 +5,14 @@ import {
   InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
-import { AuthType, SocialAccountType, User } from '@prisma/client';
+import { SocialAccountType, User } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { S3_CLIENT } from '../../provider/s3.provider';
 import { REDIS_CLIENT } from '../../provider/redis.provider';
 import { Redis } from 'ioredis';
-import { ProfileFetcherDelegator } from '../profile-fetcher/delegator.profile-fetcher';
-import { v4 } from 'uuid';
+
 import { getMimeType } from 'utils/image';
 
 @Injectable()
@@ -133,59 +132,5 @@ export class UserService {
         },
       });
     }
-  }
-
-  async searchUserByExternalProfile(profileUrlBase64: string) {
-    // Check if the profile by url exists
-    // If the account exists, we just return the user associated with it.
-    const profileUrl = Buffer.from(profileUrlBase64, 'base64').toString();
-
-    const socialAccount = await this.prisma.socialAccount.findFirst({
-      where: { profileUrl },
-      include: {
-        user: true,
-      },
-    });
-    if (socialAccount) return socialAccount.user;
-
-    // Fetch the profile details
-    const profileData = await new ProfileFetcherDelegator(
-      profileUrl,
-    ).getProfileDetails();
-
-    // Else, we create a new user, associate the social account with it, and return the user.
-
-    const newUserId = v4();
-    const [newUser] = await this.prisma.$transaction([
-      this.prisma.user.create({
-        data: {
-          id: newUserId,
-          name: profileData.name,
-          authType: AuthType.EXTERNAL,
-          jobTitle: profileData.jobTitle,
-          profilePictureUrl: profileData.profilePictureUrl,
-        },
-      }),
-      this.prisma.socialAccount.create({
-        data: {
-          platform: profileData.socialAccountType,
-          profileUrl,
-          userId: newUserId,
-        },
-      }),
-    ]);
-    return newUser;
-  }
-
-  private async findUserById(id: string) {
-    return await this.prisma.user.findUnique({ where: { id } });
-  }
-
-  private async findUserByEmail(email: string) {
-    return await this.prisma.user.findUnique({
-      where: {
-        email,
-      },
-    });
   }
 }

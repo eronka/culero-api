@@ -3,7 +3,6 @@ import {
   Body,
   Controller,
   Get,
-  Param,
   Put,
   Req,
   Res,
@@ -120,27 +119,5 @@ export class UserController {
     }
 
     res.status(302).redirect('/api/user/link-social/linkedin/callback');
-  }
-
-  @Public()
-  @Get('search-by-external-profile/:profileUrl')
-  @ApiOperation({
-    summary: 'Search users by external profile',
-    description: 'Search for users by external profile URL',
-  })
-  @ApiOkResponse({
-    description: 'Users found',
-    schema: {
-      type: 'array',
-      items: {
-        type: 'object',
-        properties: userProperties,
-      },
-    },
-  })
-  async searchUsersByExternalProfile(
-    @Param('profileUrl') profileUrlBase64: string,
-  ) {
-    return this.userService.searchUserByExternalProfile(profileUrlBase64);
   }
 }

@@ -1,5 +1,6 @@
+import { AuthType } from '@prisma/client';
 import { Type } from 'class-transformer';
-import { IsDate } from 'class-validator';
+import { IsDate, IsEnum } from 'class-validator';
 
 export class ConnectionDto {
   name?: string;
@@ -7,7 +8,7 @@ export class ConnectionDto {
   profilePictureUrl?: string;
   isEmailVerified: boolean;
   id: string;
-  email: string;
+  email?: string;
   @Type(() => Date)
   @IsDate()
   joinedAt: Date;
@@ -15,4 +16,7 @@ export class ConnectionDto {
   reviewsCount: number;
   connectionsCount: number;
   isConnection: boolean;
+
+  @IsEnum(AuthType)
+  authType: AuthType;
 }

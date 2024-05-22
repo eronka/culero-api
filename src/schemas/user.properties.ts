@@ -9,7 +9,6 @@ export const userProperties = {
   },
   isEmailVerified: { type: 'boolean' },
   headline: { type: 'string' },
-  jobTitle: { type: 'string' },
   joinedAt: { type: 'string', format: 'date-time' },
 };
 

@@ -33,7 +33,6 @@ model User {
   authType          AuthType
   isEmailVerified   Boolean          @default(false)
   headline          String?
-  jobTitle          String?
   followers         Connection[]     @relation("followsTheUser")
   followings        Connection[]     @relation("followedByUser")
   reviewsPosted     Review[]         @relation("reviewsGivenToOtherUsers")
