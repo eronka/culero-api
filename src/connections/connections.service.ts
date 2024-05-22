@@ -44,7 +44,7 @@ export class ConnectionsService {
       name: user.name,
       headline: user.headline,
       profilePictureUrl: user.profilePictureUrl,
-
+      isEmailVerified: user.isEmailVerified,
       joinedAt: user.joinedAt,
 
       reviewsCount: user._count.reviewsReceived,
