@@ -140,10 +140,10 @@ export class ConnectionsService {
     const socialAccount = await this.prisma.socialAccount.findFirst({
       where: { profileUrl },
       include: {
-        user: true,
+        user: { include: this.includeWithUserConnection() },
       },
     });
-    if (socialAccount) return socialAccount.user;
+    if (socialAccount) return this.transformUserConnection(socialAccount.user);
 
     // Fetch the profile details
     const profileData = await new ProfileFetcherDelegator(
