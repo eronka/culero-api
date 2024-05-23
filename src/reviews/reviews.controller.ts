@@ -29,6 +29,18 @@ export class ReviewsController {
   constructor(private readonly reviewsService: ReviewsService) {}
 
   /**
+   * Get the review of the current user for the specified user
+   */
+  @Get('/my-review/:userId')
+  @ApiNotFoundResponse()
+  async getMyReviewForUser(
+    @CurrentUser() user: User,
+    @Param('userId') userId: string,
+  ): Promise<ReviewDto | undefined> {
+    return this.reviewsService.getReviewByUserForUser(user.id, userId);
+  }
+
+  /**
    *  Get reviews for user with ID userID
    */
   @Get('/:userId')
@@ -113,6 +125,6 @@ export class ReviewsController {
   ) {
     await this.reviewsService.canUserModifyReview(user.id, reviewId);
 
-    return this.updateReview(user, reviewId, data);
+    return this.reviewsService.updateReview(user, reviewId, data);
   }
 }

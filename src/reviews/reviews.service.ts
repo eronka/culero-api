@@ -5,7 +5,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { User, Review, FavoriteReview } from '@prisma/client';
+import { User, Review, FavoriteReview, ReviewState } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ReviewDto } from './DTO/reviews.dto';
 import { REDIS_CLIENT } from 'src/provider/redis.provider';
@@ -43,7 +43,7 @@ export class ReviewsService {
       createdAt: review.createdAt,
       isOwnReview: review.postedById == currentUserId,
       // hide "postedBy" for anonymous reviews
-      postedToId: review.anonymous ? undefined : review.postedToId,
+      postedToId: review.postedToId,
       id: review.id,
       isFavorite: !!review.favorites.find((f) => f.userId === currentUserId),
       state: review.state,
@@ -124,6 +124,7 @@ export class ReviewsService {
         communication: ratingDto.communication,
         comment: ratingDto.comment,
         anonymous: ratingDto.anonymous,
+        state: ReviewState.APPROVED,
       },
       include: this.includeWithReview(user.id),
     });
@@ -219,14 +220,29 @@ export class ReviewsService {
   }
 
   async deleteReview(reviewId: Review['id']) {
-    return this.prisma.review.delete({
+    const review = await this.prisma.review.findUnique({
+      where: { id: reviewId },
+    });
+
+    if (!review) {
+      throw new NotFoundException('Review not found');
+    }
+    await this.prisma.review.delete({
       where: {
         id: reviewId,
       },
     });
+
+    const avgRatings = await this.calculateAvgRating(review.postedToId);
+    await this.cache.set(
+      `avg-ratings-${review.postedToId}`,
+      JSON.stringify(avgRatings),
+    );
+
+    return true;
   }
 
-  async updateReviewDto(
+  async updateReview(
     user: User,
     reviewId: string,
     data: UpdateReviewDto,
@@ -240,11 +256,37 @@ export class ReviewsService {
         communication: data.communication,
         reliability: data.reliability,
         comment: data.comment,
-        anonymous: data.isAnonymous,
+        anonymous: data.anonymous,
       },
       include: this.includeWithReview(user.id),
     });
 
+    // Update the cache
+    const avgRatings = await this.calculateAvgRating(review.postedToId);
+    await this.cache.set(
+      `avg-ratings-${review.postedToId}`,
+      JSON.stringify(avgRatings),
+    );
+
     return this.transformReview(review, user.id);
+  }
+
+  async getReviewByUserForUser(
+    currentUserId: string,
+    userId: string,
+  ): Promise<ReviewDto | undefined> {
+    const review = await this.prisma.review.findFirst({
+      where: {
+        postedById: currentUserId,
+        postedToId: userId,
+      },
+      include: this.includeWithReview(currentUserId),
+    });
+
+    if (!review) {
+      return undefined;
+    }
+
+    return this.transformReview(review, currentUserId);
   }
 }
