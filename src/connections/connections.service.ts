@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { AuthType, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { ConnectionDto } from './dto_2/Connection.dto';
+import { ConnectionDto } from './dto/Connection.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { ProfileFetcherDelegator } from 'src/user/profile-fetcher/delegator.profile-fetcher';
 import { v4 } from 'uuid';

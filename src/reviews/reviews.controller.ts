@@ -15,12 +15,12 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { ReviewDto } from './dto_2/reviews.dto';
+import { ReviewDto } from './dto/reviews.dto';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
 import { User } from '@prisma/client';
-import { CreateReviewBodyDTO } from './dto_2/create-review.dto';
-import { RatingDto } from './dto_2/rating.dto';
-import { UpdateReviewDto } from './dto_2/update-review.dto';
+import { CreateReviewBodyDTO } from './dto/create-review.dto';
+import { RatingDto } from './dto/rating.dto';
+import { UpdateReviewDto } from './dto/update-review.dto';
 
 @Controller('reviews')
 @ApiBearerAuth()

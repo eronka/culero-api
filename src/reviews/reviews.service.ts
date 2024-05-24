@@ -7,12 +7,12 @@ import {
 } from '@nestjs/common';
 import { User, Review, FavoriteReview, ReviewState } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { ReviewDto } from './dto_2/reviews.dto';
+import { ReviewDto } from './dto/reviews.dto';
 import { REDIS_CLIENT } from 'src/provider/redis.provider';
 import Redis from 'ioredis';
-import { CreateReviewDto } from './dto_2/create-review.dto';
-import { RatingDto } from './dto_2/rating.dto';
-import { UpdateReviewDto } from './dto_2/update-review.dto';
+import { CreateReviewDto } from './dto/create-review.dto';
+import { RatingDto } from './dto/rating.dto';
+import { UpdateReviewDto } from './dto/update-review.dto';
 
 @Injectable()
 export class ReviewsService {
