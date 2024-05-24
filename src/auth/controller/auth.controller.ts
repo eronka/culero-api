@@ -32,6 +32,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { userProperties } from '../../schemas/user.properties';
+import { LowercasePipe } from '../../common/pipes/lowercase.pipe';
 
 @Controller('auth')
 @ApiTags('Auth Controller')
@@ -195,7 +196,9 @@ export class AuthController {
     description: 'User not found',
   })
   @HttpCode(HttpStatus.NO_CONTENT)
-  async resendEmailVerificationCode(@Param('email') email: string) {
+  async resendEmailVerificationCode(
+    @Param('email', LowercasePipe) email: string,
+  ) {
     return await this.authService.resendEmailVerificationCode(email);
   }
 
