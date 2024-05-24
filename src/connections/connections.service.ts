@@ -86,7 +86,7 @@ export class ConnectionsService {
   }
 
   async addConnection(currentUserId: User['id'], userId: User['id']) {
-    await this.prisma.connection.upsert({
+    const connection = await this.prisma.connection.upsert({
       where: {
         followerId_followingId: {
           followerId: currentUserId,
@@ -98,9 +98,14 @@ export class ConnectionsService {
         followerId: currentUserId,
         followingId: userId,
       },
+      include: {
+        following: {
+          include: this.includeWithUserConnection(currentUserId),
+        },
+      },
     });
 
-    return this.getConnection(userId, currentUserId);
+    return this.convertConnectionToDto(connection.following);
   }
 
   async removeConnection(currentUserId: User['id'], userId: User['id']) {
