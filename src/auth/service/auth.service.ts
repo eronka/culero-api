@@ -131,6 +131,7 @@ export class AuthService {
   }
 
   async resendEmailVerificationCode(email: string) {
+    email = email.toLowerCase();
     const user = await this.findUserByEmail(email);
     if (!user) {
       throw new NotFoundException('User not found');
@@ -143,6 +144,8 @@ export class AuthService {
   }
 
   async verifyEmail(email: string, code: string) {
+    email = email.toLowerCase();
+
     const verificationCode = await this.prisma.verificationCode.findUnique({
       where: {
         email,
@@ -201,6 +204,7 @@ export class AuthService {
     profilePictureUrl?: string,
     throwErrorIfUserExists?: boolean,
   ) {
+    email = email.toLowerCase();
     let user = await this.findUserByEmail(email);
     if (user && throwErrorIfUserExists) {
       throw new ConflictException('User already exists');
@@ -209,7 +213,7 @@ export class AuthService {
     if (!user) {
       user = await this.prisma.user.create({
         data: {
-          email: email,
+          email,
           name: name,
           profilePictureUrl: profilePictureUrl,
           authType,
@@ -241,6 +245,7 @@ export class AuthService {
   }
 
   private async findUserByEmail(email: string) {
+    email = email.toLowerCase();
     return await this.prisma.user.findUnique({
       where: {
         email,
@@ -257,6 +262,8 @@ export class AuthService {
   }
 
   private async sendEmailVerificationCode(email: string) {
+    email = email.toLowerCase();
+
     // Generate the code
     let code: string;
 
