@@ -84,7 +84,7 @@ export class UserService {
    */
   async linkSocialAccount(req: any, socialAccountType: SocialAccountType) {
     const { emails, profileUrl } = req.user;
-    const email = emails[0].value;
+    const email = emails[0].value.toLowerCase();
 
     // Check if the user exists
     const currentUser = await this.prisma.user.findUniqueOrThrow({
