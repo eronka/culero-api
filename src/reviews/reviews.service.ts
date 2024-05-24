@@ -7,12 +7,12 @@ import {
 } from '@nestjs/common';
 import { User, Review, FavoriteReview, ReviewState } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { ReviewDto } from './DTO/reviews.dto';
+import { ReviewDto } from './dto/reviews.dto';
 import { REDIS_CLIENT } from 'src/provider/redis.provider';
 import Redis from 'ioredis';
-import { CreateReviewDto } from './DTO/create-review.dto';
-import { RatingDto } from './DTO/rating.dto';
-import { UpdateReviewDto } from './DTO/update-review.dto';
+import { CreateReviewDto } from './dto/create-review.dto';
+import { RatingDto } from './dto/rating.dto';
+import { UpdateReviewDto } from './dto/update-review.dto';
 
 @Injectable()
 export class ReviewsService {
@@ -288,5 +288,16 @@ export class ReviewsService {
     }
 
     return this.transformReview(review, currentUserId);
+  }
+
+  async getReviewPostedBy(currentUserId: User['id']): Promise<ReviewDto[]> {
+    const reviews = await this.prisma.review.findMany({
+      where: {
+        postedById: currentUserId,
+      },
+      include: this.includeWithReview(currentUserId),
+    });
+
+    return reviews.map((r) => this.transformReview(r, currentUserId));
   }
 }

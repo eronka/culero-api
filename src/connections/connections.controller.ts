@@ -1,7 +1,7 @@
 import { Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
 import { ConnectionsService } from './connections.service';
-import { ConnectionDto } from './DTO/Connection.dto';
+import { ConnectionDto } from './dto/Connection.dto';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,

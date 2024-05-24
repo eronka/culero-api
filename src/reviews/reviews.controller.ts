@@ -15,12 +15,12 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { ReviewDto } from './DTO/reviews.dto';
+import { ReviewDto } from './dto/reviews.dto';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
 import { User } from '@prisma/client';
-import { CreateReviewBodyDTO } from './DTO/create-review.dto';
-import { RatingDto } from './DTO/rating.dto';
-import { UpdateReviewDto } from './DTO/update-review.dto';
+import { CreateReviewBodyDTO } from './dto/create-review.dto';
+import { RatingDto } from './dto/rating.dto';
+import { UpdateReviewDto } from './dto/update-review.dto';
 
 @Controller('reviews')
 @ApiBearerAuth()
@@ -38,6 +38,15 @@ export class ReviewsController {
     @Param('userId') userId: string,
   ): Promise<ReviewDto | undefined> {
     return this.reviewsService.getReviewByUserForUser(user.id, userId);
+  }
+
+  /**
+   * Get the reviews posted by the current user
+   */
+  @Get('/posted')
+  @ApiNotFoundResponse()
+  async getReviewsPostedBy(@CurrentUser() user: User): Promise<ReviewDto[]> {
+    return this.reviewsService.getReviewPostedBy(user.id);
   }
 
   /**
