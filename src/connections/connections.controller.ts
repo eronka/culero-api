@@ -1,5 +1,5 @@
 import { Controller, Delete, Get, Param, Post } from '@nestjs/common';
-import { CurrentUser } from 'src/decorators/current-user.decorator';
+import { CurrentUser } from '../../src/decorators/current-user.decorator';
 import { ConnectionsService } from './connections.service';
 import { ConnectionDto } from './dto/Connection.dto';
 import {
@@ -8,7 +8,7 @@ import {
   ApiNotFoundResponse,
 } from '@nestjs/swagger';
 import { User } from '@prisma/client';
-import { Public } from 'src/decorators/public.decorator';
+import { Public } from '../../src/decorators/public.decorator';
 
 @ApiBearerAuth()
 @Controller('connections')

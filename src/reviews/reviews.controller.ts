@@ -16,7 +16,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { ReviewDto } from './dto/reviews.dto';
-import { CurrentUser } from 'src/decorators/current-user.decorator';
+import { CurrentUser } from '../../src/decorators/current-user.decorator';
 import { User } from '@prisma/client';
 import { CreateReviewBodyDTO } from './dto/create-review.dto';
 import { RatingDto } from './dto/rating.dto';

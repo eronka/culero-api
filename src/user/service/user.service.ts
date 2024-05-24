@@ -13,7 +13,7 @@ import { S3_CLIENT } from '../../provider/s3.provider';
 import { REDIS_CLIENT } from '../../provider/redis.provider';
 import { Redis } from 'ioredis';
 
-import { getMimeType } from 'utils/image';
+import { getMimeType } from '../../utils/image';
 
 @Injectable()
 export class UserService {

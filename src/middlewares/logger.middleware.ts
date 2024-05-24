@@ -9,6 +9,11 @@ export class AppLoggerMiddleware implements NestMiddleware {
   use(request: Request, response: Response, next: NextFunction): void {
     const startAt = process.hrtime();
     const { ip, method, originalUrl } = request;
+
+    if (!request || !request.get) {
+      next();
+      return;
+    }
     const userAgent = request.get('user-agent') || '';
 
     const send = response.send;
