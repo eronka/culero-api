@@ -9,12 +9,14 @@ import { AuthGuard } from '../auth/guard/auth/auth.guard';
 import { PrismaModule } from '../prisma/prisma.module';
 import { MailModule } from '../mail/mail.module';
 import { ProviderModule } from '../provider/provider.module';
+import { CommonModule } from '../common/common.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    CommonModule,
     AuthModule,
     UserModule,
     OauthModule,

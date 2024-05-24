@@ -131,7 +131,6 @@ export class AuthService {
   }
 
   async resendEmailVerificationCode(email: string) {
-    email = email.toLowerCase();
     const user = await this.findUserByEmail(email);
     if (!user) {
       throw new NotFoundException('User not found');
@@ -144,8 +143,6 @@ export class AuthService {
   }
 
   async verifyEmail(email: string, code: string) {
-    email = email.toLowerCase();
-
     const verificationCode = await this.prisma.verificationCode.findUnique({
       where: {
         email,
@@ -262,8 +259,6 @@ export class AuthService {
   }
 
   private async sendEmailVerificationCode(email: string) {
-    email = email.toLowerCase();
-
     // Generate the code
     let code: string;
 
