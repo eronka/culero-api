@@ -54,7 +54,7 @@ export class ConnectionsController {
     @CurrentUser() user: User,
     @Param('userId') userId: string,
   ): Promise<ConnectionDto> {
-    return this.connectionsService.connectWithUser(user.id, userId);
+    return this.connectionsService.addConnection(user.id, userId);
   }
   /**
    *
@@ -65,7 +65,7 @@ export class ConnectionsController {
     @CurrentUser() user: User,
     @Param('userId') userId: string,
   ): Promise<ConnectionDto> {
-    return this.connectionsService.unconnectWithUser(user.id, userId);
+    return this.connectionsService.removeConnection(user.id, userId);
   }
 
   /**

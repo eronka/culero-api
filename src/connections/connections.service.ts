@@ -35,7 +35,7 @@ export class ConnectionsService {
   }
 
   // transforms an user from db to a Connection DTO
-  private transformUserConnection(
+  private convertConnectionToDto(
     user: User & { _count: { followings: number; reviewsReceived: number } } & {
       followers?: { id: number; followerId: string; followingId: string }[];
     },
@@ -67,7 +67,7 @@ export class ConnectionsService {
       throw new NotFoundException(`User with ${connectionId} not found`);
     }
 
-    return this.transformUserConnection(user);
+    return this.convertConnectionToDto(user);
   }
 
   async getUserConnections(userId: User['id']) {
@@ -82,10 +82,10 @@ export class ConnectionsService {
       },
     });
 
-    return connections.map((c) => this.transformUserConnection(c.following));
+    return connections.map((c) => this.convertConnectionToDto(c.following));
   }
 
-  async connectWithUser(currentUserId: User['id'], userId: User['id']) {
+  async addConnection(currentUserId: User['id'], userId: User['id']) {
     await this.prisma.connection.upsert({
       where: {
         followerId_followingId: {
@@ -103,7 +103,7 @@ export class ConnectionsService {
     return this.getConnection(userId, currentUserId);
   }
 
-  async unconnectWithUser(currentUserId: User['id'], userId: User['id']) {
+  async removeConnection(currentUserId: User['id'], userId: User['id']) {
     await this.prisma.connection.delete({
       where: {
         followerId_followingId: {
@@ -129,7 +129,7 @@ export class ConnectionsService {
       include: this.includeWithUserConnection(userId),
     });
 
-    return users.map((u) => this.transformUserConnection(u));
+    return users.map((u) => this.convertConnectionToDto(u));
   }
 
   async searchUserByExternalProfile(profileUrlBase64: string) {
@@ -143,7 +143,7 @@ export class ConnectionsService {
         user: { include: this.includeWithUserConnection() },
       },
     });
-    if (socialAccount) return this.transformUserConnection(socialAccount.user);
+    if (socialAccount) return this.convertConnectionToDto(socialAccount.user);
 
     // Fetch the profile details
     const profileData = await new ProfileFetcherDelegator(
@@ -172,6 +172,6 @@ export class ConnectionsService {
         },
       }),
     ]);
-    return this.transformUserConnection(newUser);
+    return this.convertConnectionToDto(newUser);
   }
 }
