@@ -214,6 +214,9 @@ export class AuthService {
           name: name,
           profilePictureUrl: profilePictureUrl,
           authType,
+          settings: {
+            create: {},
+          },
         },
         select: {
           id: true,

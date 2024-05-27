@@ -84,6 +84,16 @@ export class ConnectionsController {
   }
 
   /**
+   * Get logged in user reviewed users
+   */
+
+  @Get('/reviewed')
+  async getReviewedConnections(
+    @CurrentUser() user: User,
+  ): Promise<ConnectionDto[]> {
+    return this.connectionsService.getReviewedConnections(user.id);
+  }
+  /**
    * Get a connection.
    */
   @Get('/:userId')

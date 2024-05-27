@@ -166,7 +166,9 @@ export class ConnectionsService {
           authType: AuthType.EXTERNAL,
           headline: profileData.headline,
           profilePictureUrl: profileData.profilePictureUrl,
-          settings: {},
+          settings: {
+            create: {},
+          },
         },
         include: this.includeWithUserConnection(),
       }),
@@ -179,5 +181,20 @@ export class ConnectionsService {
       }),
     ]);
     return this.convertConnectionToDto(newUser);
+  }
+
+  async getReviewedConnections(userId: string): Promise<ConnectionDto[]> {
+    const connections = await this.prisma.user.findMany({
+      where: {
+        reviewsReceived: {
+          some: {
+            postedById: userId,
+          },
+        },
+      },
+      include: this.includeWithUserConnection(),
+    });
+
+    return connections.map((c) => this.convertConnectionToDto(c));
   }
 }
