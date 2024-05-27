@@ -197,4 +197,5 @@ export class ConnectionsService {
 
     return connections.map((c) => this.convertConnectionToDto(c));
   }
+
 }

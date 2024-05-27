@@ -56,6 +56,7 @@ export class UserService {
     const putObjectRequest = new PutObjectCommand({
       Bucket: process.env.AWS_S3_BUCKET_NAME,
       Key: key,
+
       Body: buf,
       ContentType: type,
     });
@@ -162,4 +163,5 @@ export class UserService {
       },
     });
   }
+
 }
