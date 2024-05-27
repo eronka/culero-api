@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AuthModule } from '../auth/auth.module';
 import { UserModule } from '../user/user.module';
@@ -9,6 +9,9 @@ import { AuthGuard } from '../auth/guard/auth/auth.guard';
 import { PrismaModule } from '../prisma/prisma.module';
 import { MailModule } from '../mail/mail.module';
 import { ProviderModule } from '../provider/provider.module';
+import { ReviewsModule } from '../../src/reviews/reviews.module';
+import { ConnectionsModule } from '../../src/connections/connections.module';
+import { AppLoggerMiddleware } from '../../src/middlewares/logger.middleware';
 import { CommonModule } from '../common/common.module';
 
 @Module({
@@ -23,6 +26,8 @@ import { CommonModule } from '../common/common.module';
     PrismaModule,
     MailModule,
     ProviderModule,
+    ReviewsModule,
+    ConnectionsModule,
   ],
   controllers: [AppController],
   providers: [
@@ -32,4 +37,8 @@ import { CommonModule } from '../common/common.module';
     },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer): void {
+    consumer.apply(AppLoggerMiddleware).forRoutes('*');
+  }
+}

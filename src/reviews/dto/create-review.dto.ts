@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
   IsBoolean,
   IsNumber,
@@ -6,9 +7,10 @@ import {
   IsString,
   Max,
   Min,
+  ValidateNested,
 } from 'class-validator';
 
-export class RatingDto {
+export class CreateReviewDto {
   @IsNumber({}, { message: 'Quality must be a number' })
   @Min(1, { message: 'Rating must be at least 1' })
   @Max(5, { message: 'Rating must be at most 5' })
@@ -67,4 +69,23 @@ export class RatingDto {
     example: false,
   })
   anonymous?: boolean;
+}
+
+export class CreateReviewBodyDTO {
+  @IsString()
+  @ApiProperty({
+    name: 'postedToId',
+    description: 'The Id of the reviewed user.',
+    example: 'asdjas20',
+    required: true,
+  })
+  postedToId: string;
+
+  @Type(() => CreateReviewDto)
+  @ValidateNested()
+  @ApiProperty({
+    name: 'review',
+    description: 'Review data',
+  })
+  review: CreateReviewDto;
 }

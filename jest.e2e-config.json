@@ -4,7 +4,11 @@
   "testEnvironment": "node",
   "testMatch": ["**/*.e2e.spec.ts"],
   "transform": {
-    "^.+\\.[tj]s$": ["ts-jest", { "tsconfig": "<rootDir>/tsconfig.spec.json" }]
+    "^.+\\.[tj]s$": ["ts-jest", { "tsconfig": "<rootDir>/tsconfig.spec.json" }, 
+    { "astTransformers": {
+      "before": ["./utils/e2e-plugin.ts"]
+    }
+  }]
   },
   "moduleFileExtensions": ["ts", "js", "html"],
   "coverageDirectory": "./coverage-e2e"
