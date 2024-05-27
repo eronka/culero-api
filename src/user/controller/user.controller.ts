@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   Put,
   Req,
@@ -140,5 +141,14 @@ export class UserController {
     @Body() data: UpdateUserSettingsDto,
   ): Promise<UserSettingsDto> {
     return this.userService.updateSettings(user.id, data);
+  }
+
+  /**
+   * Delete the entire user account
+   */
+  @Delete()
+  async deleteUserAccount(@CurrentUser() user: User) {
+    await this.userService.deleteUser(user.id);
+    return { ok: true };
   }
 }

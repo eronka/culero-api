@@ -12,6 +12,7 @@ import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { S3_CLIENT } from '../../provider/s3.provider';
 import { REDIS_CLIENT } from '../../provider/redis.provider';
 import { Redis } from 'ioredis';
+import { v4 } from 'uuid';
 
 import { getMimeType } from '../../utils/image';
 import { UpdateUserSettingsDto } from '../dto/update-user-settings.dto';
@@ -51,9 +52,10 @@ export class UserService {
       'base64',
     );
 
+    const key = `profile-pictures/${user.id}-${v4()}`;
     const putObjectRequest = new PutObjectCommand({
       Bucket: process.env.AWS_S3_BUCKET_NAME,
-      Key: `profile-pictures/${user.id}`,
+      Key: key,
       Body: buf,
       ContentType: type,
     });
@@ -65,7 +67,7 @@ export class UserService {
       return await this.prisma.user.update({
         where: { id: user.id },
         data: {
-          profilePictureUrl: `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/profile-pictures/${user.id}`,
+          profilePictureUrl: `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`,
         },
       });
     } catch (err) {
@@ -148,6 +150,15 @@ export class UserService {
     return this.prisma.userSettings.findUniqueOrThrow({
       where: {
         userId: id,
+      },
+    });
+  }
+
+  async deleteUser(id: string) {
+    await this.prisma.userSettings.delete({ where: { userId: id } });
+    return this.prisma.user.delete({
+      where: {
+        id,
       },
     });
   }
