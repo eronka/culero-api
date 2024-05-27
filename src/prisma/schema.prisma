@@ -39,6 +39,7 @@ model User {
   reviewsReceived   Review[]         @relation("reviewsRecievedFromOtherUsers")
   joinedAt          DateTime         @default(now())
   favoriteReviews   FavoriteReview[] @relation("userFavoriteReviews")
+  settings          UserSettings?
 }
 
 model Connection {
@@ -103,4 +104,12 @@ model VerificationCode {
   expiresAt DateTime
 
   @@unique([email])
+}
+
+model UserSettings {
+  id             String  @id @default(cuid())
+  reviewsVisible Boolean @default(true)
+  anonymous      Boolean @default(true)
+  userId         String  @unique
+  user           User    @relation(fields: [userId], references: [id])
 }

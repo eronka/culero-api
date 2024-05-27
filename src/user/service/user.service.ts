@@ -14,6 +14,7 @@ import { REDIS_CLIENT } from '../../provider/redis.provider';
 import { Redis } from 'ioredis';
 
 import { getMimeType } from '../../utils/image';
+import { UpdateUserSettingsDto } from '../dto/update-user-settings.dto';
 
 @Injectable()
 export class UserService {
@@ -132,5 +133,22 @@ export class UserService {
         },
       });
     }
+  }
+
+  updateSettings(id: string, data: UpdateUserSettingsDto) {
+    return this.prisma.userSettings.update({
+      where: {
+        userId: id,
+      },
+      data,
+    });
+  }
+
+  getSettings(id: string) {
+    return this.prisma.userSettings.findUniqueOrThrow({
+      where: {
+        userId: id,
+      },
+    });
   }
 }

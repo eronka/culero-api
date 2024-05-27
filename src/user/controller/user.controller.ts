@@ -26,6 +26,8 @@ import { Public } from '../../decorators/public.decorator';
 import { Request, Response } from 'express';
 import { LinkedInOAuthStrategyFactory } from '../../oauth/factory/linkedin/linkedin-strategy.factory';
 import { AuthGuard } from '@nestjs/passport';
+import { UpdateUserSettingsDto } from '../dto/update-user-settings.dto';
+import { UserSettingsDto } from '../dto/user-settings.dto';
 
 @Controller('user')
 @ApiBearerAuth()
@@ -119,5 +121,24 @@ export class UserController {
     }
 
     res.status(302).redirect('/api/user/link-social/linkedin/callback');
+  }
+
+  /**
+   * Get user settings
+   */
+  @Get('settings')
+  async getUserSettings(@CurrentUser() user: User): Promise<UserSettingsDto> {
+    return this.userService.getSettings(user.id);
+  }
+
+  /**
+   * Update user settings
+   */
+  @Put('settings')
+  async updateUserSettings(
+    @CurrentUser() user: User,
+    @Body() data: UpdateUserSettingsDto,
+  ): Promise<UserSettingsDto> {
+    return this.userService.updateSettings(user.id, data);
   }
 }

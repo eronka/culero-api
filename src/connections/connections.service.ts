@@ -166,6 +166,7 @@ export class ConnectionsService {
           authType: AuthType.EXTERNAL,
           headline: profileData.headline,
           profilePictureUrl: profileData.profilePictureUrl,
+          settings: {},
         },
         include: this.includeWithUserConnection(),
       }),
