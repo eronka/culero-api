@@ -151,5 +151,4 @@ export class UserController {
     await this.userService.deleteUser(user.id);
     return { ok: true };
   }
-
 }
