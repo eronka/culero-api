@@ -124,7 +124,7 @@ export class UserController {
   }
 
   /**
-   * Get user settings
+   * Get logged in user's settings
    */
   @Get('settings')
   async getUserSettings(@CurrentUser() user: User): Promise<UserSettingsDto> {
@@ -132,7 +132,7 @@ export class UserController {
   }
 
   /**
-   * Update user settings
+   * Update logged in user's settings
    */
   @Put('settings')
   async updateUserSettings(
