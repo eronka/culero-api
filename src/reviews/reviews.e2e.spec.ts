@@ -35,6 +35,7 @@ describe('Reviws Controller Tests', () => {
   });
 
   beforeEach(async () => {
+    await prisma.userSettings.deleteMany();
     await prisma.user.deleteMany();
 
     await prisma.user.create({
