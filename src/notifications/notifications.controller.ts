@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { NotificationsService } from './notifications.service';
-import { CurrentUser } from 'src/decorators/current-user.decorator';
+import { CurrentUser } from '../../src/decorators/current-user.decorator';
 import { User } from '@prisma/client';
 import { NotificationDto } from './dto/notification.dto';
 import { PushTokenDto } from './dto/add-token.dto';

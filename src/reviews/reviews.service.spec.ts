@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ReviewsService } from './reviews.service';
 import { PrismaService } from '../../src/prisma/prisma.service';
 import { REDIS_CLIENT } from '../../src/provider/redis.provider';
+import { NotificationsService } from '../../src/notifications/notifications.service';
 
 describe('ReviewsService', () => {
   let service: ReviewsService;
@@ -11,6 +12,7 @@ describe('ReviewsService', () => {
       providers: [
         ReviewsService,
         PrismaService,
+        NotificationsService,
         {
           provide: REDIS_CLIENT,
           useValue: {},

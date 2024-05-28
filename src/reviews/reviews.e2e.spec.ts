@@ -12,6 +12,7 @@ import { mockDeep } from 'jest-mock-extended';
 import { MailModule } from '../mail/mail.module';
 import { UserModule } from '../user/user.module';
 import { ReviewsModule } from './reviews.module';
+import { NotificationsModule } from '../../src/notifications/notifications.module';
 
 describe('Reviws Controller Tests', () => {
   let app: NestFastifyApplication;
@@ -19,7 +20,13 @@ describe('Reviws Controller Tests', () => {
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
-      imports: [AppModule, UserModule, MailModule, ReviewsModule],
+      imports: [
+        AppModule,
+        UserModule,
+        MailModule,
+        ReviewsModule,
+        NotificationsModule,
+      ],
     })
       .overrideProvider(MailService)
       .useValue(mockDeep<MailService>())

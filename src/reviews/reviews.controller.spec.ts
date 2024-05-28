@@ -3,6 +3,7 @@ import { ReviewsController } from './reviews.controller';
 import { ReviewsService } from './reviews.service';
 import { PrismaService } from '../../src/prisma/prisma.service';
 import { REDIS_CLIENT } from '../../src/provider/redis.provider';
+import { NotificationsService } from '../../src/notifications/notifications.service';
 
 describe('ReviewsController', () => {
   let controller: ReviewsController;
@@ -13,6 +14,7 @@ describe('ReviewsController', () => {
       providers: [
         ReviewsService,
         PrismaService,
+        NotificationsService,
         {
           provide: REDIS_CLIENT,
           useValue: {},

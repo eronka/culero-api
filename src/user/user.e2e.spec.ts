@@ -11,6 +11,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { MailService } from '../mail/mail.service';
 import { mockDeep } from 'jest-mock-extended';
 import { MailModule } from '../mail/mail.module';
+import { NotificationsModule } from '../../src/notifications/notifications.module';
 
 describe('User Controller Tests', () => {
   let app: NestFastifyApplication;
@@ -18,7 +19,7 @@ describe('User Controller Tests', () => {
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
-      imports: [AppModule, UserModule, MailModule],
+      imports: [AppModule, UserModule, MailModule, NotificationsModule],
     })
       .overrideProvider(MailService)
       .useValue(mockDeep<MailService>())
