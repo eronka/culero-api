@@ -39,6 +39,8 @@ model User {
   reviewsReceived   Review[]         @relation("reviewsRecievedFromOtherUsers")
   joinedAt          DateTime         @default(now())
   favoriteReviews   FavoriteReview[] @relation("userFavoriteReviews")
+  notifications     Notification[]   @relation("notifications")
+  pushToken         PushToken[]      @relation("pushTokens")
 }
 
 model Connection {
@@ -103,4 +105,26 @@ model VerificationCode {
   expiresAt DateTime
 
   @@unique([email])
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  type      NotificationType
+  body      String
+  title     String
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade, name: "notifications")
+  createdAt DateTime         @default(now())
+  extraData Json?
+}
+
+enum NotificationType {
+  CONNECTION
+  REVIEW
+}
+
+model PushToken {
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade, name: "pushTokens")
+  userId String
+  token  String @id
 }

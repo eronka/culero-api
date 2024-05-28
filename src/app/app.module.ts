@@ -13,6 +13,7 @@ import { ReviewsModule } from '../../src/reviews/reviews.module';
 import { ConnectionsModule } from '../../src/connections/connections.module';
 import { AppLoggerMiddleware } from '../../src/middlewares/logger.middleware';
 import { CommonModule } from '../common/common.module';
+import { NotificationsModule } from 'src/notifications/notifications.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { CommonModule } from '../common/common.module';
     MailModule,
     ProviderModule,
     ReviewsModule,
+    NotificationsModule,
     ConnectionsModule,
   ],
   controllers: [AppController],
