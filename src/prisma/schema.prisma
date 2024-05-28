@@ -28,6 +28,7 @@ model User {
   id                String           @id @default(cuid())
   email             String?          @unique
   name              String?
+  location          String?
   profilePictureUrl String?
   socialAccounts    SocialAccount[]
   authType          AuthType

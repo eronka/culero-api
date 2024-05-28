@@ -37,6 +37,7 @@ export class UserService {
       data: {
         name: dto.name,
         headline: dto.headline,
+        location: dto.location,
       },
     });
   }

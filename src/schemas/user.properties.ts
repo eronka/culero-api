@@ -10,6 +10,7 @@ export const userProperties = {
   isEmailVerified: { type: 'boolean' },
   headline: { type: 'string' },
   joinedAt: { type: 'string', format: 'date-time' },
+  location: { type: 'string' },
 };
 
 export const userExtraProps = {
