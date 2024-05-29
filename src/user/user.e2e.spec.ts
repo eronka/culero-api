@@ -120,6 +120,7 @@ describe('User Controller Tests', () => {
 
   afterAll(async () => {
     try {
+      await prisma.userSettings.deleteMany();
       await prisma.user.deleteMany();
       await prisma.review.deleteMany();
       await app.close();

@@ -21,4 +21,14 @@ export class UpdateUserDto {
     example: 'Software Engineer',
   })
   headline?: string;
+
+  @IsOptional()
+  @IsString()
+  @ApiProperty({
+    name: 'location',
+    description: 'User location',
+    required: false,
+    example: 'Bucharest, Romania',
+  })
+  location?: string;
 }

@@ -164,6 +164,7 @@ describe('Auth Controller Tests', () => {
   });
 
   afterEach(async () => {
+    await prisma.userSettings.deleteMany();
     await prisma.user.deleteMany();
     await prisma.verificationCode.deleteMany();
   });
