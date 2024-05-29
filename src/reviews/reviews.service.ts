@@ -5,7 +5,13 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { User, Review, FavoriteReview, ReviewState } from '@prisma/client';
+import {
+  User,
+  Review,
+  FavoriteReview,
+  ReviewState,
+  NotificationType,
+} from '@prisma/client';
 import { PrismaService } from '../../src/prisma/prisma.service';
 import { ReviewDto } from './dto/reviews.dto';
 import { REDIS_CLIENT } from '../../src/provider/redis.provider';
@@ -13,11 +19,13 @@ import Redis from 'ioredis';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { RatingDto } from './dto/rating.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
+import { NotificationsService } from '../../src/notifications/notifications.service';
 
 @Injectable()
 export class ReviewsService {
   constructor(
     private readonly prisma: PrismaService,
+    private readonly notificationsService: NotificationsService,
     @Inject(REDIS_CLIENT) private cache: Redis,
   ) {}
 
@@ -128,6 +136,14 @@ export class ReviewsService {
       },
       include: this.includeWithReview(user.id),
     });
+
+    await this.notificationsService.sendNotificationToUser(
+      postedToId,
+      NotificationType.REVIEW,
+      `You have a new review from ${review.anonymous ? 'anonymous user' : review.postedBy.name}`,
+      'New Culero review',
+      { postedToId: postedToId, postedById: user.id },
+    );
 
     // Update the cache
     const avgRatings = await this.calculateAvgRating(postedToId);

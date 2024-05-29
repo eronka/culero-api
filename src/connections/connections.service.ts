@@ -3,17 +3,21 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { AuthType, User } from '@prisma/client';
+import { AuthType, NotificationType, User } from '@prisma/client';
 import { PrismaService } from '../../src/prisma/prisma.service';
 import { ConnectionDto } from './dto/Connection.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { ProfileFetcherDelegator } from '../../src/user/profile-fetcher/delegator.profile-fetcher';
 import { v4 } from 'uuid';
+import { NotificationsService } from '../../src/notifications/notifications.service';
 
 @Injectable()
-@ApiTags('Connections controller')
+@ApiTags('Connections service')
 export class ConnectionsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notificationsService: NotificationsService,
+  ) {}
 
   // retuns an object to be used with prisma's include
   private includeWithUserConnection(currentUserId?: User['id']) {
@@ -104,6 +108,14 @@ export class ConnectionsService {
         },
       },
     });
+
+    await this.notificationsService.sendNotificationToUser(
+      userId,
+      NotificationType.CONNECTION,
+      `You have a new connection.`,
+      'New Culero connection',
+      { followerId: currentUserId, followingId: userId },
+    );
 
     return this.convertConnectionToDto(connection.following);
   }
