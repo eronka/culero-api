@@ -99,8 +99,14 @@ export class AuthController {
   @Public()
   @Get('facebook/callback')
   @UseGuards(AuthGuard('facebook'))
-  async facebookOAuthCallback(@Req() req) {
-    return await this.authService.handleFacebookOAuthLogin(req);
+  async facebookOAuthCallback(@Req() req, @Res() res) {
+    const user = await this.authService.handleFacebookOAuthLogin(req);
+
+    const host = req.session.app_url;
+
+    res.send(
+      `<script>window.location.replace("${host}?token=${user.token}")</script>`,
+    );
   }
 
   @Public()
@@ -124,8 +130,13 @@ export class AuthController {
   @Public()
   @Get('linkedin/callback')
   @UseGuards(AuthGuard('linkedin'))
-  async linkedinOAuthCallback(@Req() req) {
-    return await this.authService.handleLinkedInOAuthLogin(req);
+  async linkedinOAuthCallback(@Req() req, @Res() res) {
+    const user = await this.authService.handleLinkedInOAuthLogin(req);
+    const host = req.session.app_url;
+
+    res.send(
+      `<script>window.location.replace("${host}?token=${user.token}")</script>`,
+    );
   }
 
   @Public()
@@ -150,8 +161,13 @@ export class AuthController {
   @Public()
   @Get('apple/callback')
   @UseGuards(AuthGuard('apple'))
-  async appleOAuthCallback(@Req() req) {
-    return await this.authService.handleAppleOAuthLogin(req);
+  async appleOAuthCallback(@Req() req, @Res() res) {
+    const user = await this.authService.handleAppleOAuthLogin(req);
+    const host = req.session.app_url;
+
+    res.send(
+      `<script>window.location.replace("${host}?token=${user.token}")</script>`,
+    );
   }
 
   @Public()
@@ -176,8 +192,13 @@ export class AuthController {
   @Public()
   @Get('github/callback')
   @UseGuards(AuthGuard('github'))
-  async githubOAuthCallback(@Req() req) {
-    return await this.authService.handleGithubOAuthLogin(req);
+  async githubOAuthCallback(@Req() req, @Res() res) {
+    const user = await this.authService.handleGithubOAuthLogin(req);
+    const host = req.session.app_url;
+
+    res.send(
+      `<script>window.location.replace("${host}?token=${user.token}")</script>`,
+    );
   }
 
   @Public()
