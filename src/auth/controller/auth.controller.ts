@@ -34,7 +34,7 @@ import {
 } from '@nestjs/swagger';
 import { userProperties } from '../../schemas/user.properties';
 import { LowercasePipe } from '../../common/pipes/lowercase.pipe';
-import { GithubOAuthStrategyFactory } from 'src/oauth/factory/github/github-strategy.factory';
+import { GithubOAuthStrategyFactory } from '../../oauth/factory/github/github-strategy.factory';
 
 @Controller('auth')
 @ApiTags('Auth Controller')

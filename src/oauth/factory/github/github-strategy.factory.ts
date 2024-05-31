@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { OAuthStrategyFactory } from '../oauth-strategy.factory';
-import { GithubStrategy } from 'src/oauth/strategy/github/github.strategy';
+import { GithubStrategy } from '../../strategy/github/github.strategy';
 
 @Injectable()
 export class GithubOAuthStrategyFactory implements OAuthStrategyFactory {
