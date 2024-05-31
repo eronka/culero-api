@@ -57,9 +57,10 @@ export class AuthService {
 
     const user = await this.createUserIfNotExists(
       email,
+      AuthType.GOOGLE,
       name,
       profilePictureUrl,
-      AuthType.GOOGLE,
+      false,
     );
 
     const token = await this.generateToken(user);
@@ -81,6 +82,7 @@ export class AuthService {
       AuthType.FACEBOOK,
       displayName,
       profilePictureUrl,
+      false,
     );
 
     const token = await this.generateToken(user);
@@ -214,6 +216,7 @@ export class AuthService {
           name: name,
           profilePictureUrl: profilePictureUrl,
           authType,
+          isEmailVerified: authType !== AuthType.EMAIL,
           settings: {
             create: {},
           },
@@ -232,6 +235,7 @@ export class AuthService {
     } else if (!user.isEmailVerified) {
       await this.sendEmailVerificationCode(email);
     }
+
     return user;
   }
 

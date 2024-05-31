@@ -3,6 +3,7 @@ import { AppModule } from './app/app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { json } from 'express';
+import * as session from 'express-session';
 
 function initializeSwagger(app: any) {
   const config = new DocumentBuilder()
@@ -18,6 +19,8 @@ function initializeSwagger(app: any) {
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const globalPrefix = 'api';
+  app.use(session({ secret: process.env.SESSION_SECRET }));
+
   app.setGlobalPrefix(globalPrefix);
   app.enableCors();
   app.useGlobalPipes(

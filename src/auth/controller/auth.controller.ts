@@ -8,6 +8,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   Req,
   Res,
   UseGuards,
@@ -51,13 +52,14 @@ export class AuthController {
     summary: 'Google auth',
     description: 'Sign in or sign up with Google',
   })
-  async googleOAuthLogin(@Res() res) {
+  async googleOAuthLogin(@Res() res, @Query() query, @Req() req) {
     if (!this.googleOAuthStrategyFactory.isOAuthEnabled()) {
       throw new HttpException(
         'Google Auth is not enabled in this environment.',
         HttpStatus.BAD_REQUEST,
       );
     }
+    req.session.app_url = query.app_url;
 
     res.status(302).redirect('/api/auth/google/callback');
   }
@@ -65,8 +67,13 @@ export class AuthController {
   @Public()
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
-  async googleOAuthCallback(@Req() req) {
-    return await this.authService.handleGoogleOAuthLogin(req);
+  async googleOAuthCallback(@Req() req, @Res() res) {
+    const user = await this.authService.handleGoogleOAuthLogin(req);
+    const host = req.session.app_url;
+
+    res.send(
+      `<script>window.location.replace("${host}?token=${user.token}")</script>`,
+    );
   }
 
   @Public()
