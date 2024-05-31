@@ -132,6 +132,23 @@ export class AuthService {
     };
   }
 
+  async handleGithubOAuthLogin(req: any) {
+    const { email, name, login, avatar_url } = req.user._json;
+    const user = await this.createUserIfNotExists(
+      email || login,
+      AuthType.GITHUB,
+      name,
+      avatar_url,
+    );
+
+    const token = await this.generateToken(user);
+
+    return {
+      ...user,
+      token,
+    };
+  }
+
   async resendEmailVerificationCode(email: string) {
     const user = await this.findUserByEmail(email);
     if (!user) {

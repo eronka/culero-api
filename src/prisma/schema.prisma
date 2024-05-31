@@ -12,6 +12,7 @@ enum AuthType {
   APPLE
   FACEBOOK
   LINKEDIN
+  GITHUB
   EMAIL
   EXTERNAL
 }

@@ -57,6 +57,7 @@
     "jest-mock-extended": "^3.0.5",
     "nodemailer": "^6.9.12",
     "passport-facebook": "^3.0.0",
+    "passport-github2": "^0.1.12",
     "passport-google-oauth20": "^2.0.0",
     "passport-linkedin-oauth2": "^2.0.0",
     "prisma": "^5.10.2",

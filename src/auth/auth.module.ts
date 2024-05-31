@@ -11,6 +11,8 @@ import { LinkedInStrategy } from '../oauth/strategy/linkedin/linkedin.strategy';
 import { AppleOAuthStrategyFactory } from '../oauth/factory/apple/apple-strategy.factory';
 import { AppleStrategy } from '../oauth/strategy/apple/apple.strategy';
 import { MailService } from '../mail/mail.service';
+import { GithubOAuthStrategyFactory } from 'src/oauth/factory/github/github-strategy.factory';
+import { GithubStrategy } from 'src/oauth/strategy/github/github.strategy';
 
 @Module({
   imports: [
@@ -63,6 +65,14 @@ import { MailService } from '../mail/mail.service';
         appleOAuthStrategyFactory.createOAuthStrategy();
       },
       inject: [AppleOAuthStrategyFactory],
+    },
+    GithubOAuthStrategyFactory,
+    {
+      provide: GithubStrategy,
+      useFactory: (githubOAuthFactory: GithubOAuthStrategyFactory) => {
+        githubOAuthFactory.createOAuthStrategy();
+      },
+      inject: [GithubOAuthStrategyFactory],
     },
   ],
 })
