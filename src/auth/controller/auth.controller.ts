@@ -8,6 +8,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   Req,
   Res,
   UseGuards,
@@ -33,6 +34,7 @@ import {
 } from '@nestjs/swagger';
 import { userProperties } from '../../schemas/user.properties';
 import { LowercasePipe } from '../../common/pipes/lowercase.pipe';
+import { GithubOAuthStrategyFactory } from '../../oauth/factory/github/github-strategy.factory';
 
 @Controller('auth')
 @ApiTags('Auth Controller')
@@ -43,6 +45,7 @@ export class AuthController {
     private facebookOAuthStrategyFactory: FacebookOAuthStrategyFactory,
     private linkedinOAuthStrategyFactory: LinkedInOAuthStrategyFactory,
     private appleOAuthStrategyFactory: AppleOAuthStrategyFactory,
+    private githubOAuthStrategyFactory: GithubOAuthStrategyFactory,
   ) {}
 
   @Public()
@@ -51,13 +54,14 @@ export class AuthController {
     summary: 'Google auth',
     description: 'Sign in or sign up with Google',
   })
-  async googleOAuthLogin(@Res() res) {
+  async googleOAuthLogin(@Res() res, @Query() query, @Req() req) {
     if (!this.googleOAuthStrategyFactory.isOAuthEnabled()) {
       throw new HttpException(
         'Google Auth is not enabled in this environment.',
         HttpStatus.BAD_REQUEST,
       );
     }
+    req.session.app_url = query.app_url;
 
     res.status(302).redirect('/api/auth/google/callback');
   }
@@ -65,8 +69,13 @@ export class AuthController {
   @Public()
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
-  async googleOAuthCallback(@Req() req) {
-    return await this.authService.handleGoogleOAuthLogin(req);
+  async googleOAuthCallback(@Req() req, @Res() res) {
+    const user = await this.authService.handleGoogleOAuthLogin(req);
+    const host = req.session.app_url;
+
+    res.send(
+      `<script>window.location.replace("${host}?token=${user.token}")</script>`,
+    );
   }
 
   @Public()
@@ -75,13 +84,14 @@ export class AuthController {
     summary: 'Facebook auth',
     description: 'Sign in or sign up with Facebook',
   })
-  async facebookOAuthLogin(@Res() res) {
+  async facebookOAuthLogin(@Res() res, @Query() query, @Req() req) {
     if (!this.facebookOAuthStrategyFactory.isOAuthEnabled()) {
       throw new HttpException(
         'Facebook Auth is not enabled in this environment.',
         HttpStatus.BAD_REQUEST,
       );
     }
+    req.session.app_url = query.app_url;
 
     res.status(302).redirect('/api/auth/facebook/callback');
   }
@@ -89,8 +99,14 @@ export class AuthController {
   @Public()
   @Get('facebook/callback')
   @UseGuards(AuthGuard('facebook'))
-  async facebookOAuthCallback(@Req() req) {
-    return await this.authService.handleFacebookOAuthLogin(req);
+  async facebookOAuthCallback(@Req() req, @Res() res) {
+    const user = await this.authService.handleFacebookOAuthLogin(req);
+
+    const host = req.session.app_url;
+
+    res.send(
+      `<script>window.location.replace("${host}?token=${user.token}")</script>`,
+    );
   }
 
   @Public()
@@ -99,13 +115,14 @@ export class AuthController {
     summary: 'LinkedIn auth',
     description: 'Sign in or sign up with LinkedIn',
   })
-  async linkedinOAuthLogin(@Res() res) {
+  async linkedinOAuthLogin(@Res() res, @Query() query, @Req() req) {
     if (!this.linkedinOAuthStrategyFactory.isOAuthEnabled()) {
       throw new HttpException(
         'LinkedIn Auth is not enabled in this environment.',
         HttpStatus.BAD_REQUEST,
       );
     }
+    req.session.app_url = query.app_url;
 
     res.status(302).redirect('/api/auth/linkedin/callback');
   }
@@ -113,8 +130,13 @@ export class AuthController {
   @Public()
   @Get('linkedin/callback')
   @UseGuards(AuthGuard('linkedin'))
-  async linkedinOAuthCallback(@Req() req) {
-    return await this.authService.handleLinkedInOAuthLogin(req);
+  async linkedinOAuthCallback(@Req() req, @Res() res) {
+    const user = await this.authService.handleLinkedInOAuthLogin(req);
+    const host = req.session.app_url;
+
+    res.send(
+      `<script>window.location.replace("${host}?token=${user.token}")</script>`,
+    );
   }
 
   @Public()
@@ -123,7 +145,7 @@ export class AuthController {
     summary: 'Apple auth',
     description: 'Sign in or sign up with Apple',
   })
-  async appleOAuthLogin(@Res() res) {
+  async appleOAuthLogin(@Res() res, @Query() query, @Req() req) {
     if (!this.appleOAuthStrategyFactory.isOAuthEnabled()) {
       throw new HttpException(
         'Apple Auth is not enabled in this environment.',
@@ -131,14 +153,52 @@ export class AuthController {
       );
     }
 
+    req.session.app_url = query.app_url;
+
     res.status(302).redirect('/api/auth/apple/callback');
   }
 
   @Public()
   @Get('apple/callback')
   @UseGuards(AuthGuard('apple'))
-  async appleOAuthCallback(@Req() req) {
-    return await this.authService.handleAppleOAuthLogin(req);
+  async appleOAuthCallback(@Req() req, @Res() res) {
+    const user = await this.authService.handleAppleOAuthLogin(req);
+    const host = req.session.app_url;
+
+    res.send(
+      `<script>window.location.replace("${host}?token=${user.token}")</script>`,
+    );
+  }
+
+  @Public()
+  @Get('github')
+  @ApiOperation({
+    summary: 'Github auth',
+    description: 'Sign in or sign up with Github',
+  })
+  async githubOauthLogin(@Res() res, @Query() query, @Req() req) {
+    if (!this.githubOAuthStrategyFactory.isOAuthEnabled()) {
+      throw new HttpException(
+        'Github Auth is not enabled in this environment.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    req.session.app_url = query.app_url;
+
+    res.status(302).redirect('/api/auth/github/callback');
+  }
+
+  @Public()
+  @Get('github/callback')
+  @UseGuards(AuthGuard('github'))
+  async githubOAuthCallback(@Req() req, @Res() res) {
+    const user = await this.authService.handleGithubOAuthLogin(req);
+    const host = req.session.app_url;
+
+    res.send(
+      `<script>window.location.replace("${host}?token=${user.token}")</script>`,
+    );
   }
 
   @Public()

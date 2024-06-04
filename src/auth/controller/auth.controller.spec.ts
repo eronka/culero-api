@@ -10,6 +10,7 @@ import { AppleOAuthStrategyFactory } from '../../oauth/factory/apple/apple-strat
 import { ConfigService } from '@nestjs/config';
 import { MailService } from '../../mail/mail.service';
 import { mockDeep } from 'jest-mock-extended';
+import { GithubOAuthStrategyFactory } from '../../oauth/factory/github/github-strategy.factory';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -25,6 +26,7 @@ describe('AuthController', () => {
         LinkedInOAuthStrategyFactory,
         FacebookOAuthStrategyFactory,
         AppleOAuthStrategyFactory,
+        GithubOAuthStrategyFactory,
         ConfigService,
         MailService,
       ],

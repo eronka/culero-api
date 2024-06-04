@@ -9,6 +9,7 @@ import { FacebookOAuthStrategyFactory } from '../../oauth/factory/facebook/faceb
 import { AppleOAuthStrategyFactory } from '../../oauth/factory/apple/apple-strategy.factory';
 import { ConfigService } from '@nestjs/config';
 import { MailService } from '../../mail/mail.service';
+import { GithubOAuthStrategyFactory } from '../..//oauth/factory/github/github-strategy.factory';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -23,6 +24,7 @@ describe('AuthService', () => {
         LinkedInOAuthStrategyFactory,
         FacebookOAuthStrategyFactory,
         AppleOAuthStrategyFactory,
+        GithubOAuthStrategyFactory,
         ConfigService,
         MailService,
       ],

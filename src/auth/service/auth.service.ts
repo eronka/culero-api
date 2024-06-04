@@ -57,9 +57,10 @@ export class AuthService {
 
     const user = await this.createUserIfNotExists(
       email,
+      AuthType.GOOGLE,
       name,
       profilePictureUrl,
-      AuthType.GOOGLE,
+      false,
     );
 
     const token = await this.generateToken(user);
@@ -81,6 +82,7 @@ export class AuthService {
       AuthType.FACEBOOK,
       displayName,
       profilePictureUrl,
+      false,
     );
 
     const token = await this.generateToken(user);
@@ -120,6 +122,23 @@ export class AuthService {
       AuthType.APPLE,
       displayName,
       null,
+    );
+
+    const token = await this.generateToken(user);
+
+    return {
+      ...user,
+      token,
+    };
+  }
+
+  async handleGithubOAuthLogin(req: any) {
+    const { email, name, login, avatar_url } = req.user._json;
+    const user = await this.createUserIfNotExists(
+      email || login,
+      AuthType.GITHUB,
+      name,
+      avatar_url,
     );
 
     const token = await this.generateToken(user);
@@ -214,6 +233,7 @@ export class AuthService {
           name: name,
           profilePictureUrl: profilePictureUrl,
           authType,
+          isEmailVerified: authType !== AuthType.EMAIL,
           settings: {
             create: {},
           },
@@ -232,6 +252,7 @@ export class AuthService {
     } else if (!user.isEmailVerified) {
       await this.sendEmailVerificationCode(email);
     }
+
     return user;
   }
 
