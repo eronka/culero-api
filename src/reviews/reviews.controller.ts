@@ -39,6 +39,14 @@ export class ReviewsController {
   ): Promise<ReviewDto | undefined> {
     return this.reviewsService.getReviewByUserForUser(user.id, userId);
   }
+  /**
+   * Get latest platform-wide reviews.
+   */
+
+  @Get('/latest')
+  async getLatestReviews(@CurrentUser() user: User): Promise<ReviewDto[]> {
+    return this.reviewsService.getLatestReviews(user.id);
+  }
 
   /**
    * Get the reviews posted by the current user

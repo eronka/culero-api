@@ -316,4 +316,16 @@ export class ReviewsService {
 
     return reviews.map((r) => this.transformReview(r, currentUserId));
   }
+
+  async getLatestReviews(currentUserId: User['id']): Promise<ReviewDto[]> {
+    const reviews = await this.prisma.review.findMany({
+      include: this.includeWithReview(currentUserId),
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: 25,
+    });
+
+    return reviews.map((r) => this.transformReview(r, currentUserId));
+  }
 }
