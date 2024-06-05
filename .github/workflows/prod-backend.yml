@@ -8,7 +8,7 @@ on:
         '.github/workflows/prod-backend.yml',
         'Dockerfile',
         'package.json',
-        'fly.backend.toml',
+        'fly.toml',
       ]
 
 env:
@@ -35,7 +35,7 @@ jobs:
       - name: Deploy to prod
         run: |
           ~/.fly/bin/fly deploy \
-            --config fly.backend.toml \
+            --config fly.toml \
             --dockerfile Dockerfile \
             --app culero-stage-api \
             --access-token ${{ secrets.FLY_ACCESS_TOKEN }}
