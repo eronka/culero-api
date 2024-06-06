@@ -1,12 +1,13 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
-import { AuthType, User } from '@prisma/client';
+import { AuthType, SocialAccountType, User } from '@prisma/client';
 import { SignupDto } from '../dto/signup.dto';
 import { MailService } from '../../mail/mail.service';
 import { SigninDto } from '../dto/signin.dto';
@@ -321,5 +322,58 @@ export class AuthService {
       },
     });
     await this.mailService.sendEmailVerificationCode(email, code);
+  }
+
+  async connectSocialPlatform(
+    platform: SocialAccountType,
+    userId: string,
+    req: any,
+  ) {
+    console.log(platform, userId, req.user);
+
+    const socialAcc = await this.prisma.socialAccount.findMany({
+      where: { socialId: req.user.id, platform },
+    });
+
+    if (socialAcc.length !== 0) {
+      throw new BadRequestException(
+        'Social Account Already conected with another account',
+      );
+    }
+
+    return this.prisma.socialAccount.create({
+      data: {
+        platform,
+        displayName:
+          req.user.displayName || req.user._json.first_name
+            ? `${req.user._json.first_name} ${req.user._json.last_name}`
+            : req.user._json.login,
+        email: req.user.emails[0].value || req.user._json.email,
+        socialId: req.user.id,
+        profileUrl: req.user.profileUrl,
+        pictureUrl: req.user.photos[0].value,
+        userId,
+      },
+    });
+  }
+
+  async getSocialAccounts(userId: string) {
+    return this.prisma.socialAccount.findMany({ where: { userId } });
+  }
+
+  async getUserFromToken(token: string) {
+    try {
+      const payload = await this.jwt.verifyAsync(token, {
+        secret: process.env.JWT_SECRET,
+      });
+
+      return await this.prisma.user.findUnique({
+        where: {
+          id: payload['id'],
+        },
+      });
+    } catch {
+      throw new ForbiddenException();
+    }
   }
 }

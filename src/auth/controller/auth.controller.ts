@@ -35,6 +35,8 @@ import {
 import { userProperties } from '../../schemas/user.properties';
 import { LowercasePipe } from '../../common/pipes/lowercase.pipe';
 import { GithubOAuthStrategyFactory } from '../../oauth/factory/github/github-strategy.factory';
+import { CurrentUser } from 'src/decorators/current-user.decorator';
+import { SocialAccountType, User } from '@prisma/client';
 
 @Controller('auth')
 @ApiTags('Auth Controller')
@@ -97,16 +99,49 @@ export class AuthController {
   }
 
   @Public()
+  @Get('facebook/connect')
+  @ApiOperation({
+    summary: 'Facebook Social Account connect',
+    description: 'Connect account with Facebook profile',
+  })
+  async facebookSocialConnect(@Res() res, @Query() query, @Req() req) {
+    if (!this.facebookOAuthStrategyFactory.isOAuthEnabled()) {
+      throw new HttpException(
+        'Facebook Auth is not enabled in this environment.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    req.session.app_url = query.app_url;
+
+    const token = query.token;
+    const user = await this.authService.getUserFromToken(token);
+    req.session.intent = { facebook: 'connect' };
+    req.session.userId = user.id;
+
+    res.status(302).redirect('/api/auth/facebook/callback');
+  }
+
+  @Public()
   @Get('facebook/callback')
   @UseGuards(AuthGuard('facebook'))
   async facebookOAuthCallback(@Req() req, @Res() res) {
-    const user = await this.authService.handleFacebookOAuthLogin(req);
-
     const host = req.session.app_url;
 
-    res.send(
-      `<script>window.location.replace("${host}?token=${user.token}")</script>`,
-    );
+    if (req.session.intent?.facebook == 'connect') {
+      await this.authService.connectSocialPlatform(
+        SocialAccountType.FACEBOOK,
+        req.session.userId,
+        req,
+      );
+
+      res.send(`<script>window.location.replace("${host}")</script>`);
+    } else {
+      const user = await this.authService.handleFacebookOAuthLogin(req);
+      res.send(
+        `<script>window.location.replace("${host}?token=${user.token}")</script>`,
+      );
+    }
   }
 
   @Public()
@@ -128,15 +163,45 @@ export class AuthController {
   }
 
   @Public()
+  @Get('linkedin/connect')
+  @ApiOperation({
+    summary: 'LinkedIn Social Account connect',
+    description: 'Sign in or sign up with LinkedIn',
+  })
+  async linkedinSocialConnect(@Res() res, @Query() query, @Req() req) {
+    if (!this.linkedinOAuthStrategyFactory.isOAuthEnabled()) {
+      throw new HttpException(
+        'LinkedIn Auth is not enabled in this environment.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    const token = query.token;
+    const user = await this.authService.getUserFromToken(token);
+    req.session.app_url = query.app_url;
+    req.session.intent = { linkedin: 'connect' };
+    req.session.userId = user.id;
+    res.status(302).redirect('/api/auth/linkedin/callback');
+  }
+
+  @Public()
   @Get('linkedin/callback')
   @UseGuards(AuthGuard('linkedin'))
   async linkedinOAuthCallback(@Req() req, @Res() res) {
-    const user = await this.authService.handleLinkedInOAuthLogin(req);
     const host = req.session.app_url;
 
-    res.send(
-      `<script>window.location.replace("${host}?token=${user.token}")</script>`,
-    );
+    if (req.session.intent?.linkedin == 'connect') {
+      await this.authService.connectSocialPlatform(
+        SocialAccountType.LINKEDIN,
+        req.session.userId,
+        req,
+      );
+      res.send(`<script>window.location.replace("${host}")</script>`);
+    } else {
+      const user = await this.authService.handleLinkedInOAuthLogin(req);
+      res.send(
+        `<script>window.location.replace("${host}?token=${user.token}")</script>`,
+      );
+    }
   }
 
   @Public()
@@ -190,15 +255,49 @@ export class AuthController {
   }
 
   @Public()
+  @Get('github/connect')
+  @ApiOperation({
+    summary: 'Github Social Account connect',
+    description: 'Connect account with Github profile',
+  })
+  async githubSocialConnect(@Res() res, @Query() query, @Req() req) {
+    if (!this.githubOAuthStrategyFactory.isOAuthEnabled()) {
+      throw new HttpException(
+        'Github Auth is not enabled in this environment.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    req.session.app_url = query.app_url;
+
+    const token = query.token;
+    const user = await this.authService.getUserFromToken(token);
+    req.session.intent = { github: 'connect' };
+    req.session.userId = user.id;
+
+    res.status(302).redirect('/api/auth/github/callback');
+  }
+
+  @Public()
   @Get('github/callback')
   @UseGuards(AuthGuard('github'))
   async githubOAuthCallback(@Req() req, @Res() res) {
-    const user = await this.authService.handleGithubOAuthLogin(req);
     const host = req.session.app_url;
 
-    res.send(
-      `<script>window.location.replace("${host}?token=${user.token}")</script>`,
-    );
+    if (req.session.intent?.github == 'connect') {
+      await this.authService.connectSocialPlatform(
+        SocialAccountType.GITHUB,
+        req.session.userId,
+        req,
+      );
+
+      res.send(`<script>window.location.replace("${host}")</script>`);
+    } else {
+      const user = await this.authService.handleGithubOAuthLogin(req);
+      res.send(
+        `<script>window.location.replace("${host}?token=${user.token}")</script>`,
+      );
+    }
   }
 
   @Public()
@@ -286,5 +385,10 @@ export class AuthController {
   })
   async verifyEmail(@Body() dto: EmailVerificationDto) {
     return await this.authService.verifyEmail(dto.email, dto.code);
+  }
+
+  @Get('/social-accounts')
+  async getSocialAccounts(@CurrentUser() user: User) {
+    return this.authService.getSocialAccounts(user.id);
   }
 }
