@@ -78,13 +78,34 @@ export class AuthService {
     const displayName = name.givenName + ' ' + name.familyName;
     const profilePictureUrl = photos[0].value;
 
-    const user = await this.createUserIfNotExists(
-      email,
-      AuthType.FACEBOOK,
-      displayName,
-      profilePictureUrl,
-      false,
-    );
+    const socialAccount = await this.prisma.socialAccount.findFirst({
+      where: {
+        socialId: req.user.socialId,
+        platform: SocialAccountType.FACEBOOK,
+      },
+      include: {
+        user: true,
+      },
+    });
+
+    let user;
+
+    if (socialAccount) {
+      user = socialAccount.user;
+    } else {
+      user = await this.createUserIfNotExists(
+        email,
+        AuthType.FACEBOOK,
+        displayName,
+        profilePictureUrl,
+        false,
+      );
+      await this.connectSocialPlatform(
+        SocialAccountType.FACEBOOK,
+        user.id,
+        req,
+      );
+    }
 
     const token = await this.generateToken(user);
 
@@ -100,12 +121,34 @@ export class AuthService {
     const displayName = name.givenName + ' ' + name.familyName;
     const profilePictureUrl = photos[0].value;
 
-    const user = await this.createUserIfNotExists(
-      email,
-      AuthType.LINKEDIN,
-      displayName,
-      profilePictureUrl,
-    );
+    const socialAccount = await this.prisma.socialAccount.findFirst({
+      where: {
+        socialId: req.user.socialId,
+        platform: SocialAccountType.LINKEDIN,
+      },
+      include: {
+        user: true,
+      },
+    });
+
+    let user;
+
+    if (socialAccount) {
+      user = socialAccount.user;
+    } else {
+      user = await this.createUserIfNotExists(
+        email,
+        AuthType.LINKEDIN,
+        displayName,
+        profilePictureUrl,
+        false,
+      );
+      await this.connectSocialPlatform(
+        SocialAccountType.LINKEDIN,
+        user.id,
+        req,
+      );
+    }
 
     const token = await this.generateToken(user);
 
@@ -135,12 +178,30 @@ export class AuthService {
 
   async handleGithubOAuthLogin(req: any) {
     const { email, name, login, avatar_url } = req.user._json;
-    const user = await this.createUserIfNotExists(
-      email || login,
-      AuthType.GITHUB,
-      name,
-      avatar_url,
-    );
+    const socialAccount = await this.prisma.socialAccount.findFirst({
+      where: {
+        socialId: req.user.socialId,
+        platform: SocialAccountType.GITHUB,
+      },
+      include: {
+        user: true,
+      },
+    });
+
+    let user;
+
+    if (socialAccount) {
+      user = socialAccount.user;
+    } else {
+      user = await this.createUserIfNotExists(
+        email || login,
+        AuthType.GITHUB,
+        name,
+        avatar_url,
+        false,
+      );
+      await this.connectSocialPlatform(SocialAccountType.GITHUB, user.id, req);
+    }
 
     const token = await this.generateToken(user);
 
@@ -345,10 +406,11 @@ export class AuthService {
       data: {
         platform,
         displayName:
-          req.user.displayName || req.user._json.first_name
+          req.user.displayName ||
+          (req.user._json.first_name
             ? `${req.user._json.first_name} ${req.user._json.last_name}`
-            : req.user._json.login,
-        email: req.user.emails[0].value || req.user._json.email,
+            : req.user._json.login),
+        email: req.user.emails?.[0]?.value || req.user._json.email,
         socialId: req.user.id,
         profileUrl: req.user.profileUrl,
         pictureUrl: req.user.photos[0].value,
