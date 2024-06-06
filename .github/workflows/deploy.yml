@@ -2,23 +2,21 @@ on:
   push:
     branches:
       - main
+      - develop
     paths:
       [
         'src/**',
-        '.github/workflows/prod-backend.yml',
+        '.github/workflows/deploy.yml',
         'Dockerfile',
         'package.json',
         'fly.toml',
       ]
 
-env:
-  DATABASE_URL: ${{ secrets.DB_PROD_URL }}
-
 jobs:
-  deploy-backend-prod:
+  deploy-backend:
+    environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'stage' }}
     runs-on: ubuntu-latest
-    name: Deploy to prod
-    if: github.ref == 'refs/heads/develop'
+    name: Deploy backend
 
     steps:
       - name: Checkout
@@ -31,11 +29,16 @@ jobs:
       - name: pnpm install
         run: pnpm install
       - name: Deploy migrations
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: pnpm db:deploy-migrations
-      - name: Deploy to prod
+      - name: Deploy
+        env:
+          FLY_APP_NAME: ${{ vars.FLY_APP_NAME }}
+          FLY_ACCESS_TOKEN: ${{ secrets.FLY_ACCESS_TOKEN }}
         run: |
           ~/.fly/bin/fly deploy \
             --config fly.toml \
             --dockerfile Dockerfile \
-            --app culero-stage-api \
-            --access-token ${{ secrets.FLY_ACCESS_TOKEN }}
+            --app $FLY_APP_NAME \
+            --access-token $FLY_ACCESS_TOKEN
