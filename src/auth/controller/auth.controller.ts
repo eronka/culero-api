@@ -35,7 +35,7 @@ import {
 import { userProperties } from '../../schemas/user.properties';
 import { LowercasePipe } from '../../common/pipes/lowercase.pipe';
 import { GithubOAuthStrategyFactory } from '../../oauth/factory/github/github-strategy.factory';
-import { CurrentUser } from 'src/decorators/current-user.decorator';
+import { CurrentUser } from '../../decorators/current-user.decorator';
 import { SocialAccountType, User } from '@prisma/client';
 
 @Controller('auth')
