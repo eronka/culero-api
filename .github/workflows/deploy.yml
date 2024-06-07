@@ -31,7 +31,11 @@ jobs:
       - name: Deploy migrations
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: pnpm db:deploy-migrations
+          DATABASE_APP_NAME: ${{ vars.DATABASE_APP_NAME }}
+        run: |
+          fly proxy 5432:5432 $DATABASE_APP_NAME.flycast --app $DATABASE_APP_NAME &
+          pnpm db:deploy-migrations
+          kill %1
       - name: Deploy
         env:
           FLY_APP_NAME: ${{ vars.FLY_APP_NAME }}
