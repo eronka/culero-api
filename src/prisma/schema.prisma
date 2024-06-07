@@ -57,10 +57,14 @@ model Connection {
 }
 
 model SocialAccount {
-  id         Int               @id @default(autoincrement())
-  platform   SocialAccountType
-  profileUrl String
-  addedOn    DateTime          @default(now())
+  id          Int               @id @default(autoincrement())
+  platform    SocialAccountType
+  displayName String?
+  email       String?
+  socialId    String?
+  profileUrl  String?
+  pictureUrl  String?
+  addedOn     DateTime          @default(now())
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId String
