@@ -33,7 +33,7 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           DATABASE_APP_NAME: ${{ vars.DATABASE_APP_NAME }}
         run: |
-          fly proxy 5432:5432 $DATABASE_APP_NAME.flycast --app $DATABASE_APP_NAME &
+          ~/.fly/bin/fly proxy 5432:5432 $DATABASE_APP_NAME.flycast --app $DATABASE_APP_NAME --access-token $FLY_ACCESS_TOKEN &
           pnpm db:deploy-migrations
           kill %1
       - name: Deploy
