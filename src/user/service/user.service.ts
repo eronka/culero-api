@@ -13,7 +13,6 @@ import { S3_CLIENT } from '../../provider/s3.provider';
 import { REDIS_CLIENT } from '../../provider/redis.provider';
 import { Redis } from 'ioredis';
 import { v4 } from 'uuid';
-
 import { getMimeType } from '../../utils/image';
 import { UpdateUserSettingsDto } from '../dto/update-user-settings.dto';
 
