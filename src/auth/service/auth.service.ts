@@ -217,9 +217,6 @@ export class AuthService {
       throw new NotFoundException('User not found');
     }
 
-    if (user.isEmailVerified) {
-      throw new BadRequestException('Email already verified');
-    }
     await this.sendEmailVerificationCode(email);
   }
 
