@@ -99,8 +99,8 @@ importers:
         specifier: ^2.0.0
         version: 2.0.0
       passport-linkedin-oauth2:
-        specifier: ^2.0.0
-        version: 2.0.0
+        specifier: github:auth0/passport-linkedin-oauth2
+        version: https://codeload.github.com/auth0/passport-linkedin-oauth2/tar.gz/87bd3076edb262933ebd460d367e8cd3aa941b23
       prisma:
         specifier: ^5.10.2
         version: 5.10.2
@@ -3117,8 +3117,10 @@ packages:
     resolution: {integrity: sha512-KSk6IJ15RoxuGq7D1UKK/8qKhNfzbLeLrG3gkLZ7p4A6DBCcv7xpyQwuXtWdpyR0+E0mwkpjY1VfPOhxQrKzdQ==}
     engines: {node: '>= 0.4.0'}
 
-  passport-linkedin-oauth2@2.0.0:
-    resolution: {integrity: sha512-PnSeq2HzFQ/y1/p2RTF/kG2zhJ7kwGVg4xO3E+JNxz2aI0pFJGAqC503FVpUksYbhQdNhL6QYlK9qrEXD7ZYCg==}
+  passport-linkedin-oauth2@https://codeload.github.com/auth0/passport-linkedin-oauth2/tar.gz/87bd3076edb262933ebd460d367e8cd3aa941b23:
+    resolution: {tarball: https://codeload.github.com/auth0/passport-linkedin-oauth2/tar.gz/87bd3076edb262933ebd460d367e8cd3aa941b23}
+    version: 3.0.0
+    engines: {node: '>= 16'}
 
   passport-oauth2@1.8.0:
     resolution: {integrity: sha512-cjsQbOrXIDE4P8nNb3FQRCCmJJ/utnFKEz2NX209f7KOHPoX18gF7gBzBbLLsj2/je4KrgiwLLGjf0lm9rtTBA==}
@@ -7969,7 +7971,7 @@ snapshots:
     dependencies:
       passport-oauth2: 1.8.0
 
-  passport-linkedin-oauth2@2.0.0:
+  passport-linkedin-oauth2@https://codeload.github.com/auth0/passport-linkedin-oauth2/tar.gz/87bd3076edb262933ebd460d367e8cd3aa941b23:
     dependencies:
       passport-oauth2: 1.8.0
 
