@@ -116,11 +116,7 @@ export class AuthService {
   }
 
   async handleLinkedInOAuthLogin(req: any) {
-    const { emails, name, photos } = req.user;
-    const email = emails[0].value;
-    const displayName = name.givenName + ' ' + name.familyName;
-    const profilePictureUrl = photos[0].value;
-
+    const { email, displayName, picture } = req.user;
     const socialAccount = await this.prisma.socialAccount.findFirst({
       where: {
         socialId: req.user.socialId,
@@ -140,7 +136,7 @@ export class AuthService {
         email,
         AuthType.LINKEDIN,
         displayName,
-        profilePictureUrl,
+        picture,
         false,
       );
       await this.connectSocialPlatform(
@@ -280,6 +276,7 @@ export class AuthService {
     throwErrorIfUserExists?: boolean,
   ) {
     email = email.toLowerCase();
+
     let user = await this.findUserByEmail(email);
     if (user && throwErrorIfUserExists) {
       throw new ConflictException('User already exists');
@@ -387,8 +384,6 @@ export class AuthService {
     userId: string,
     req: any,
   ) {
-    console.log(platform, userId, req.user);
-
     const socialAcc = await this.prisma.socialAccount.findMany({
       where: { socialId: req.user.id, platform },
     });
@@ -408,9 +403,9 @@ export class AuthService {
             ? `${req.user._json.first_name} ${req.user._json.last_name}`
             : req.user._json.login),
         email: req.user.emails?.[0]?.value || req.user._json.email,
-        socialId: req.user.id,
+        socialId: req.user.id || req.user._json.sub,
         profileUrl: req.user.profileUrl,
-        pictureUrl: req.user.photos[0].value,
+        pictureUrl: req.user.photos?.[0]?.value || req.user.picture,
         userId,
       },
     });
