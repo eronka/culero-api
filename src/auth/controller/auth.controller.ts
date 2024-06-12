@@ -224,7 +224,7 @@ export class AuthController {
   }
 
   @Public()
-  @Get('apple/callback')
+  @Post('apple/callback')
   @UseGuards(AuthGuard('apple'))
   async appleOAuthCallback(@Req() req, @Res() res) {
     const user = await this.authService.handleAppleOAuthLogin(req);
