@@ -236,6 +236,18 @@ export class AuthController {
   }
 
   @Public()
+  @Get('apple/callback')
+  @UseGuards(AuthGuard('apple'))
+  async appleOAuthCallback2(@Req() req, @Res() res) {
+    const user = await this.authService.handleAppleOAuthLogin(req);
+    const host = req.session.app_url;
+
+    res.send(
+      `<script>window.location.replace("${host}?token=${user.token}")</script>`,
+    );
+  }
+
+  @Public()
   @Get('github')
   @ApiOperation({
     summary: 'Github auth',
