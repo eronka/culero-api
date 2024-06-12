@@ -3,8 +3,8 @@ primary_region = "syd"
 [http_service]
   internal_port = 4200
   force_https = true
-  auto_stop_machines = true
-  auto_start_machines = true
+  auto_stop_machines = false
+  auto_start_machines = false
   min_machines_running = 0
   [http_service.concurrency]
     type = "requests"

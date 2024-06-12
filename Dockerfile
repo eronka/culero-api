@@ -3,7 +3,7 @@ FROM node:20-alpine AS base
 FROM base as build
 
 WORKDIR /app
-
+RUN apk add --no-cache git
 RUN npm i -g pnpm
 
 COPY package.json .
