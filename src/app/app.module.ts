@@ -17,7 +17,7 @@ import { NotificationsModule } from '../../src/notifications/notifications.modul
 import RedisStore from 'connect-redis';
 import * as session from 'express-session';
 import Redis from 'ioredis';
-import { REDIS_CLIENT } from 'src/provider/redis.provider';
+import { REDIS_CLIENT } from '../../src/provider/redis.provider';
 
 @Module({
   imports: [
