@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { Inject, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AuthModule } from '../auth/auth.module';
 import { UserModule } from '../user/user.module';
@@ -14,6 +14,10 @@ import { ConnectionsModule } from '../../src/connections/connections.module';
 import { AppLoggerMiddleware } from '../../src/middlewares/logger.middleware';
 import { CommonModule } from '../common/common.module';
 import { NotificationsModule } from '../../src/notifications/notifications.module';
+import RedisStore from 'connect-redis';
+import * as session from 'express-session';
+import Redis from 'ioredis';
+import { REDIS_CLIENT } from '../../src/provider/redis.provider';
 
 @Module({
   imports: [
@@ -40,7 +44,19 @@ import { NotificationsModule } from '../../src/notifications/notifications.modul
   ],
 })
 export class AppModule implements NestModule {
+  constructor(@Inject(REDIS_CLIENT) private redis: Redis) {}
+
   configure(consumer: MiddlewareConsumer): void {
-    consumer.apply(AppLoggerMiddleware).forRoutes('*');
+    consumer
+      .apply(
+        AppLoggerMiddleware,
+        session({
+          secret: process.env.SESSION_SECRET || 'lala',
+          resave: false,
+          saveUninitialized: false,
+          store: new RedisStore({ client: this.redis }),
+        }),
+      )
+      .forRoutes('*');
   }
 }
