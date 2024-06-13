@@ -51,7 +51,7 @@ export class AppModule implements NestModule {
       .apply(
         AppLoggerMiddleware,
         session({
-          secret: process.env.SESSION_SECRET,
+          secret: process.env.SESSION_SECRET || 'lala',
           resave: false,
           saveUninitialized: false,
           store: new RedisStore({ client: this.redis }),
