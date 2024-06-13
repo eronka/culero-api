@@ -1,4 +1,5 @@
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -41,9 +42,10 @@ jobs:
       - name: Deploy
         env:
           FLY_APP_NAME: ${{ vars.FLY_APP_NAME }}
+          FLY_CONFIG_FILE_NAME: ${{ github.ref == 'refs/heads/main' && 'fly.prod.toml' || 'flu.stage.toml' }}
         run: |
           ~/.fly/bin/fly deploy \
-            --config fly.toml \
+            --config $FLY_CONFIG_FILE_NAME \
             --dockerfile Dockerfile \
             --app $FLY_APP_NAME \
             --access-token $FLY_ACCESS_TOKEN
