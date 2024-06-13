@@ -155,13 +155,13 @@ export class AuthService {
   }
 
   async handleAppleOAuthLogin(req: any) {
-    const { email, name } = req.user;
-    const displayName = name.firstName + ' ' + name.lastName;
+    const { email, displayName } = req.user;
     const user = await this.createUserIfNotExists(
       email,
       AuthType.APPLE,
       displayName,
       null,
+      false,
     );
 
     const token = await this.generateToken(user);
