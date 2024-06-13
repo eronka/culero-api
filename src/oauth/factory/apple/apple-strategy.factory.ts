@@ -17,7 +17,7 @@ export class AppleOAuthStrategyFactory implements OAuthStrategyFactory {
     this.keyID = this.configService.get<string>('APPLE_KEY_ID');
     this.key = this.configService
       .get<string>('APPLE_KEY')
-      .replace(/\\n/gm, '\n');
+      ?.replace(/\\n/gm, '\n');
     this.callbackURL = this.configService.get<string>('APPLE_CALLBACK_URL');
   }
 
