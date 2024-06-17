@@ -176,7 +176,7 @@ export class AuthService {
     const { email, name, login, avatar_url } = req.user._json;
     const socialAccount = await this.prisma.socialAccount.findFirst({
       where: {
-        socialId: req.user.socialId,
+        socialId: req.user.id,
         platform: SocialAccountType.GITHUB,
       },
       include: {
@@ -384,7 +384,6 @@ export class AuthService {
     userId: string,
     req: any,
   ) {
-
     const socialAcc = await this.prisma.socialAccount.findMany({
       where: { socialId: req.user.id, platform },
     });
