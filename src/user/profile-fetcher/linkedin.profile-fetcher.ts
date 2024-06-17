@@ -24,6 +24,7 @@ export class LinkedInProfileFetcher extends ProfileFetcher {
         socialAccountType: SocialAccountType.LINKEDIN,
         profileUrl: this.profileUrl,
         headline: data.data.job_title,
+        socialId: data.data.profile_id,
         profilePictureUrl: data.data.profile_image_url,
       };
     } else {
