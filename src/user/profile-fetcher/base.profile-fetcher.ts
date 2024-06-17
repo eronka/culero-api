@@ -12,4 +12,5 @@ export interface ProfileDetails {
   name?: string;
   headline?: string;
   profilePictureUrl?: string;
+  socialId?: string;
 }

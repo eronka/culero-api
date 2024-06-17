@@ -154,18 +154,25 @@ export class ConnectionsService {
     // If the account exists, we just return the user associated with it.
     const profileUrl = Buffer.from(profileUrlBase64, 'base64').toString();
 
+    // Fetch the profile details
+    const profileData = await new ProfileFetcherDelegator(
+      profileUrl,
+    ).getProfileDetails();
+
     const socialAccount = await this.prisma.socialAccount.findFirst({
-      where: { profileUrl },
+      where: {
+        OR: [
+          { profileUrl },
+          {
+            socialId: profileData.socialId,
+          },
+        ],
+      },
       include: {
         user: { include: this.includeWithUserConnection() },
       },
     });
     if (socialAccount) return this.convertConnectionToDto(socialAccount.user);
-
-    // Fetch the profile details
-    const profileData = await new ProfileFetcherDelegator(
-      profileUrl,
-    ).getProfileDetails();
 
     // Else, we create a new user, associate the social account with it, and return the user.
 
@@ -188,6 +195,7 @@ export class ConnectionsService {
         data: {
           platform: profileData.socialAccountType,
           profileUrl,
+          socialId: profileData.socialId,
           userId: newUserId,
         },
       }),
