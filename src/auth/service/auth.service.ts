@@ -119,7 +119,7 @@ export class AuthService {
     const { email, displayName, picture } = req.user;
     const socialAccount = await this.prisma.socialAccount.findFirst({
       where: {
-        socialId: req.user.socialId,
+        socialId: req.user.id,
         platform: SocialAccountType.LINKEDIN,
       },
       include: {
@@ -384,7 +384,6 @@ export class AuthService {
     userId: string,
     req: any,
   ) {
-
     const socialAcc = await this.prisma.socialAccount.findMany({
       where: { socialId: req.user.id, platform },
     });
