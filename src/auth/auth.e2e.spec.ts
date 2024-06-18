@@ -41,28 +41,7 @@ describe('Auth Controller Tests', () => {
   it('should be able to sign up using email', async () => {
     const response = await app.inject({
       method: 'POST',
-      url: '/auth/sign-up',
-      payload: {
-        email: 'jane@example.com',
-      },
-    });
-
-    expect(response.statusCode).toEqual(201);
-    expect(response.json().email).toEqual('jane@example.com');
-  });
-
-  it('should be able to sign in using email', async () => {
-    await prisma.user.create({
-      data: {
-        email: 'jane@example.com',
-        isEmailVerified: true,
-        authType: AuthType.EMAIL,
-      },
-    });
-
-    const response = await app.inject({
-      method: 'POST',
-      url: '/auth/sign-in',
+      url: '/auth/send-verification-email',
       payload: {
         email: 'jane@example.com',
       },
@@ -75,10 +54,9 @@ describe('Auth Controller Tests', () => {
   it('should send verification code to email on sign up', async () => {
     await app.inject({
       method: 'POST',
-      url: '/auth/sign-up',
+      url: '/auth/send-verification-email',
       payload: {
         email: 'jane@example.com',
-        password: 'Password123',
       },
     });
 
@@ -123,10 +101,9 @@ describe('Auth Controller Tests', () => {
     // Sign up
     await app.inject({
       method: 'POST',
-      url: '/auth/sign-up',
+      url: '/auth/send-verification-email',
       payload: {
         email: 'jane@example.com',
-        password: 'Password123',
       },
     });
 
