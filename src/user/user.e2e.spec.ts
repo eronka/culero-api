@@ -54,6 +54,30 @@ describe('User Controller Tests', () => {
     expect(prisma).toBeDefined();
   });
 
+  it('should not be able to update itself if onboarding is not finished', async () => {
+    await prisma.user.update({
+      where: {
+        email: 'johndoe@example.com',
+      },
+      data: {
+        onboarded: false,
+      },
+    });
+
+    const response = await app.inject({
+      method: 'PUT',
+      url: '/user',
+      headers: {
+        'x-e2e-user-email': 'johndoe@example.com',
+      },
+      payload: {
+        name: 'Jane Doe',
+      },
+    });
+
+    expect(response.statusCode).toBe(401);
+  });
+
   it('should be able to get the current user', async () => {
     const response = await app.inject({
       method: 'GET',
