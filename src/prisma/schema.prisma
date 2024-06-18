@@ -30,6 +30,7 @@ model User {
   email             String?          @unique
   name              String?
   location          String?
+  onboarded         Boolean          @default(false)
   profilePictureUrl String?
   socialAccounts    SocialAccount[]
   authType          AuthType

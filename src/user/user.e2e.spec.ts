@@ -44,6 +44,7 @@ describe('User Controller Tests', () => {
         name: 'John Doe',
         isEmailVerified: true,
         authType: AuthType.EMAIL,
+        onboarded: true,
       },
     });
   });
