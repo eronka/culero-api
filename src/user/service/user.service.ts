@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Inject,
   Injectable,
   InternalServerErrorException,
@@ -136,6 +137,17 @@ export class UserService {
         },
       });
     }
+  }
+
+  async onboardUser(user: User) {
+    if (user.onboarded) {
+      throw new ConflictException('User has already been onboarded');
+    }
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { onboarded: true },
+    });
   }
 
   updateSettings(id: string, data: UpdateUserSettingsDto) {
