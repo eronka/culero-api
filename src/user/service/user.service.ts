@@ -16,6 +16,8 @@ import { Redis } from 'ioredis';
 import { v4 } from 'uuid';
 import { getMimeType } from '../../utils/image';
 import { UpdateUserSettingsDto } from '../dto/update-user-settings.dto';
+import { plainToClass } from 'class-transformer';
+import UserResponseDto from '../dto/user-response.dto';
 
 @Injectable()
 export class UserService {
@@ -32,14 +34,17 @@ export class UserService {
   }
 
   async updateSelf(user: User, dto: UpdateUserDto) {
-    return await this.prisma.user.update({
-      where: { id: user.id },
-      data: {
-        name: dto.name,
-        headline: dto.headline,
-        location: dto.location,
-      },
-    });
+    return plainToClass(
+      UserResponseDto,
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: {
+          name: dto.name,
+          headline: dto.headline,
+          location: dto.location,
+        },
+      }),
+    );
   }
 
   async updateProfilePicture(user: User, file: string) {
@@ -66,12 +71,15 @@ export class UserService {
       await this.s3.send(putObjectRequest);
       this.logger.log('Profile picture uploaded');
 
-      return await this.prisma.user.update({
-        where: { id: user.id },
-        data: {
-          profilePictureUrl: `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`,
-        },
-      });
+      return plainToClass(
+        UserResponseDto,
+        await this.prisma.user.update({
+          where: { id: user.id },
+          data: {
+            profilePictureUrl: `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`,
+          },
+        }),
+      );
     } catch (err) {
       throw new InternalServerErrorException(
         'Failed to upload profile picture',
@@ -144,10 +152,13 @@ export class UserService {
       throw new ConflictException('User has already been onboarded');
     }
 
-    await this.prisma.user.update({
-      where: { id: user.id },
-      data: { onboarded: true },
-    });
+    return plainToClass(
+      UserResponseDto,
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: { onboarded: true },
+      }),
+    );
   }
 
   updateSettings(id: string, data: UpdateUserSettingsDto) {
