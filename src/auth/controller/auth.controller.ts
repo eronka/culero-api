@@ -35,6 +35,7 @@ import { LowercasePipe } from '../../common/pipes/lowercase.pipe';
 import { GithubOAuthStrategyFactory } from '../../oauth/factory/github/github-strategy.factory';
 import { CurrentUser } from '../../decorators/current-user.decorator';
 import { SocialAccountType, User } from '@prisma/client';
+import { BypassOnboardingCheck } from '../../decorators/bypass-onboarding.decorator';
 
 @Controller('auth')
 @ApiTags('Auth Controller')
@@ -311,7 +312,7 @@ export class AuthController {
   }
 
   @Public()
-  @Post('send-verification-email')
+  @Post('email')
   @ApiOperation({
     summary: 'Sign in or sign up with email',
     description: 'Sign in or sign up with email',
@@ -378,6 +379,7 @@ export class AuthController {
     return await this.authService.verifyEmail(dto);
   }
 
+  @BypassOnboardingCheck()
   @Get('/social-accounts')
   async getSocialAccounts(@CurrentUser() user: User) {
     return this.authService.getSocialAccounts(user.id);
