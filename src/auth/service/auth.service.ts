@@ -220,22 +220,17 @@ export class AuthService {
       throw new NotFoundException('User not found');
     }
 
-    const updatedUser = await this.prisma.user.update({
-      where: {
-        email,
-      },
-      data: {
-        isEmailVerified: true,
-      },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        profilePictureUrl: true,
-        authType: true,
-        isEmailVerified: true,
-      },
-    });
+    const updatedUser = plainToClass(
+      UserResponseDto,
+      await this.prisma.user.update({
+        where: {
+          email,
+        },
+        data: {
+          isEmailVerified: true,
+        },
+      }),
+    );
 
     await this.prisma.verificationCode.delete({
       where: {

@@ -41,20 +41,22 @@ describe('Auth Controller Tests', () => {
   it('should be able to sign up using email', async () => {
     const response = await app.inject({
       method: 'POST',
-      url: '/auth/send-verification-email',
+      url: '/auth/email',
       payload: {
         email: 'jane@example.com',
       },
     });
 
     expect(response.statusCode).toEqual(201);
-    expect(response.json().email).toEqual('jane@example.com');
+    expect(response.json()).toEqual({
+      status: 'success',
+    });
   });
 
   it('should send verification code to email on sign up', async () => {
     await app.inject({
       method: 'POST',
-      url: '/auth/send-verification-email',
+      url: '/auth/email',
       payload: {
         email: 'jane@example.com',
       },
@@ -101,7 +103,7 @@ describe('Auth Controller Tests', () => {
     // Sign up
     await app.inject({
       method: 'POST',
-      url: '/auth/send-verification-email',
+      url: '/auth/email',
       payload: {
         email: 'jane@example.com',
       },
