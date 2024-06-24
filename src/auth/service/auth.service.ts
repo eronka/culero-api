@@ -10,6 +10,8 @@ import { AuthType, SocialAccountType, User } from '@prisma/client';
 import { UserDetailsDto } from '../dto/user-details.dto';
 import { MailService } from '../../mail/mail.service';
 import { EmailVerificationDto } from '../dto/email-verification.dto';
+import { plainToClass } from 'class-transformer';
+import UserResponseDto from '../../user/dto/user-response.dto';
 
 @Injectable()
 export class AuthService {
@@ -20,14 +22,11 @@ export class AuthService {
   ) {}
 
   async sendVerificationCode(dto: UserDetailsDto) {
-    const user = await this.createUserIfNotExists(
-      dto.email,
-      AuthType.EMAIL,
-      null,
-      null,
-    );
+    await this.createUserIfNotExists(dto.email, AuthType.EMAIL, null, null);
 
-    return user;
+    return {
+      status: 'success',
+    };
   }
 
   async handleGoogleOAuthLogin(req: any) {
@@ -279,17 +278,10 @@ export class AuthService {
             create: {},
           },
         },
-        select: {
-          id: true,
-          email: true,
-          name: true,
-          profilePictureUrl: true,
-          authType: true,
-          isEmailVerified: true,
-        },
       });
-    } else {
+    } else if (!user.onboarded) {
       // And if it exists, we need to update the user data
+      // only if the user is not onboarded yet
       user = await this.prisma.user.update({
         where: {
           email,
@@ -298,14 +290,6 @@ export class AuthService {
           name,
           profilePictureUrl,
         },
-        select: {
-          id: true,
-          email: true,
-          name: true,
-          profilePictureUrl: true,
-          authType: true,
-          isEmailVerified: true,
-        },
       });
     }
 
@@ -313,7 +297,7 @@ export class AuthService {
       await this.sendEmailVerificationCode(email);
     }
 
-    return user;
+    return plainToClass(UserResponseDto, user);
   }
 
   private async generateToken(user: Partial<User>) {
@@ -330,14 +314,6 @@ export class AuthService {
     return await this.prisma.user.findUnique({
       where: {
         email,
-      },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        profilePictureUrl: true,
-        authType: true,
-        isEmailVerified: true,
       },
     });
   }

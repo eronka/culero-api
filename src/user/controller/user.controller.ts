@@ -58,6 +58,7 @@ export class UserController {
     return this.userService.getSelf(user);
   }
 
+  @BypassOnboardingCheck()
   @Put()
   @ApiOperation({
     summary: 'Update current user',
@@ -77,6 +78,7 @@ export class UserController {
     return this.userService.updateSelf(user, dto);
   }
 
+  @BypassOnboardingCheck()
   @Put('/profile-picture')
   @ApiOperation({
     summary: 'Upload profile picture encoded in base64',
