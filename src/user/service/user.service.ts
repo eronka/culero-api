@@ -30,7 +30,7 @@ export class UserService {
   ) {}
 
   async getSelf(user: User) {
-    return user;
+    return plainToClass(UserResponseDto, user);
   }
 
   async updateSelf(user: User, dto: UpdateUserDto) {

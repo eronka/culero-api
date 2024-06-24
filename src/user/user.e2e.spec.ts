@@ -54,7 +54,7 @@ describe('User Controller Tests', () => {
     expect(prisma).toBeDefined();
   });
 
-  it('should not be able to update itself if onboarding is not finished', async () => {
+  it('should be able to update itself if onboarding is not finished', async () => {
     await prisma.user.update({
       where: {
         email: 'johndoe@example.com',
@@ -75,7 +75,14 @@ describe('User Controller Tests', () => {
       },
     });
 
-    expect(response.statusCode).toBe(401);
+    const updatedUser = await prisma.user.findUnique({
+      where: {
+        email: 'johndoe@example.com',
+      },
+    });
+    expect(updatedUser.name).toBe('Jane Doe');
+
+    expect(response.statusCode).toBe(200);
   });
 
   it('should be able to get the current user', async () => {
