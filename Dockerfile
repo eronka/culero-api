@@ -9,7 +9,7 @@ RUN npm i -g pnpm
 COPY package.json .
 COPY tsconfig.json .
 
-COPY package.json pnpm-lock.yaml* ./
+COPY pnpm-lock.yaml* ./
 
 RUN pnpm install
 
