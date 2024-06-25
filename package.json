@@ -26,8 +26,7 @@
     "db:reset": "pnpm dlx prisma migrate reset --force --schema=src/prisma/schema.prisma",
     "prepare": "husky",
     "docker:build": "docker build -t culero-api .",
-    "docker:run": "docker run --network host --env-file .env --rm culero-api",
-    "test:docker": "bash test-docker.sh"
+    "docker:run": "docker run --network host --env-file .env --rm culero-api"
   },
   "dependencies": {
     "@arendajaelu/nestjs-passport-apple": "^2.0.2",
