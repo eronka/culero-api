@@ -9,6 +9,8 @@ RUN npm i -g pnpm
 COPY package.json .
 COPY tsconfig.json .
 
+COPY pnpm-lock.yaml* ./
+
 RUN pnpm install
 
 COPY . .
@@ -16,7 +18,7 @@ COPY . .
 RUN pnpm db:generate-types
 RUN pnpm build
 
-RUN pnpm prune --prod
+RUN pnpm prune --prod --no-optional --ignore-scripts
 
 FROM base as release
 

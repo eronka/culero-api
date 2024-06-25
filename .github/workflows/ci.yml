@@ -44,3 +44,10 @@ jobs:
         run: pnpm run test:unit
       - name: Run e2e tests
         run: pnpm run test:e2e
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build Docker image and run tests
+        run: bash test-docker.sh
