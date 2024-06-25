@@ -4,6 +4,9 @@ set -e
 echo "Building Docker image..."
 docker build -t culero-api .
 
+echo "Starting necessary containers with Docker Compose..."
+docker-compose up -d
+
 echo "Running Docker container..."
 docker run --rm -d \
   -e DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy" \
@@ -24,5 +27,6 @@ fi
 
 echo "Cleaning up..."
 docker stop culero-api-test
+docker-compose down
 
 echo "Docker build and run tests completed successfully."
