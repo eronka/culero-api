@@ -20,12 +20,10 @@ import { Public } from '../../decorators/public.decorator';
 import { FacebookOAuthStrategyFactory } from '../../oauth/factory/facebook/facebook-strategy.factory';
 import { LinkedInOAuthStrategyFactory } from '../../oauth/factory/linkedin/linkedin-strategy.factory';
 import { AppleOAuthStrategyFactory } from '../../oauth/factory/apple/apple-strategy.factory';
-import { SignupDto } from '../dto/signup.dto';
-import { SigninDto } from '../dto/signin.dto';
+import { UserDetailsDto } from '../dto/user-details.dto';
 import { EmailVerificationDto } from '../dto/email-verification.dto';
 import {
   ApiBadRequestResponse,
-  ApiConflictResponse,
   ApiCreatedResponse,
   ApiNoContentResponse,
   ApiNotFoundResponse,
@@ -37,6 +35,7 @@ import { LowercasePipe } from '../../common/pipes/lowercase.pipe';
 import { GithubOAuthStrategyFactory } from '../../oauth/factory/github/github-strategy.factory';
 import { CurrentUser } from '../../decorators/current-user.decorator';
 import { SocialAccountType, User } from '@prisma/client';
+import { BypassOnboardingCheck } from '../../decorators/bypass-onboarding.decorator';
 
 @Controller('auth')
 @ApiTags('Auth Controller')
@@ -313,29 +312,10 @@ export class AuthController {
   }
 
   @Public()
-  @Post('sign-up')
+  @Post('email')
   @ApiOperation({
-    summary: 'Sign up',
-    description: 'Sign up with email',
-  })
-  @ApiCreatedResponse({
-    description: 'User signed up successfully',
-  })
-  @ApiConflictResponse({
-    description: 'User with this email already exists',
-  })
-  async signUp(@Body() dto: SignupDto) {
-    return await this.authService.signUp(dto);
-  }
-
-  @Public()
-  @Post('sign-in')
-  @ApiOperation({
-    summary: 'Sign in',
-    description: 'Sign in with email',
-  })
-  @ApiNotFoundResponse({
-    description: 'User not found',
+    summary: 'Sign in or sign up with email',
+    description: 'Sign in or sign up with email',
   })
   @ApiCreatedResponse({
     description: 'User signed in successfully',
@@ -347,8 +327,8 @@ export class AuthController {
       },
     },
   })
-  async signIn(@Body() dto: SigninDto) {
-    return await this.authService.signIn(dto);
+  async sendVerificationCode(@Body() dto: UserDetailsDto) {
+    return await this.authService.sendVerificationCode(dto);
   }
 
   @Public()
@@ -396,9 +376,10 @@ export class AuthController {
     },
   })
   async verifyEmail(@Body() dto: EmailVerificationDto) {
-    return await this.authService.verifyEmail(dto.email, dto.code);
+    return await this.authService.verifyEmail(dto);
   }
 
+  @BypassOnboardingCheck()
   @Get('/social-accounts')
   async getSocialAccounts(@CurrentUser() user: User) {
     return this.authService.getSocialAccounts(user.id);

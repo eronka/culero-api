@@ -1,6 +1,5 @@
 import {
   BadRequestException,
-  ConflictException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -8,9 +7,11 @@ import {
 import { PrismaService } from '../../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { AuthType, SocialAccountType, User } from '@prisma/client';
-import { SignupDto } from '../dto/signup.dto';
+import { UserDetailsDto } from '../dto/user-details.dto';
 import { MailService } from '../../mail/mail.service';
-import { SigninDto } from '../dto/signin.dto';
+import { EmailVerificationDto } from '../dto/email-verification.dto';
+import { plainToClass } from 'class-transformer';
+import UserResponseDto from '../../user/dto/user-response.dto';
 
 @Injectable()
 export class AuthService {
@@ -20,35 +21,12 @@ export class AuthService {
     private mailService: MailService,
   ) {}
 
-  async signUp(dto: SignupDto) {
-    const user = await this.createUserIfNotExists(
-      dto.email,
-      AuthType.EMAIL,
-      null,
-      null,
-      true,
-    );
+  async sendVerificationCode(dto: UserDetailsDto) {
+    await this.createUserIfNotExists(dto.email, AuthType.EMAIL, null, null);
 
-    return user;
-  }
-
-  async signIn(dto: SigninDto) {
-    const user = await this.prisma.user.findUnique({
-      where: {
-        email: dto.email,
-      },
-      select: {
-        isEmailVerified: true,
-        email: true,
-      },
-    });
-
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
-    await this.sendEmailVerificationCode(dto.email);
-    return user;
+    return {
+      status: 'success',
+    };
   }
 
   async handleGoogleOAuthLogin(req: any) {
@@ -61,7 +39,6 @@ export class AuthService {
       AuthType.GOOGLE,
       name,
       profilePictureUrl,
-      false,
     );
 
     const token = await this.generateToken(user);
@@ -98,7 +75,6 @@ export class AuthService {
         AuthType.FACEBOOK,
         displayName,
         profilePictureUrl,
-        false,
       );
       await this.connectSocialPlatform(
         SocialAccountType.FACEBOOK,
@@ -137,7 +113,6 @@ export class AuthService {
         AuthType.LINKEDIN,
         displayName,
         picture,
-        false,
       );
       await this.connectSocialPlatform(
         SocialAccountType.LINKEDIN,
@@ -161,7 +136,6 @@ export class AuthService {
       AuthType.APPLE,
       displayName,
       null,
-      false,
     );
 
     const token = await this.generateToken(user);
@@ -194,7 +168,6 @@ export class AuthService {
         AuthType.GITHUB,
         name,
         avatar_url,
-        false,
       );
       await this.connectSocialPlatform(SocialAccountType.GITHUB, user.id, req);
     }
@@ -216,7 +189,9 @@ export class AuthService {
     await this.sendEmailVerificationCode(email);
   }
 
-  async verifyEmail(email: string, code: string) {
+  async verifyEmail(dto: EmailVerificationDto) {
+    const { email, code } = dto;
+
     const verificationCode = await this.prisma.verificationCode.findUnique({
       where: {
         email,
@@ -235,22 +210,27 @@ export class AuthService {
       throw new BadRequestException('Code expired');
     }
 
-    const user = await this.prisma.user.update({
+    const user = await this.prisma.user.findUnique({
       where: {
         email,
       },
-      data: {
-        isEmailVerified: true,
-      },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        profilePictureUrl: true,
-        authType: true,
-        isEmailVerified: true,
-      },
     });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const updatedUser = plainToClass(
+      UserResponseDto,
+      await this.prisma.user.update({
+        where: {
+          email,
+        },
+        data: {
+          isEmailVerified: true,
+        },
+      }),
+    );
 
     await this.prisma.verificationCode.delete({
       where: {
@@ -258,12 +238,14 @@ export class AuthService {
       },
     });
 
-    await this.mailService.sendEmailVerifiedEmail(email);
+    // We send the email verified email only if the user is was not verified before
+    if (!user.isEmailVerified)
+      await this.mailService.sendEmailVerifiedEmail(email);
 
-    const token = await this.generateToken(user);
+    const token = await this.generateToken(updatedUser);
 
     return {
-      ...user,
+      ...updatedUser,
       token,
     };
   }
@@ -273,14 +255,11 @@ export class AuthService {
     authType: AuthType,
     name?: string,
     profilePictureUrl?: string,
-    throwErrorIfUserExists?: boolean,
   ) {
     email = email.toLowerCase();
 
     let user = await this.findUserByEmail(email);
-    if (user && throwErrorIfUserExists) {
-      throw new ConflictException('User already exists');
-    }
+
     // We need to create the user if it doesn't exist yet
     if (!user) {
       user = await this.prisma.user.create({
@@ -289,27 +268,31 @@ export class AuthService {
           name: name,
           profilePictureUrl: profilePictureUrl,
           authType,
-          isEmailVerified: authType !== AuthType.EMAIL,
+          isEmailVerified: authType !== AuthType.EMAIL, // If the user signs up with OAuth, we consider the email as verified
           settings: {
             create: {},
           },
         },
-        select: {
-          id: true,
-          email: true,
-          name: true,
-          profilePictureUrl: true,
-          authType: true,
-          isEmailVerified: true,
+      });
+    } else if (!user.onboarded) {
+      // And if it exists, we need to update the user data
+      // only if the user is not onboarded yet
+      user = await this.prisma.user.update({
+        where: {
+          email,
+        },
+        data: {
+          name,
+          profilePictureUrl,
         },
       });
+    }
 
-      await this.sendEmailVerificationCode(email);
-    } else if (!user.isEmailVerified) {
+    if (!user.isEmailVerified) {
       await this.sendEmailVerificationCode(email);
     }
 
-    return user;
+    return plainToClass(UserResponseDto, user);
   }
 
   private async generateToken(user: Partial<User>) {
@@ -326,14 +309,6 @@ export class AuthService {
     return await this.prisma.user.findUnique({
       where: {
         email,
-      },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        profilePictureUrl: true,
-        authType: true,
-        isEmailVerified: true,
       },
     });
   }

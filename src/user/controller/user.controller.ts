@@ -4,6 +4,7 @@ import {
   Controller,
   Delete,
   Get,
+  Patch,
   Put,
   Req,
   Res,
@@ -29,6 +30,7 @@ import { LinkedInOAuthStrategyFactory } from '../../oauth/factory/linkedin/linke
 import { AuthGuard } from '@nestjs/passport';
 import { UpdateUserSettingsDto } from '../dto/update-user-settings.dto';
 import { UserSettingsDto } from '../dto/user-settings.dto';
+import { BypassOnboardingCheck } from '../../decorators/bypass-onboarding.decorator';
 
 @Controller('user')
 @ApiBearerAuth()
@@ -40,6 +42,7 @@ export class UserController {
   ) {}
 
   @Get()
+  @BypassOnboardingCheck()
   @ApiOperation({
     summary: 'Get current user',
     description: 'Get the currently logged in user',
@@ -55,6 +58,7 @@ export class UserController {
     return this.userService.getSelf(user);
   }
 
+  @BypassOnboardingCheck()
   @Put()
   @ApiOperation({
     summary: 'Update current user',
@@ -74,6 +78,7 @@ export class UserController {
     return this.userService.updateSelf(user, dto);
   }
 
+  @BypassOnboardingCheck()
   @Put('/profile-picture')
   @ApiOperation({
     summary: 'Upload profile picture encoded in base64',
@@ -141,6 +146,12 @@ export class UserController {
     @Body() data: UpdateUserSettingsDto,
   ): Promise<UserSettingsDto> {
     return this.userService.updateSettings(user.id, data);
+  }
+
+  @Patch('onboard')
+  @BypassOnboardingCheck()
+  async onboardUser(@CurrentUser() user: User) {
+    return this.userService.onboardUser(user);
   }
 
   /**
