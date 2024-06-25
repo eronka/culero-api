@@ -51,6 +51,7 @@ describe('Reviws Controller Tests', () => {
         email: 'johndoe@example.com',
         name: 'John Doe',
         isEmailVerified: true,
+        onboarded: true,
         authType: AuthType.EMAIL,
       },
     });

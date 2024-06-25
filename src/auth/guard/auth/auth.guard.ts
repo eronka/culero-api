@@ -3,6 +3,7 @@ import {
   ExecutionContext,
   ForbiddenException,
   Injectable,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
@@ -10,6 +11,7 @@ import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY } from '../../../decorators/public.decorator';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { User } from '@prisma/client';
+import { ONBOARDING_BYPASSED } from '../../../decorators/bypass-onboarding.decorator';
 
 const X_E2E_USER_EMAIL = 'x-e2e-user-email';
 
@@ -72,6 +74,17 @@ export class AuthGuard implements CanActivate {
       if (!user.isEmailVerified) {
         throw new ForbiddenException('Email not verified');
       }
+    }
+
+    const onboardingBypassed =
+      this.reflector.getAllAndOverride<boolean>(ONBOARDING_BYPASSED, [
+        context.getHandler(),
+        context.getClass(),
+      ]) ?? false;
+
+    // If the onboarding is not finished, we throw an UnauthorizedException.
+    if (!onboardingBypassed && !user.onboarded) {
+      throw new UnauthorizedException('Onboarding not finished');
     }
 
     // We attach the user to the request object.

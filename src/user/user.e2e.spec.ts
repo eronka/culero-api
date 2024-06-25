@@ -44,6 +44,7 @@ describe('User Controller Tests', () => {
         name: 'John Doe',
         isEmailVerified: true,
         authType: AuthType.EMAIL,
+        onboarded: true,
       },
     });
   });
@@ -51,6 +52,37 @@ describe('User Controller Tests', () => {
   it('should be defined', () => {
     expect(app).toBeDefined();
     expect(prisma).toBeDefined();
+  });
+
+  it('should be able to update itself if onboarding is not finished', async () => {
+    await prisma.user.update({
+      where: {
+        email: 'johndoe@example.com',
+      },
+      data: {
+        onboarded: false,
+      },
+    });
+
+    const response = await app.inject({
+      method: 'PUT',
+      url: '/user',
+      headers: {
+        'x-e2e-user-email': 'johndoe@example.com',
+      },
+      payload: {
+        name: 'Jane Doe',
+      },
+    });
+
+    const updatedUser = await prisma.user.findUnique({
+      where: {
+        email: 'johndoe@example.com',
+      },
+    });
+    expect(updatedUser.name).toBe('Jane Doe');
+
+    expect(response.statusCode).toBe(200);
   });
 
   it('should be able to get the current user', async () => {
